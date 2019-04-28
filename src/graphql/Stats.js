@@ -6,11 +6,19 @@ export default gql`
       files
       matches
       series
-      voobly_users
+      users
       by_day {
         date
         matches
       }
+      platforms { label count }
+      encodings { label count }
+      languages { label count }
+      datasets { label count }
+      diplomacy_types { label count }
+      maps { label count }
+      game_types { label count }
+      speeds { label count }
     }
   }
 `;

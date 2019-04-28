@@ -19,13 +19,12 @@ import humanizeDuration from 'humanize-duration'
 import {upperFirst} from 'lodash'
 
 import MatchIcon from 'mdi-react/SwordCrossIcon'
-import WinnerIcon from 'mdi-react/TrophyVariantIcon'
 import MVPIcon from 'mdi-react/StarIcon'
 
 import AppLink from './util/AppLink'
 import CardIconHeader from './util/CardIconHeader'
+import WinnerMark from './util/WinnerMark'
 
-const VOOBLY_MATCH_URL = 'https://www.voobly.com/match/view/'
 const PLAYER_COLORS = {
   1: '#6599d8',
   2: '#f25f5f',
@@ -66,11 +65,11 @@ const useStyles = makeStyles({
 })
 
 const getMatchTitle = (match) => {
-  let title = match.type + ' ' + match.diplomacy_type
+  let title = match.type.name + ' ' + match.diplomacy_type
   if (match.diplomacy_type === 'TG') {
     title += ' ' + match.team_size
   }
-  title += ' on ' + match.map.name
+  title += ' on ' + match.map_name
   return title
 }
 
@@ -78,44 +77,62 @@ const getHasTeams = (size) => {
   return size !== '1v1'
 }
 
-const WinnerMark = ({winner, className}) => {
-  return (
-    <span>{winner
-      ? <WinnerIcon className={className} />
-      : <svg className={className} />
-    }</span>
-  )
-}
-
 const PlayerName = ({player}) => {
   const classes = useStyles()
   return (
     <span>
       <div style={{backgroundColor: PLAYER_COLORS[player.color_id + 1]}} className={classes.playerColor} />
-      {player.voobly_user_id
-        ? <AppLink path={['players', player.voobly_user_id]} text={player.voobly_user.name} />
+      {player.user_id
+        ? <AppLink path={['players', player.user_id]} text={player.user.name} />
         : player.name
       }
     </span>
   )
 }
 
-const PlayerRow = ({player, hasTeams}) => {
+const TeamRow = ({number, winner, span}) => {
   const classes = useStyles()
   return (
     <TableRow>
-      <TableCell>
-        <WinnerMark winner={!hasTeams && player.winner} className={classes.winner} /> <PlayerName player={player} />
+      <TableCell colSpan={span}>
+        <Typography variant='h6'>
+          Team {number} <WinnerMark winner={winner} className={classes.teamWinner} />
+        </Typography>
       </TableCell>
-      <TableCell>
-        <AppLink path={['civilizations', player.civilization.cid]} text={player.civilization.name} />
-      </TableCell>
-      {hasTeams && <TableCell>
-        {player.mvp && <MVPIcon className={classes.mvpIcon} />}
-      </TableCell>}
-      <TableCell align='right'>{player.score}</TableCell>
     </TableRow>
   )
+}
+
+const TeamBody = ({teams, hasTeams, children, span}) => {
+  const classes = useStyles()
+  return (
+    <>
+      {teams.map((team, index) => (
+        <TableBody key={index}>
+          {hasTeams && <TeamRow number={index + 1} winner={team.winner} span={span} />}
+          {team.members.map((player, mindex) => (
+            <TableRow key={mindex}>
+              <TableCell>
+                <WinnerMark winner={!hasTeams && player.winner} className={classes.winner} /> <PlayerName player={player} />
+              </TableCell>
+              {children(player)}
+            </TableRow>
+          ))}
+        </TableBody>
+      ))}
+    </>
+  )
+}
+
+const rateString = (player) => {
+  let out = player.rate_snapshot
+  const diff = player.rate_after - player.rate_before
+  if (diff > 0) {
+    out += ' ' + String.fromCharCode(8593) + Math.abs(diff)
+  } else if (diff < 0) {
+    out += ' ' + String.fromCharCode(8595) + Math.abs(diff)
+  }
+  return out
 }
 
 const Teams = ({size, teams}) => {
@@ -128,21 +145,24 @@ const Teams = ({size, teams}) => {
           <TableCell>Player</TableCell>
           <TableCell>Civilization</TableCell>
           {hasTeams && <TableCell>MVP</TableCell>}
+          <TableCell align='right'>Rating</TableCell>
           <TableCell align='right'>Score</TableCell>
         </TableRow>
       </TableHead>
-      {teams.map((team, index) => (
-        <TableBody key={index}>
-          {hasTeams && <TableRow>
-            <TableCell colSpan={4}>
-              <Typography variant='h6'>
-                Team {index + 1} <WinnerMark winner={team.winner} className={classes.teamWinner} />
-              </Typography>
+      <TeamBody teams={teams} hasTeams={hasTeams} span={5}>
+        {(player) => (
+          <>
+            <TableCell>
+              <AppLink path={['civilizations', player.civilization.dataset_id, player.civilization.cid]} text={player.civilization.name} />
             </TableCell>
-          </TableRow>}
-          {team.members.map((member, mindex) => <PlayerRow player={member} hasTeams={hasTeams} key={mindex} />)}
-        </TableBody>
-      ))}
+            {hasTeams && <TableCell>
+              {player.mvp && <MVPIcon className={classes.mvpIcon} />}
+            </TableCell>}
+            <TableCell align='right'>{rateString(player)}</TableCell>
+            <TableCell align='right'>{player.score}</TableCell>
+          </>
+        )}
+      </TeamBody>
     </Table>
   )
 }
@@ -158,17 +178,23 @@ const Information = ({match}) => {
       {match.played && <TableRow>
         <TableCell>Played</TableCell><TableCell><Timestamp time={match.played} format='full' /></TableCell>
       </TableRow>}
-      {match.rated && match.voobly_ladder && <TableRow>
+      {match.rated && match.ladder && <TableRow>
         <TableCell>Ladder</TableCell>
         <TableCell>
-          <AppLink path={['ladders', match.voobly_ladder.id]} text={match.voobly_ladder.name} />
+          <AppLink path={['ladders', match.ladder.platform_id, match.ladder.lid]} text={match.ladder.name} />
         </TableCell>
       </TableRow>}
       <TableRow>
         <TableCell>Rated</TableCell><TableCell>{match.rated ? 'Yes' : 'No'}</TableCell>
       </TableRow>
+      {match.series && match.tournament && match.event && <TableRow>
+        <TableCell>Event</TableCell><TableCell>{match.event.name}</TableCell>
+      </TableRow>}
+      {match.series && match.tournament && <TableRow>
+        <TableCell>Tournament</TableCell><TableCell><AppLink path={['events', match.tournament.id]} text={match.tournament.name} /></TableCell>
+      </TableRow>}
       {match.series && <TableRow>
-        <TableCell>Series</TableCell><TableCell>{match.series.name}</TableCell>
+        <TableCell>Series</TableCell><TableCell><AppLink path={['events', match.tournament.id, match.series.id]} text={match.series.metadata.name} /></TableCell>
       </TableRow>}
       {!hasTeams && <TableRow>
         <TableCell>Mirror</TableCell><TableCell>{match.mirror ? 'Yes' : 'No'}</TableCell>
@@ -176,26 +202,26 @@ const Information = ({match}) => {
       <TableRow>
         <TableCell>Map</TableCell>
         <TableCell>
-          <AppLink path={['maps', match.map.id]} text={match.map.name} /> ({upperFirst(match.map_size)})
+          <AppLink path={['maps', match.map_name]} text={match.map_name} /> ({match.map_size.name})
         </TableCell>
       </TableRow>
       <TableRow>
         <TableCell>Cheats</TableCell><TableCell>{match.cheats ? 'On' : 'Off'}</TableCell>
       </TableRow>
       <TableRow>
-        <TableCell>Reveal Map</TableCell><TableCell>{upperFirst(match.reveal_map)}</TableCell>
+        <TableCell>Reveal Map</TableCell><TableCell>{match.map_reveal_choice.name}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell>Population Limit</TableCell><TableCell>{match.population_limit}</TableCell>
       </TableRow>
       <TableRow>
-        <TableCell>Speed</TableCell><TableCell>{upperFirst(match.speed)}</TableCell>
+        <TableCell>Speed</TableCell><TableCell>{match.speed.name}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell>Lock Teams</TableCell><TableCell>{match.lock_teams ? 'On' : 'Off'}</TableCell>
       </TableRow>
       <TableRow>
-        <TableCell>Difficulty</TableCell><TableCell>{upperFirst(match.difficulty)}</TableCell>
+        <TableCell>Difficulty</TableCell><TableCell>{match.difficulty.name}</TableCell>
       </TableRow>
       {match.dataset && <TableRow>
         <TableCell>Dataset</TableCell><TableCell>{match.dataset.name} {match.dataset_version}</TableCell>
@@ -203,14 +229,157 @@ const Information = ({match}) => {
       <TableRow>
         <TableCell>Version</TableCell><TableCell>{upperFirst(match.version)}</TableCell>
       </TableRow>
-      {match.voobly_id && <TableRow>
+      {match.platform && <TableRow>
+        <TableCell>Platform</TableCell>
+        <TableCell>
+          <Link href={match.platform.url} underline='always' target='_blank'>{match.platform.name}</Link>
+        </TableCell>
+      </TableRow>}
+      {match.platform_match_id && <TableRow>
         <TableCell>Match Link</TableCell>
         <TableCell>
-          <Link href={VOOBLY_MATCH_URL + match.voobly_id} underline='always' target='_blank'>{match.voobly_id}</Link>
+          <Link href={match.platform.match_url + match.platform_match_id} underline='always' target='_blank'>{match.platform_match_id}</Link>
         </TableCell>
       </TableRow>}
     </TableBody>
     </Table>
+  )
+}
+
+const Achievements = ({size, teams}) => {
+  const hasTeams = getHasTeams(size)
+  return (
+    <div>
+      <Typography variant='h6'>Score</Typography>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Player</TableCell>
+            <TableCell align='right'>Military</TableCell>
+            <TableCell align='right'>Economy</TableCell>
+            <TableCell align='right'>Technology</TableCell>
+            <TableCell align='right'>Society</TableCell>
+            <TableCell align='right'>Total</TableCell>
+          </TableRow>
+        </TableHead>
+        <TeamBody teams={teams} hasTeams={hasTeams} span={6}>
+          {(player) => (
+            <>
+              <TableCell align='right'>{player.military_score}</TableCell>
+              <TableCell align='right'>{player.economy_score}</TableCell>
+              <TableCell align='right'>{player.technology_score}</TableCell>
+              <TableCell align='right'>{player.society_score}</TableCell>
+              <TableCell align='right'>{player.score}</TableCell>
+            </>
+          )}
+        </TeamBody>
+      </Table>
+      <br />
+      <Typography variant='h6'>Military</Typography>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Player</TableCell>
+            <TableCell align='right'>Units Killed</TableCell>
+            <TableCell align='right'>Buildings Razed</TableCell>
+            <TableCell align='right'>Units Lost</TableCell>
+            <TableCell align='right'>Buildings Lost</TableCell>
+            <TableCell align='right'>Units Converted</TableCell>
+          </TableRow>
+        </TableHead>
+        <TeamBody teams={teams} hasTeams={hasTeams} span={6}>
+          {(player) => (
+            <>
+              <TableCell align='right'>{player.units_killed}</TableCell>
+              <TableCell align='right'>{player.buildings_razed}</TableCell>
+              <TableCell align='right'>{player.units_lost}</TableCell>
+              <TableCell align='right'>{player.buildings_lost}</TableCell>
+              <TableCell align='right'>{player.units_converted}</TableCell>
+            </>
+          )}
+        </TeamBody>
+      </Table>
+      <br />
+      <Typography variant='h6'>Economy</Typography>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Player</TableCell>
+            <TableCell align='right'>Food</TableCell>
+            <TableCell align='right'>Wood</TableCell>
+            <TableCell align='right'>Stone</TableCell>
+            <TableCell align='right'>Gold</TableCell>
+            <TableCell align='right'>Sent</TableCell>
+            <TableCell align='right'>Received</TableCell>
+            <TableCell align='right'>Trade</TableCell>
+            <TableCell align='right'>Relic</TableCell>
+          </TableRow>
+        </TableHead>
+        <TeamBody teams={teams} hasTeams={hasTeams} span={9}>
+          {(player) => (
+            <>
+              <TableCell align='right'>{player.food_collected}</TableCell>
+              <TableCell align='right'>{player.wood_collected}</TableCell>
+              <TableCell align='right'>{player.stone_collected}</TableCell>
+              <TableCell align='right'>{player.gold_collected}</TableCell>
+              <TableCell align='right'>{player.tribute_sent}</TableCell>
+              <TableCell align='right'>{player.tribute_received}</TableCell>
+              <TableCell align='right'>{player.trade_gold}</TableCell>
+              <TableCell align='right'>{player.relic_gold}</TableCell>
+            </>
+          )}
+        </TeamBody>
+      </Table>
+      <br />
+      <Typography variant='h6'>Technology</Typography>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Player</TableCell>
+            <TableCell align='right'>Feudal</TableCell>
+            <TableCell align='right'>Castle</TableCell>
+            <TableCell align='right'>Imperial</TableCell>
+            <TableCell align='right'>Explored</TableCell>
+            <TableCell align='right'>Researches</TableCell>
+          </TableRow>
+        </TableHead>
+        <TeamBody teams={teams} hasTeams={hasTeams} span={6}>
+          {(player) => (
+            <>
+              <TableCell align='right'>{humanizeDuration(player.feudal_time_secs * 1000)}</TableCell>
+              <TableCell align='right'>{humanizeDuration(player.castle_time_secs * 1000)}</TableCell>
+              <TableCell align='right'>{humanizeDuration(player.imperial_time_secs * 1000)}</TableCell>
+              <TableCell align='right'>{player.explored_percent}</TableCell>
+              <TableCell align='right'>{player.research_count}</TableCell>
+            </>
+          )}
+        </TeamBody>
+      </Table>
+      <br />
+      <Typography variant='h6'>Society</Typography>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Player</TableCell>
+            <TableCell align='right'>Wonders</TableCell>
+            <TableCell align='right'>Castles</TableCell>
+            <TableCell align='right'>Relics</TableCell>
+            <TableCell align='right'>Villager High</TableCell>
+          </TableRow>
+        </TableHead>
+        <TeamBody teams={teams} hasTeams={hasTeams} span={5}>
+          {(player) => (
+            <>
+              <TableCell align='right'>{player.total_wonders}</TableCell>
+              <TableCell align='right'>{player.total_castles}</TableCell>
+              <TableCell align='right'>{player.total_relics}</TableCell>
+              <TableCell align='right'>{player.villager_high}</TableCell>
+            </>
+          )}
+        </TeamBody>
+      </Table>
+
+    </div>
   )
 }
 
@@ -249,13 +418,15 @@ const Match = ({match}) => {
           <Tabs value={tab} onChange={(e, value) => setTab(value)}>
             <Tab label='Players' />
             <Tab label='Information' />
+            <Tab label='Achievements' />
             <Tab label='Files' />
           </Tabs>
         </AppBar>
         <Typography component='div' className={classes.tabContent}>
           {tab === 0 && <Teams size={match.team_size} teams={match.teams} />}
           {tab === 1 && <Information match={match} />}
-          {tab === 2 && <Files files={match.files} />}
+          {tab === 2 && <Achievements size={match.team_size} teams={match.teams} />}
+          {tab === 3 && <Files files={match.files} />}
         </Typography>
       </CardContent>
     </Card>

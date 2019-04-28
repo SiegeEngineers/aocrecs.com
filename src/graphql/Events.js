@@ -3,9 +3,13 @@ import gql from 'graphql-tag';
 export default gql`
 {
   events {
+    id
     name
-    index
     tournaments {
+      id
+      name
+    }
+    maps {
       id
       name
     }

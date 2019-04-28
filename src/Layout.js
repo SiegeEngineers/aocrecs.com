@@ -12,7 +12,6 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 
-import PlayerIcon from 'mdi-react/AccountIcon'
 import EventIcon from 'mdi-react/CalendarRangeIcon'
 import HomeIcon from 'mdi-react/HomeIcon'
 import SearchIcon from 'mdi-react/SearchIcon'
@@ -24,9 +23,9 @@ import Main from './Main'
 import Search from './Search'
 import Events from './Events'
 import Ladders from './Ladders'
-import Players from './Players'
 import Civilizations from './Civilizations'
 import Maps from './Maps'
+
 
 const drawerWidth = 180
 
@@ -86,11 +85,6 @@ const MENU = [
     icon: LadderIcon
   },
   {
-    link: '/players',
-    title: 'Players',
-    icon: PlayerIcon
-  },
-  {
     link: '/civilizations',
     title: 'Civilizations',
     icon: CivIcon
@@ -101,6 +95,7 @@ const MENU = [
     icon: MapIcon
   }
 ]
+
 
 const Layout = () => {
   const classes = useStyles()
@@ -143,9 +138,8 @@ const Layout = () => {
           <Route exact path='/' component={Main} />
           <Route path='/search' component={Search} />
           <Route path='/events/:id?/:sid?' component={Events} />
-          <Route path='/ladders/:id?/:vid?' component={Ladders} />
-          <Route path='/players/:id?' component={Players} />
-          <Route path='/civilizations/:id?' component={Civilizations} />
+          <Route path='/ladders/:pid?/:id?/:vid?' component={Ladders} />
+          <Route path='/civilizations/:did?/:id?' component={Civilizations} />
           <Route path='/maps/:id?' component={Maps} />
           <Redirect to='/' />
         </Switch>

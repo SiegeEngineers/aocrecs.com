@@ -46,10 +46,10 @@ const CivTable = ({civilizations, selected}) => {
         {civilizations.map((civilization, index) =>
           <TableRow key={index} selected={selected === civilization.civilization.cid}>
             <TableCell>
-              <AppLink path={['civilizations', civilization.civilization.cid]} text={civilization.civilization.name} />
+              <AppLink path={['civilizations', civilization.civilization.dataset_id, civilization.civilization.cid]} text={civilization.civilization.name} />
             </TableCell>
-            <TableCell>{civilization.num_matches}</TableCell>
-            <TableCell>{Math.round(civilization.percent_matches * 1000)/10}%</TableCell>
+            <TableCell>{civilization.count}</TableCell>
+            <TableCell>{Math.round(civilization.percent * 1000)/10}%</TableCell>
           </TableRow>
         )}
       </TableBody>
@@ -91,7 +91,7 @@ const CivilizationsView = ({match}) => {
             {(data) => (
               <Select value={dataset_id} onChange={(e, v) => setDataset(e.target.value)}>
                 {data.datasets.map((dataset) =>
-                  <MenuItem key={dataset.id} value={dataset.id}>{dataset.name} {dataset.version}</MenuItem>
+                  <MenuItem key={dataset.id} value={dataset.id}>{dataset.name}</MenuItem>
                 )}
               </Select>
             )}

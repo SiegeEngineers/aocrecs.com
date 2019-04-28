@@ -1,4 +1,5 @@
 import React from 'react'
+import {makeStyles} from '@material-ui/styles'
 
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
@@ -16,26 +17,46 @@ import AppLink from './util/AppLink'
 import CardIconHeader from './util/CardIconHeader'
 import DataQuery from './util/DataQuery'
 import RelatedMatches from './util/RelatedMatches'
+import StandardIcon from 'mdi-react/StarIcon'
 
 import GetMap from './graphql/Map'
 import GetMaps from './graphql/Maps'
 
+
+const useStyles = makeStyles({
+  standardIcon: {
+    width: '12px',
+    height: '12px'
+  }
+})
+
+
 const MapTable = ({rows, selected}) => {
+  const classes = useStyles()
   return (
     <Table>
       <TableHead>
         <TableRow>
+          <TableCell></TableCell>
           <TableCell>Map</TableCell>
-          <TableCell>Matches</TableCell>
-          <TableCell>Percent</TableCell>
+          <TableCell>Events</TableCell>
+          <TableCell align='right'>Matches</TableCell>
+          <TableCell align='right'>Percent</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {rows.map((row, index) =>
-          <TableRow key={index} selected={selected === row.map.id}>
-            <TableCell><AppLink path={['maps', row.map.id]} text={row.map.name} /></TableCell>
-            <TableCell>{row.num_matches}</TableCell>
-            <TableCell>{Math.round(row.percent_matches * 1000)/10}%</TableCell>
+          <TableRow key={index} selected={selected === row.map.name}>
+            <TableCell align='center'>{row.map.builtin && <StandardIcon className={classes.standardIcon} />}</TableCell>
+            <TableCell><AppLink path={['maps', row.map.name]} text={row.map.name} /></TableCell>
+            <TableCell>
+              {row.map.events.map((event, i) => [
+                i > 0 && ', ',
+                <AppLink path={['events', event.id]} text={event.name} key={event.id} />
+              ])}
+            </TableCell>
+            <TableCell align='right'>{row.count}</TableCell>
+            <TableCell align='right'>{Math.round(row.percent * 1000)/10}%</TableCell>
           </TableRow>
         )}
       </TableBody>
@@ -43,22 +64,25 @@ const MapTable = ({rows, selected}) => {
   )
 }
 
-const Map = ({id}) => {
+const Map = ({name}) => {
   return (
-    <RelatedMatches query={GetMap} variables={{id}} field='map'>
+    <RelatedMatches query={GetMap} variables={{name}} field='map'>
       {(data) => (
         <Card>
           <CardIconHeader icon={<MapIcon />} title={data.name} />
           <CardContent>
-            <Typography component='span'>
-              <ol>
-                {data.popular_civs.map((stat) =>
-                  <li key={stat.civilization.cid}>
-                    {stat.civilization.name} ({Math.round(stat.percent_matches * 1000)/10}%)
-                  </li>
-                )}
-              </ol>
-            </Typography>
+            {data.popular_civs.length > 0 && <div>
+              <Typography variant='h6'>Popular 1v1 Civilizations</Typography>
+              <Typography component='span'>
+                <ol>
+                  {data.popular_civs.map((stat) =>
+                    <li key={stat.civilization.cid}>
+                      {stat.civilization.name} ({Math.round(stat.percent * 1000)/10}%)
+                    </li>
+                  )}
+                </ol>
+              </Typography>
+            </div>}
           </CardContent>
         </Card>
       )}
@@ -80,7 +104,7 @@ const MapsView = ({match}) => {
         </DataQuery>
       </Grid>
       {match.params.id && <Grid item xs={6}>
-        <Map id={match.params.id} />
+        <Map name={match.params.id} />
       </Grid>}
     </Grid>
   )

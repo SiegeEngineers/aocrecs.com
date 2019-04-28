@@ -6,10 +6,11 @@ query Civilizations($dataset_id: Int!) {
     by_civilization(dataset_id: $dataset_id) {
       civilization {
         cid
+        dataset_id
         name
       }
-      num_matches
-      percent_matches
+      count
+      percent
     }
   }
 }

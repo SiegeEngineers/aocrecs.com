@@ -11,6 +11,7 @@ import Timestamp from 'react-timestamp'
 
 import VooblyUserIcon from 'mdi-react/AccountIcon'
 
+import AppLink from './util/AppLink'
 import CardIconHeader from './util/CardIconHeader'
 
 const VooblyUser = ({voobly_user}) => {
@@ -33,8 +34,16 @@ const VooblyUser = ({voobly_user}) => {
               <TableCell>Account Created</TableCell>
               <TableCell>
                 <Timestamp time={voobly_user.account_created} format='full' />
-            </TableCell>
+              </TableCell>
             </TableRow>
+            {voobly_user.meta_ranks.map(rank => (
+              <TableRow key={rank.ladder.id}>
+                <TableCell>
+                  <AppLink path={['ladders', rank.ladder.id]} text={rank.ladder.name} />
+                </TableCell>
+                <TableCell>#{rank.rank}</TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </CardContent>

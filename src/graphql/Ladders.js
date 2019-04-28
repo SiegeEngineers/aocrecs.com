@@ -1,11 +1,12 @@
 import gql from 'graphql-tag';
 
 export default gql`
-{
-  meta_ladders {
+query Ladders($platform_id: String!) {
+  meta_ladders(platform_id: $platform_id) {
     id
+    platform_id
     name
-    ranks {
+    ranks(limit: 15) {
       rank
       rating
       user {

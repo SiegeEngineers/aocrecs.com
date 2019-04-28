@@ -6,7 +6,9 @@ query Tournament($id: String!) {
     rounds {
       series {
         id
-        name
+        metadata {
+          name
+        }
         participants {
           name
           score

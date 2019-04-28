@@ -3,19 +3,21 @@ import gql from 'graphql-tag';
 import MatchFragment from '../graphql/MatchFragment.js';
 
 export default gql`
-query Map($id: Int!, $offset: Int!, $limit: Int!) {
-  map(id: $id) {
+query Map($name: String!, $offset: Int!, $limit: Int!) {
+  map(name: $name) {
     name
     popular_civs {
-      percent_matches
+      percent
       civilization {
         cid
         name
       }
     }
-    match_count
     matches(offset: $offset, limit: $limit) {
-      ...MatchFragment
+      count
+      hits {
+        ...MatchFragment
+      }
     }
   }
 }

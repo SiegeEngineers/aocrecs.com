@@ -10,6 +10,7 @@ import DataQuery from './util/DataQuery'
 
 import GetStats from './graphql/Stats'
 
+
 const Stat = ({title, stat}) => {
   return (
     <Card>
@@ -27,17 +28,57 @@ const Main = () => {
       {(data) => (
         <div>
           <Grid container spacing={24}>
-            <Grid item><Stat title='Files' stat={data.stats.files} /></Grid>
-            <Grid item><Stat title='Matches' stat={data.stats.matches} /></Grid>
-            <Grid item><Stat title='Series' stat={data.stats.series} /></Grid>
-            <Grid item><Stat title='Players' stat={data.stats.voobly_users} /></Grid>
+            <Grid item><Stat title='Files' stat={data.stats.files.toLocaleString()} /></Grid>
+            <Grid item><Stat title='Matches' stat={data.stats.matches.toLocaleString()} /></Grid>
+            <Grid item><Stat title='Series' stat={data.stats.series.toLocaleString()} /></Grid>
+            <Grid item><Stat title='Players' stat={data.stats.users.toLocaleString()} /></Grid>
           </Grid>
           <Grid container spacing={24}>
             <Grid item>
               <Card>
                 <CardContent>
                   <Typography variant='h5'>Match Additions</Typography>
-                  <Chart width='500' series={[{data: data.stats.by_day.map(d => [d.date, d.matches])}]} />
+                  <Chart id="additions" width='500' height='280' timeseries={true} series={[{data: data.stats.by_day.map(d => [d.date, d.matches])}]} />
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item>
+              <Card>
+                <CardContent>
+                  <Typography variant='h5'>Languages</Typography>
+                  <Chart id="languages" width='500' height='280' type='bar' series={[{data: data.stats.languages.map(i => ({x: i.label, y: i.count}))}]} />
+                </CardContent>
+              </Card>
+            </Grid>
+          <Grid item>
+              <Card>
+                <CardContent>
+                  <Typography variant='h5'>Datasets</Typography>
+                  <Chart id="datasets" width='500' height='280' type='bar' series={[{data: data.stats.datasets.map(i => ({x: i.label.split(': ')[1], y: i.count}))}]} />
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item>
+              <Card>
+                <CardContent>
+                  <Typography variant='h5'>Platforms</Typography>
+                  <Chart id="platforms" width='500' height='280' type='bar' series={[{data: data.stats.platforms.map(i => ({x: i.label, y: i.count}))}]} />
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item>
+              <Card>
+                <CardContent>
+                  <Typography variant='h5'>Diplomacy</Typography>
+                  <Chart id="diplomacy" width='500' height='280' type='bar' series={[{data: data.stats.diplomacy_types.map(i => ({x: i.label, y: i.count}))}]} />
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item>
+              <Card>
+                <CardContent>
+                  <Typography variant='h5'>Match Types</Typography>
+                  <Chart id="types" width='500' height='280' type='bar' series={[{data: data.stats.game_types.map(i => ({x: i.label, y: i.count}))}]} />
                 </CardContent>
               </Card>
             </Grid>

@@ -5,11 +5,15 @@ export default gql`
   stats {
     by_map {
       map {
-        id
         name
+        builtin
+        events {
+          id
+          name
+        }
       }
-      num_matches
-      percent_matches
+      count
+      percent
     }
   }
 }

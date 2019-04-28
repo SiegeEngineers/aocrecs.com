@@ -7,7 +7,9 @@ import TextField from '@material-ui/core/TextField'
 
 import RelatedMatches from './util/RelatedMatches'
 
-import GetVooblyUser from './graphql/VooblyUser'
+import VooblyUser from './VooblyUser'
+
+import GetUser from './graphql/User'
 
 const useStyles = makeStyles({
   input: {
@@ -40,10 +42,14 @@ const Players = ({match}) => {
       <br />
       {match.params.id &&
         <RelatedMatches
-          query={GetVooblyUser}
+          query={GetUser}
           variables={{user_id: match.params.id}}
           field='voobly_user'
-        />
+        >
+          {(data) => (
+            <VooblyUser voobly_user={data} />
+          )}
+        </RelatedMatches>
       }
     </div>
   )
