@@ -12,6 +12,12 @@ fragment MatchFragment on Match {
   diplomacy_type
   team_size
   map_name
+  event_map {
+    event {
+      id
+      name
+    }
+  }
   platform_match_id
   cheats
   map_size {

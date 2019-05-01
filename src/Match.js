@@ -82,8 +82,8 @@ const PlayerName = ({player}) => {
   return (
     <span>
       <div style={{backgroundColor: PLAYER_COLORS[player.color_id + 1]}} className={classes.playerColor} />
-      {player.user_id
-        ? <AppLink path={['players', player.user_id]} text={player.user.name} />
+      {player.user_id && player.user.name
+        ? player.user.name
         : player.name
       }
     </span>
@@ -135,7 +135,7 @@ const rateString = (player) => {
   return out
 }
 
-const Teams = ({size, teams}) => {
+const Teams = ({size, teams, rated}) => {
   const hasTeams = getHasTeams(size)
   const classes = useStyles()
   return (
@@ -145,7 +145,7 @@ const Teams = ({size, teams}) => {
           <TableCell>Player</TableCell>
           <TableCell>Civilization</TableCell>
           {hasTeams && <TableCell>MVP</TableCell>}
-          <TableCell align='right'>Rating</TableCell>
+          {rated && <TableCell align='right'>Rating</TableCell>}
           <TableCell align='right'>Score</TableCell>
         </TableRow>
       </TableHead>
@@ -158,7 +158,7 @@ const Teams = ({size, teams}) => {
             {hasTeams && <TableCell>
               {player.mvp && <MVPIcon className={classes.mvpIcon} />}
             </TableCell>}
-            <TableCell align='right'>{rateString(player)}</TableCell>
+            {rated && <TableCell align='right'>{rateString(player)}</TableCell>}
             <TableCell align='right'>{player.score}</TableCell>
           </>
         )}
@@ -205,6 +205,12 @@ const Information = ({match}) => {
           <AppLink path={['maps', match.map_name]} text={match.map_name} /> ({match.map_size.name})
         </TableCell>
       </TableRow>
+      {match.event_map && <TableRow>
+        <TableCell>Map Event</TableCell>
+        <TableCell>
+          <AppLink path={['events', match.event_map.event.id]} text={match.event_map.event.name} />
+        </TableCell>
+      </TableRow>}
       <TableRow>
         <TableCell>Cheats</TableCell><TableCell>{match.cheats ? 'On' : 'Off'}</TableCell>
       </TableRow>
@@ -412,7 +418,7 @@ const Match = ({match}) => {
   const title = getMatchTitle(match)
   return (
     <Card>
-      <CardIconHeader icon={<MatchIcon />} title={title}/>
+      <CardIconHeader icon={<AppLink path={['match', match.id]} text={<MatchIcon />} />} title={title}/>
       <CardContent>
         <AppBar position='static'>
           <Tabs value={tab} onChange={(e, value) => setTab(value)}>
@@ -423,7 +429,7 @@ const Match = ({match}) => {
           </Tabs>
         </AppBar>
         <Typography component='div' className={classes.tabContent}>
-          {tab === 0 && <Teams size={match.team_size} teams={match.teams} />}
+          {tab === 0 && <Teams size={match.team_size} teams={match.teams} rated={match.rated} />}
           {tab === 1 && <Information match={match} />}
           {tab === 2 && <Achievements size={match.team_size} teams={match.teams} />}
           {tab === 3 && <Files files={match.files} />}

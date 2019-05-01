@@ -25,6 +25,7 @@ import Events from './Events'
 import Ladders from './Ladders'
 import Civilizations from './Civilizations'
 import Maps from './Maps'
+import Match from './MatchView'
 
 
 const drawerWidth = 180
@@ -141,6 +142,7 @@ const Layout = () => {
           <Route path='/ladders/:pid?/:id?/:vid?' component={Ladders} />
           <Route path='/civilizations/:did?/:id?' component={Civilizations} />
           <Route path='/maps/:id?' component={Maps} />
+          <Route path='/match/:id?' component={Match} />
           <Redirect to='/' />
         </Switch>
       </main>
