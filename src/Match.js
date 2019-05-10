@@ -20,10 +20,15 @@ import {upperFirst} from 'lodash'
 
 import MatchIcon from 'mdi-react/SwordCrossIcon'
 import MVPIcon from 'mdi-react/StarIcon'
+import YesIcon from 'mdi-react/CheckIcon'
+import NoIcon from 'mdi-react/CloseIcon'
+import UndeterminedIcon from 'mdi-react/MinusIcon'
 
 import AppLink from './util/AppLink'
+import DataQuery from './util/DataQuery'
 import CardIconHeader from './util/CardIconHeader'
 import WinnerMark from './util/WinnerMark'
+import GetOdds from './graphql/Odds'
 
 const PLAYER_COLORS = {
   1: '#6599d8',
@@ -159,7 +164,7 @@ const Teams = ({size, teams, rated}) => {
               {player.mvp && <MVPIcon className={classes.mvpIcon} />}
             </TableCell>}
             {rated && <TableCell align='right'>{rateString(player)}</TableCell>}
-            <TableCell align='right'>{player.score}</TableCell>
+            <TableCell align='right'>{player.score && player.score.toLocaleString()}</TableCell>
           </>
         )}
       </TeamBody>
@@ -412,6 +417,46 @@ const Files = ({files}) => {
   )
 }
 
+const Scenario = ({title, scenario, match}) => {
+  return (
+    <TableRow>
+      <TableCell>{title}</TableCell>
+      {scenario ? scenario.map((team, index) => (
+        <TableCell align='right'>{Math.round(team.percent*1000)/10}% ({team.wins}/{team.losses})</TableCell>
+      )): <TableCell align='center' colspan={match.teams.length + 1}>{match.mirror ? "Not applicable" : "Not enough data"}</TableCell>}
+      {scenario && <TableCell align='center'>{scenario[match.winning_team_id].percent > 0.5 ? <YesIcon /> : (scenario[match.winning_team_id].percent === 0.5 ? <UndeterminedIcon /> : <NoIcon />)}</TableCell>}
+    </TableRow>
+  )
+}
+
+const Odds = ({match}) => {
+  const hasTeams = getHasTeams(match.team_size)
+  return (
+    <DataQuery query={GetOdds} variables={{match_id: match.id}}>
+      {(data) => (
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Scenario</TableCell>
+            {match.teams.map((team, index) => (
+              <TableCell align='right'>{hasTeams ? <span>Team {index+1}</span> : <PlayerName player={team.members[0]} />}</TableCell>
+            ))}
+            <TableCell align='center'>Expected Outcome</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <Scenario title='Players' scenario={data.match.odds.teams} match={match} />
+          <Scenario title='Players on Map' scenario={data.match.odds.teams_and_map} match={match} />
+          <Scenario title='Players with Civilizations' scenario={data.match.odds.teams_and_civilization} match={match} />
+          <Scenario title='Civilizations' scenario={data.match.odds.civilizations} match={match} />
+          <Scenario title='Civilizations on Map' scenario={data.match.odds.civilizations_and_map} match={match} />
+        </TableBody>
+      </Table>
+      )}
+      </DataQuery>
+    )
+}
+
 const Match = ({match}) => {
   const [tab, setTab] = useState(0)
   const classes = useStyles()
@@ -425,6 +470,7 @@ const Match = ({match}) => {
             <Tab label='Players' />
             <Tab label='Information' />
             <Tab label='Achievements' />
+            <Tab label='Odds' />
             <Tab label='Files' />
           </Tabs>
         </AppBar>
@@ -432,7 +478,8 @@ const Match = ({match}) => {
           {tab === 0 && <Teams size={match.team_size} teams={match.teams} rated={match.rated} />}
           {tab === 1 && <Information match={match} />}
           {tab === 2 && <Achievements size={match.team_size} teams={match.teams} />}
-          {tab === 3 && <Files files={match.files} />}
+          {tab === 3 && <Odds match={match} />}
+          {tab === 4 && <Files files={match.files} />}
         </Typography>
       </CardContent>
     </Card>

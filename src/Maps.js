@@ -55,7 +55,7 @@ const MapTable = ({rows, selected}) => {
                 <AppLink path={['events', event.id]} text={event.name} key={event.id} />
               ])}
             </TableCell>
-            <TableCell align='right'>{row.count}</TableCell>
+            <TableCell align='right'>{row.count.toLocaleString()}</TableCell>
             <TableCell align='right'>{Math.round(row.percent * 1000)/10}%</TableCell>
           </TableRow>
         )}

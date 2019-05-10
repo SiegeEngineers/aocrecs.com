@@ -67,6 +67,7 @@ fragment MatchFragment on Match {
     name
   }
   version
+  winning_team_id
   teams {
     winner
     members {
