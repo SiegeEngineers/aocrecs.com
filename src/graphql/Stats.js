@@ -11,14 +11,11 @@ export default gql`
         date
         matches
       }
-      platforms { label count }
-      encodings { label count }
-      languages { label count }
-      datasets { label count }
-      diplomacy_types { label count }
-      maps { label count }
-      game_types { label count }
-      speeds { label count }
+      platforms { id label count }
+      languages { id label count }
+      datasets { id label count }
+      diplomacy_types { id label count }
+      game_types { id label count }
     }
   }
 `;

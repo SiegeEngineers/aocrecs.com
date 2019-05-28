@@ -11,14 +11,14 @@ import Layout from './Layout.js'
 const cache = new InMemoryCache({
   dataIdFromObject: object => {
     switch (object.__typename) {
-      case 'StatItem': return object.id + Math.floor((Math.random() * 100000) + 1).toString()
+      case 'StatItem': return object.id.toString() + object.label
       default: return defaultDataIdFromObject(object)
     }
   }
 })
 
 const client = new ApolloClient({
-  uri: process.env.REACT_APP_GRAPHQL,
+  uri: process.env.REACT_APP_API + '/graphql',
   cache: cache
 })
 

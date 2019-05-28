@@ -79,7 +79,7 @@ const Chart = ({id, type, timeseries, series, width, height}) => {
       },
       xaxis: {
         labels: {
-          formatter: (value) => Math.floor(value).toLocaleString()
+          formatter: (value) => value === 0 ? 0 : (value/1000) + 'k'
         }
       },
       yaxis: {

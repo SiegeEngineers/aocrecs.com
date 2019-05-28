@@ -41,7 +41,7 @@ const PLAYER_COLORS = {
   8: '#ff8c00'
 }
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   playerColor: {
     borderRadius: '4px',
     borderWidth: '1px',
@@ -66,8 +66,11 @@ const useStyles = makeStyles({
   winner: {
     width: '12px',
     height: '12px'
+  },
+  downloadLink: {
+    color: theme.palette.primary.main
   }
-})
+}))
 
 const getMatchTitle = (match) => {
   let title = match.type.name + ' ' + match.diplomacy_type
@@ -395,6 +398,7 @@ const Achievements = ({size, teams}) => {
 }
 
 const Files = ({files}) => {
+  const classes = useStyles()
   return (
     <Table>
       <TableHead>
@@ -407,7 +411,7 @@ const Files = ({files}) => {
       <TableBody>
         {files.map(file => (
           <TableRow key={file.id}>
-            <TableCell>{file.original_filename}</TableCell>
+            <TableCell><a className={classes.downloadLink} href={process.env.REACT_APP_API + '/download/' + file.id}>{file.original_filename}</a></TableCell>
             <TableCell>{file.owner.name}</TableCell>
             <TableCell align='right'>{file.size}</TableCell>
           </TableRow>
