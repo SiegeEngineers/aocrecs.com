@@ -74,9 +74,7 @@ fragment MatchFragment on Match {
       name
       color_id
       user_id
-      user {
-        name
-      }
+      user_name
       civilization {
         cid
         dataset_id

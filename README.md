@@ -1,6 +1,6 @@
-# aoc-web-prototype
+# aoc-web
 
-Prototype UI for a federated API. Currently oriented towards `aoc-mgz-db` data.
+Prototype UI for the graphql API.
 
 ## Setup
 
@@ -8,7 +8,7 @@ Prototype UI for a federated API. Currently oriented towards `aoc-mgz-db` data.
 
 ## Configuration
 
-Set environmental variable `REACT_APP_GRAPHQL` to the URL of the federated API endpoint.
+Set environmental variable `REACT_APP_GRAPHQL` to the URL of the graphql API endpoint.
 
 ## Development Server
 

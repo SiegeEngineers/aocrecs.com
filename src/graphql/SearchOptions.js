@@ -15,6 +15,9 @@ export default gql`
       mirror { id label count }
       rated { id label count }
       rms_zr { id label count }
+      colors { id label count }
+      winner { id label count }
+      mvp { id label count }
     }
   }
 `;

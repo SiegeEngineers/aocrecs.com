@@ -90,8 +90,8 @@ const PlayerName = ({player}) => {
   return (
     <span>
       <div style={{backgroundColor: PLAYER_COLORS[player.color_id + 1]}} className={classes.playerColor} />
-      {player.user_id && player.user.name
-        ? player.user.name
+      {player.user_name
+        ? player.user_name
         : player.name
       }
     </span>
@@ -426,8 +426,8 @@ const Scenario = ({title, scenario, match}) => {
     <TableRow>
       <TableCell>{title}</TableCell>
       {scenario ? scenario.map((team, index) => (
-        <TableCell align='right'>{Math.round(team.percent*1000)/10}% ({team.wins}/{team.losses})</TableCell>
-      )): <TableCell align='center' colspan={match.teams.length + 1}>{match.mirror ? "Not applicable" : "Not enough data"}</TableCell>}
+        <TableCell key={index} align='right'>{Math.round(team.percent*1000)/10}% ({team.wins}/{team.losses})</TableCell>
+      )): <TableCell align='center' colSpan={match.teams.length + 1}>{match.mirror ? 'Not applicable' : 'Not enough data'}</TableCell>}
       {scenario && <TableCell align='center'>{scenario[match.winning_team_id].percent > 0.5 ? <YesIcon /> : (scenario[match.winning_team_id].percent === 0.5 ? <UndeterminedIcon /> : <NoIcon />)}</TableCell>}
     </TableRow>
   )
@@ -443,7 +443,7 @@ const Odds = ({match}) => {
           <TableRow>
             <TableCell>Scenario</TableCell>
             {match.teams.map((team, index) => (
-              <TableCell align='right'>{hasTeams ? <span>Team {index+1}</span> : <PlayerName player={team.members[0]} />}</TableCell>
+              <TableCell key={index} align='right'>{hasTeams ? <span>Team {index+1}</span> : <PlayerName player={team.members[0]} />}</TableCell>
             ))}
             <TableCell align='center'>Expected Outcome</TableCell>
           </TableRow>
