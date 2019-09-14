@@ -28,10 +28,10 @@ const Main = () => {
       {(data) => (
         <div>
           <Grid container spacing={24}>
-            <Grid item><Stat title='Files' stat={data.stats.files.toLocaleString()} /></Grid>
             <Grid item><Stat title='Matches' stat={data.stats.matches.toLocaleString()} /></Grid>
             <Grid item><Stat title='Series' stat={data.stats.series.toLocaleString()} /></Grid>
             <Grid item><Stat title='Players' stat={data.stats.users.toLocaleString()} /></Grid>
+            <Grid item><Stat title='Maps' stat={data.stats.map_count.toLocaleString()} /></Grid>
           </Grid>
           <Grid container spacing={24}>
             <Grid item>

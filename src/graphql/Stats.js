@@ -3,10 +3,10 @@ import gql from "graphql-tag";
 export default gql`
   {
     stats {
-      files
       matches
       series
       users
+      map_count
       by_day {
         date
         matches
