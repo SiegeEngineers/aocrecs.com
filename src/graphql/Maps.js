@@ -4,10 +4,10 @@ export default gql`
 {
   stats {
     by_map {
-      map {
-        name
-        builtin
-        events {
+      name
+      builtin
+      event_maps {
+        event {
           id
           name
         }

@@ -46,13 +46,13 @@ const MapTable = ({rows, selected}) => {
       </TableHead>
       <TableBody>
         {rows.map((row, index) =>
-          <TableRow key={index} selected={selected === row.map.name}>
-            <TableCell align='center'>{row.map.builtin && <StandardIcon className={classes.standardIcon} />}</TableCell>
-            <TableCell><AppLink path={['maps', row.map.name]} text={row.map.name} /></TableCell>
+          <TableRow key={index} selected={selected === row.name}>
+            <TableCell align='center'>{row.builtin && <StandardIcon className={classes.standardIcon} />}</TableCell>
+            <TableCell><AppLink path={['maps', row.name]} text={row.name} /></TableCell>
             <TableCell>
-              {row.map.events.map((event, i) => [
+              {row.event_maps.map((map, i) => [
                 i > 0 && ', ',
-                <AppLink path={['events', event.id]} text={event.name} key={event.id} />
+                <AppLink path={['events', map.event.id]} text={map.event.name} key={map.event.id} />
               ])}
             </TableCell>
             <TableCell align='right'>{row.count.toLocaleString()}</TableCell>

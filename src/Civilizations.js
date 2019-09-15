@@ -48,7 +48,7 @@ const CivTable = ({civilizations, selected}) => {
             <TableCell>
               <AppLink path={['civilizations', civilization.civilization.dataset_id, civilization.civilization.cid]} text={civilization.civilization.name} />
             </TableCell>
-            <TableCell>{civilization.count}</TableCell>
+            <TableCell>{civilization.count.toLocaleString()}</TableCell>
             <TableCell>{Math.round(civilization.percent * 1000)/10}%</TableCell>
           </TableRow>
         )}
