@@ -1,6 +1,6 @@
-# aoc-web
+# aocrecs.com
 
-Prototype UI for the graphql API.
+UI for aocrecs.com
 
 ## Setup
 
@@ -8,7 +8,7 @@ Prototype UI for the graphql API.
 
 ## Configuration
 
-Set environmental variable `REACT_APP_GRAPHQL` to the URL of the graphql API endpoint.
+Set environmental variable `REACT_APP_API` to the URL of the API endpoint.
 
 ## Development Server
 
