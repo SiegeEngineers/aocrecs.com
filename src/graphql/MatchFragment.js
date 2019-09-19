@@ -73,6 +73,7 @@ fragment MatchFragment on Match {
     members {
       name
       color_id
+      platform_id
       user_id
       user_name
       civilization {

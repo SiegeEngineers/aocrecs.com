@@ -81,7 +81,7 @@ const Civilization = ({id, dataset_id}) => {
 }
 
 const CivilizationsView = ({match}) => {
-  const [dataset_id, setDataset] = useState(1)
+  const [dataset_id, setDataset] = useState(match.params.did ? parseInt(match.params.did) : 1)
   return (
     <Grid container spacing={24}>
       <Grid item xs={6}>

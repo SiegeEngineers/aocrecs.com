@@ -20,18 +20,18 @@ import AppLink from './util/AppLink'
 import DataQuery from './util/DataQuery'
 import RelatedMatches from './util/RelatedMatches'
 
-import VooblyUser from './VooblyUser.js'
+import User from './User.js'
 
 import GetPlatforms from './graphql/Platforms.js'
 import GetLadders from './graphql/Ladders.js'
 import GetUser from './graphql/User.js'
 
-const VooblyUserWrapper = ({user_id, platform_id}) => {
+const UserWrapper = ({user_id, platform_id}) => {
   const field = 'user'
   return (
     <RelatedMatches query={GetUser} variables={{user_id, platform_id}} field={field}>
       {(data) => (
-        <VooblyUser voobly_user={data} />
+        <User user={data} />
       )}
   </RelatedMatches>
   )
@@ -74,7 +74,7 @@ const LaddersView = ({match, history}) => {
   const [platform_id, setPlatform] = useState('voobly')
   return (
     <div>
-              <FormControl>
+        <FormControl>
           <InputLabel htmlFor='platform'>Platform</InputLabel>
           <DataQuery query={GetPlatforms}>
             {(data) => (
@@ -109,7 +109,7 @@ const LaddersView = ({match, history}) => {
             ))}
           </Grid>
           {match.params.vid && <Grid item xs={6}>
-            <VooblyUserWrapper user_id={match.params.vid} platform_id={platform_id} />
+            <UserWrapper user_id={match.params.vid} platform_id={platform_id} />
             </Grid>}
           </Grid>
       )}

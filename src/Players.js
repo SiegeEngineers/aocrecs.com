@@ -7,7 +7,7 @@ import TextField from '@material-ui/core/TextField'
 
 import RelatedMatches from './util/RelatedMatches'
 
-import VooblyUser from './VooblyUser'
+import User from './User'
 
 import GetUser from './graphql/User'
 
@@ -47,7 +47,7 @@ const Players = ({match}) => {
           field='voobly_user'
         >
           {(data) => (
-            <VooblyUser voobly_user={data} />
+            <User user={data} />
           )}
         </RelatedMatches>
       }
