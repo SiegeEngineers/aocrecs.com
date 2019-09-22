@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {makeStyles} from '@material-ui/styles'
 
 import Card from '@material-ui/core/Card'
@@ -12,6 +12,8 @@ import TableRow from '@material-ui/core/TableRow'
 import Typography from '@material-ui/core/Typography'
 
 import MapIcon from 'mdi-react/EarthIcon'
+
+import Pagination from 'material-ui-flat-pagination'
 
 import AppLink from './util/AppLink'
 import CardIconHeader from './util/CardIconHeader'
@@ -33,34 +35,52 @@ const useStyles = makeStyles({
 
 const MapTable = ({rows, selected}) => {
   const classes = useStyles()
+  const [offset, setOffset] = useState(0)
+  const limit = 25
   return (
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell></TableCell>
-          <TableCell>Map</TableCell>
-          <TableCell>Events</TableCell>
-          <TableCell align='right'>Matches</TableCell>
-          <TableCell align='right'>Percent</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {rows.map((row, index) =>
-          <TableRow key={index} selected={selected === row.name}>
-            <TableCell align='center'>{row.builtin && <StandardIcon className={classes.standardIcon} />}</TableCell>
-            <TableCell><AppLink path={['maps', row.name]} text={row.name} /></TableCell>
-            <TableCell>
-              {row.event_maps.map((map, i) => [
-                i > 0 && ', ',
-                <AppLink path={['events', map.event.id]} text={map.event.name} key={map.event.id} />
-              ])}
-            </TableCell>
-            <TableCell align='right'>{row.count.toLocaleString()}</TableCell>
-            <TableCell align='right'>{Math.round(row.percent * 1000)/10}%</TableCell>
+    <>
+      <Pagination
+        limit={limit}
+        offset={offset}
+        total={rows.length}
+        onClick={(e, offset) => setOffset(offset)}
+      />
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell></TableCell>
+            <TableCell></TableCell>
+            <TableCell>Map</TableCell>
+            <TableCell>Events</TableCell>
+            <TableCell align='right'>Matches</TableCell>
+            <TableCell align='right'>Percent</TableCell>
           </TableRow>
-        )}
-      </TableBody>
-    </Table>
+        </TableHead>
+        <TableBody>
+          {rows.slice(offset, offset + limit).map((row, index) =>
+            <TableRow key={index} selected={selected === row.name}>
+              <TableCell align='center'>{row.builtin && <StandardIcon className={classes.standardIcon} />}</TableCell>
+              <TableCell>{offset + index + 1}</TableCell>
+              <TableCell><AppLink path={['maps', row.name]} text={row.name} /></TableCell>
+              <TableCell>
+                {row.event_maps.map((map, i) => [
+                  i > 0 && ', ',
+                  <AppLink path={['events', map.event.id]} text={map.event.name} key={map.event.id} />
+                ])}
+              </TableCell>
+              <TableCell align='right'>{row.count.toLocaleString()}</TableCell>
+              <TableCell align='right'>{Math.round(row.percent * 1000)/10}%</TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <Pagination
+        limit={limit}
+        offset={offset}
+        total={rows.length}
+        onClick={(e, offset) => setOffset(offset)}
+      />
+    </>
   )
 }
 

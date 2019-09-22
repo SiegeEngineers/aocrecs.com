@@ -22,6 +22,9 @@ query Report($year: Int!, $month: Int!) {
       rank
       user_id
       user_name
+      user {
+        canonical_name
+      }
       platform_id
       rating
       change
@@ -30,6 +33,9 @@ query Report($year: Int!, $month: Int!) {
       rank
       user_id
       user_name
+      user {
+        canonical_name
+      }
       platform_id
       rating
       change

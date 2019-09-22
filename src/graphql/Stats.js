@@ -9,7 +9,7 @@ export default gql`
       map_count
       by_day {
         date
-        matches
+        count
       }
       platforms { id label count }
       languages { id label count }

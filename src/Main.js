@@ -38,7 +38,7 @@ const Main = () => {
               <Card>
                 <CardContent>
                   <Typography variant='h5'>Match Additions</Typography>
-                  <Chart id="additions" width='500' height='280' timeseries={true} series={[{data: data.stats.by_day.map(d => [d.date, d.matches])}]} />
+                  <Chart id="additions" width='500' height='280' timeseries={true} series={[{data: data.stats.by_day.map(d => [d.date, d.count])}]} y_min={0} />
                 </CardContent>
               </Card>
             </Grid>

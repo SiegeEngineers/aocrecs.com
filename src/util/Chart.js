@@ -4,7 +4,7 @@ import {useTheme} from '@material-ui/styles'
 import {merge} from 'lodash'
 
 
-const Chart = ({id, type, timeseries, series, width, height}) => {
+const Chart = ({id, type, timeseries, series, width, height, y_min}) => {
   const theme = useTheme()
   const options = {
     colors: [theme.palette.primary.main],
@@ -19,7 +19,8 @@ const Chart = ({id, type, timeseries, series, width, height}) => {
       }
     },
     yaxis: {
-      min: 0,
+      min: y_min,
+      tickAmount: height / 50,
       forceNiceScale: true,
       labels: {
         style: {

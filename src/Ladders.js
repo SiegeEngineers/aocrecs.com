@@ -45,8 +45,6 @@ const RankTable = ({platform_id, ladder_id, ranks, selected}) => {
           <TableCell>Rank</TableCell>
           <TableCell>Name</TableCell>
           <TableCell align='right'>Rating</TableCell>
-          <TableCell align='right'>Wins</TableCell>
-          <TableCell align='right'>Losses</TableCell>
           <TableCell align='right'>Streak</TableCell>
         </TableRow>
       </TableHead>
@@ -56,11 +54,10 @@ const RankTable = ({platform_id, ladder_id, ranks, selected}) => {
             <TableCell>{rank.rank}</TableCell>
             <TableCell>
               <AppLink path={['ladders', platform_id, ladder_id, rank.user.id]} text={rank.user.name} />
+              {rank.user.canonical_name !== null && rank.user.canonical_name !== rank.user.name && ' (aka ' + rank.user.canonical_name + ')'}
             </TableCell>
             <TableCell align='right'>{rank.rating}</TableCell>
-            <TableCell align='right'>{rank.wins}</TableCell>
-            <TableCell align='right'>{rank.losses}</TableCell>
-            <TableCell align='right'>{rank.streak}</TableCell>
+            <TableCell align='right'>{rank.streak > 0 ? '+' + rank.streak : rank.streak}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -92,7 +89,7 @@ const LaddersView = ({match, history}) => {
     <DataQuery query={GetLadders} variables={{platform_id}}>
       {(data) => (
           <Grid container spacing={24}>
-            <Grid item xs={6}>
+            <Grid item xs={3}>
             {data.meta_ladders.map(ladder => (
               <ExpansionPanel
                 key={ladder.id}

@@ -152,7 +152,10 @@ const RankingsSection = ({data, title}) => {
               <TableRow key={row.user_id}>
                 <TableCell><ChangeIndicator change={row.change} /></TableCell>
                 <TableCell>{row.rank}</TableCell>
-                <TableCell><AppLink path={['player', row.platform_id, row.user_id]} text={row.user_name} /></TableCell>
+                <TableCell>
+                  <AppLink path={['player', row.platform_id, row.user_id]} text={row.user_name} />
+                  {row.user.canonical_name !== null && row.user.canonical_name !== row.user_name && ' (aka ' + row.user.canonical_name + ')'}
+                </TableCell>
                 <TableCell align='right'>{row.rating}</TableCell>
               </TableRow>
             )}
@@ -270,10 +273,10 @@ const ReportsView = ({match, history}) => {
               <LongestMatchesSection data={data.report.longest_matches} />
             </Grid>
             <Grid item>
-              <MostImprovementSection data={data.report.improvement_tg} title={'Team Game'} />
+              <MostImprovementSection data={data.report.improvement_1v1} title={'1v1'} />
             </Grid>
             <Grid item>
-              <MostImprovementSection data={data.report.improvement_1v1} title={'1v1'} />
+              <MostImprovementSection data={data.report.improvement_tg} title={'Team Game'} />
             </Grid>
           </Grid>
             </>
