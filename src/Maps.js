@@ -9,6 +9,7 @@ import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
+import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
 
 import MapIcon from 'mdi-react/EarthIcon'
@@ -36,15 +37,25 @@ const useStyles = makeStyles({
 const MapTable = ({rows, selected}) => {
   const classes = useStyles()
   const [offset, setOffset] = useState(0)
+  const [filter, setFilter] = useState(null)
   const limit = 25
+  const filterName = (rows) => {
+    return rows.filter((row) => filter !== null ? row.name.includes(filter) : true)
+  }
+  let total = filterName(rows).length
   return (
     <>
-      <Pagination
+      <TextField
+        label='Map'
+        value={filter}
+        onChange={(event) => setFilter(event.target.value)}
+      />
+      {total > limit && <Pagination
         limit={limit}
         offset={offset}
-        total={rows.length}
+        total={total}
         onClick={(e, offset) => setOffset(offset)}
-      />
+      />}
       <Table>
         <TableHead>
           <TableRow>
@@ -57,7 +68,7 @@ const MapTable = ({rows, selected}) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.slice(offset, offset + limit).map((row, index) =>
+          {filterName(rows).slice(offset, offset + limit).map((row, index) =>
             <TableRow key={index} selected={selected === row.name}>
               <TableCell align='center'>{row.builtin && <StandardIcon className={classes.standardIcon} />}</TableCell>
               <TableCell>{offset + index + 1}</TableCell>
@@ -74,12 +85,12 @@ const MapTable = ({rows, selected}) => {
           )}
         </TableBody>
       </Table>
-      <Pagination
+      {total > limit && <Pagination
         limit={limit}
         offset={offset}
-        total={rows.length}
+        total={total}
         onClick={(e, offset) => setOffset(offset)}
-      />
+      />}
     </>
   )
 }
