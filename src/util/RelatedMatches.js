@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 
 import Pagination from 'material-ui-flat-pagination'
 import {merge} from 'lodash'
@@ -9,6 +9,7 @@ import Matches from '../Matches'
 const RelatedMatches = ({query, variables, field, children}) => {
   const limit = 8
   const [offset, setOffset] = useState(0)
+  useEffect(() => setOffset(0), [variables])
   return (
     <DataQuery query={query} variables={merge({offset, limit}, variables)}>
       {(data) => (
