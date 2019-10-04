@@ -15,7 +15,7 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Typography from '@material-ui/core/Typography'
 
-import {format} from 'date-fns'
+import {format, subMonths} from 'date-fns'
 import humanizeDuration from 'humanize-duration'
 
 import AppLink from './util/AppLink'
@@ -114,7 +114,10 @@ const MostImprovementSection = ({data, title}) => {
             {data.map((row, index) =>
               <TableRow key={row.id}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell><AppLink path={['player', row.platform_id, row.id]} text={row.name} /></TableCell>
+                <TableCell>
+                  <AppLink path={['player', row.platform_id, row.id]} text={row.name} />
+                  {row.canonical_name !== null && row.canonical_name !== row.name && ' (aka ' + row.canonical_name + ')'}
+                </TableCell>
                 <TableCell align='right'>{row.min_rate}</TableCell>
                 <TableCell align='right'>{row.max_rate}</TableCell>
                 <TableCell align='right'>+{row.diff_rate}</TableCell>
@@ -229,7 +232,7 @@ const MostMatchesSection = ({data}) => {
 }
 
 const ReportsView = ({match, history}) => {
-  const [report_date, setReportDate] = useState('2019-8')
+  const [report_date, setReportDate] = useState(format(subMonths(new Date(), 1), 'yyyy-M'))
   return (
     <div>
         <FormControl>

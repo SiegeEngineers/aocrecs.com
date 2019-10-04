@@ -43,6 +43,7 @@ query Report($year: Int!, $month: Int!) {
     improvement_1v1: most_improvement(platform_id: "voobly", ladder_id: 131) {
       name
       id
+      canonical_name
       platform_id
       min_rate
       max_rate
@@ -54,6 +55,7 @@ query Report($year: Int!, $month: Int!) {
     improvement_tg: most_improvement(platform_id: "voobly", ladder_id: 132) {
       name
       id
+      canonical_name
       platform_id
       min_rate
       max_rate
