@@ -6,10 +6,13 @@ query Report($year: Int!, $month: Int!) {
     total_matches
     total_players
     most_matches(platform_id: "voobly") {
-      id
-      name
       platform_id
       count
+      user {
+        id
+        name
+        canonical_name
+      }
     }
 		popular_maps {
       rank
@@ -21,8 +24,8 @@ query Report($year: Int!, $month: Int!) {
     rankings_1v1: rankings(platform_id: "voobly", ladder_id: 131) {
       rank
       user_id
-      user_name
       user {
+        name
         canonical_name
       }
       platform_id
@@ -34,6 +37,7 @@ query Report($year: Int!, $month: Int!) {
       user_id
       user_name
       user {
+        name
         canonical_name
       }
       platform_id
@@ -41,9 +45,11 @@ query Report($year: Int!, $month: Int!) {
       change
     }
     improvement_1v1: most_improvement(platform_id: "voobly", ladder_id: 131) {
-      name
-      id
-      canonical_name
+      user {
+        id
+        name
+        canonical_name
+      }
       platform_id
       min_rate
       max_rate
@@ -53,9 +59,11 @@ query Report($year: Int!, $month: Int!) {
       losses
     }
     improvement_tg: most_improvement(platform_id: "voobly", ladder_id: 132) {
-      name
-      id
-      canonical_name
+      user {
+        id
+        name
+        canonical_name
+      }
       platform_id
       min_rate
       max_rate

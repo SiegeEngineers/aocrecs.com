@@ -101,11 +101,11 @@ const MostImprovementSection = ({data, title}) => {
           </TableHead>
           <TableBody>
             {data.map((row, index) =>
-              <TableRow key={row.id}>
+              <TableRow key={row.user.id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>
-                  <AppLink path={['player', row.platform_id, row.id]} text={row.name} />
-                  {row.canonical_name !== null && row.canonical_name !== row.name && ' (aka ' + row.canonical_name + ')'}
+                  <AppLink path={['player', row.platform_id, row.user.id]} text={row.user.name} />
+                  {row.user.canonical_name !== null && row.user.canonical_name !== row.user.name && ' (aka ' + row.user.canonical_name + ')'}
                 </TableCell>
                 <TableCell align='right'>{row.min_rate}</TableCell>
                 <TableCell align='right'>{row.max_rate}</TableCell>
@@ -142,8 +142,8 @@ const RankingsSection = ({data, title}) => {
                 <TableCell><ChangeIndicator change={row.change} /></TableCell>
                 <TableCell>{row.rank}</TableCell>
                 <TableCell>
-                  <AppLink path={['player', row.platform_id, row.user_id]} text={row.user_name} />
-                  {row.user.canonical_name !== null && row.user.canonical_name !== row.user_name && ' (aka ' + row.user.canonical_name + ')'}
+                  <AppLink path={['player', row.platform_id, row.user_id]} text={row.user.name} />
+                  {row.user.canonical_name !== null && row.user.canonical_name !== row.user.name && ' (aka ' + row.user.canonical_name + ')'}
                 </TableCell>
                 <TableCell align='right'>{row.rating}</TableCell>
               </TableRow>
@@ -204,7 +204,10 @@ const MostMatchesSection = ({data}) => {
             {data.map((row, index) =>
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell><AppLink path={['player', row.platform_id, row.id]} text={row.name} /></TableCell>
+                <TableCell>
+                  <AppLink path={['player', row.platform_id, row.user.id]} text={row.user.name} />
+                  {row.user.canonical_name !== null && row.user.canonical_name !== row.user.name && ' (aka ' + row.user.canonical_name + ')'}
+                </TableCell>
                 <TableCell align='right'>{row.count.toLocaleString()}</TableCell>
               </TableRow>
             )}
