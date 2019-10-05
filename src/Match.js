@@ -28,6 +28,7 @@ import AppLink from './util/AppLink'
 import DataQuery from './util/DataQuery'
 import CardIconHeader from './util/CardIconHeader'
 import WinnerMark from './util/WinnerMark'
+import {getMatchTitle} from './util/Shared'
 import GetOdds from './graphql/Odds'
 
 const PLAYER_COLORS = {
@@ -72,14 +73,6 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-const getMatchTitle = (match) => {
-  let title = match.type.name + ' ' + match.diplomacy_type
-  if (match.diplomacy_type === 'TG') {
-    title += ' ' + match.team_size
-  }
-  title += ' on ' + match.map_name
-  return title
-}
 
 const getHasTeams = (size) => {
   return size !== '1v1'
@@ -464,7 +457,7 @@ const Odds = ({match}) => {
 const Match = ({match}) => {
   const [tab, setTab] = useState(0)
   const classes = useStyles()
-  const title = getMatchTitle(match)
+  const title = getMatchTitle(match, true)
   return (
     <Card>
       <CardIconHeader icon={<AppLink path={['match', match.id]} text={<MatchIcon />} />} title={title}/>

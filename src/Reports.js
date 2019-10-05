@@ -20,19 +20,10 @@ import humanizeDuration from 'humanize-duration'
 
 import AppLink from './util/AppLink'
 import DataQuery from './util/DataQuery'
+import {getMatchTitle} from './util/Shared'
 
 import GetReports from './graphql/Reports.js'
 import GetReport from './graphql/Report.js'
-
-const getMatchTitle = (match) => {
-  let title = match.type.name + ' ' + match.diplomacy_type
-  if (match.diplomacy_type === 'TG') {
-    title += ' ' + match.team_size
-  }
-  return title
-}
-
-
 
 const ChangeIndicator = ({change}) => {
   let out = ''
@@ -60,7 +51,6 @@ const Stat = ({title, stat}) => {
   )
 }
 
-
 const LongestMatchesSection = ({data}) => {
   return (
     <Card>
@@ -79,7 +69,7 @@ const LongestMatchesSection = ({data}) => {
             {data.map((match, index) =>
               <TableRow key={match.id}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell><AppLink path={['match', match.id]} text={getMatchTitle(match)} /></TableCell>
+                <TableCell><AppLink path={['match', match.id]} text={getMatchTitle(match, false)} /></TableCell>
                 <TableCell> <AppLink path={['maps', match.map_name]} text={match.map_name} /></TableCell>
                 <TableCell>{humanizeDuration(match.duration_secs * 1000)}</TableCell>
               </TableRow>
@@ -90,7 +80,6 @@ const LongestMatchesSection = ({data}) => {
     </Card>
   )
 }
-
 
 const MostImprovementSection = ({data, title}) => {
   return (
@@ -133,9 +122,6 @@ const MostImprovementSection = ({data, title}) => {
   )
 }
 
-
-
-
 const RankingsSection = ({data, title}) => {
   return (
     <Card>
@@ -169,7 +155,6 @@ const RankingsSection = ({data, title}) => {
   )
 }
 
-
 const PopularMapsSection = ({data}) => {
   return (
     <Card>
@@ -201,7 +186,6 @@ const PopularMapsSection = ({data}) => {
     </Card>
   )
 }
-
 
 const MostMatchesSection = ({data}) => {
   return (
@@ -235,30 +219,29 @@ const ReportsView = ({match, history}) => {
   const [report_date, setReportDate] = useState(format(subMonths(new Date(), 1), 'yyyy-M'))
   return (
     <div>
-        <FormControl>
-          <InputLabel htmlFor='platform'>Report</InputLabel>
-          <DataQuery query={GetReports}>
-            {(data) => (
-              <Select value={report_date} onChange={(e, v) => setReportDate(e.target.value)}>
-                {data.reports.map((report) =>
-                  <MenuItem key={report.year + '_' + report.month} value={report.year + '-' + report.month}>
-                    {format(new Date(report.year, report.month-1), 'MMMM yyyy')}
-                  </MenuItem>
-                )}
-              </Select>
-            )}
-          </DataQuery>
-        </FormControl>
-        <br />
-        <br />
-        <DataQuery query={GetReport} variables={{year: report_date.split('-')[0], month: report_date.split('-')[1]}}>
+      <FormControl>
+        <InputLabel htmlFor='platform'>Report</InputLabel>
+        <DataQuery query={GetReports}>
           {(data) => (
-            <>
+            <Select value={report_date} onChange={(e, v) => setReportDate(e.target.value)}>
+              {data.reports.map((report) =>
+                <MenuItem key={report.year + '_' + report.month} value={report.year + '-' + report.month}>
+                  {format(new Date(report.year, report.month-1), 'MMMM yyyy')}
+                </MenuItem>
+              )}
+            </Select>
+          )}
+        </DataQuery>
+      </FormControl>
+      <br />
+      <br />
+      <DataQuery query={GetReport} variables={{year: report_date.split('-')[0], month: report_date.split('-')[1]}}>
+      {(data) => (
+        <>
           <Grid container spacing={24}>
             <Grid item><Stat title='Matches' stat={data.report.total_matches.toLocaleString()} /></Grid>
             <Grid item><Stat title='Players' stat={data.report.total_players.toLocaleString()} /></Grid>
           </Grid>
-
           <Grid container spacing={24}>
             <Grid item>
               <MostMatchesSection data={data.report.most_matches} />
@@ -282,11 +265,10 @@ const ReportsView = ({match, history}) => {
               <MostImprovementSection data={data.report.improvement_tg} title={'Team Game'} />
             </Grid>
           </Grid>
-            </>
-          )}
-          </DataQuery>
-
-  </div>
+        </>
+      )}
+      </DataQuery>
+    </div>
   )
 }
 
