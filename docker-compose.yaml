@@ -1,0 +1,30 @@
+version: '3'
+services:
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+  server:
+    image: aocgql
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - MGZ_DB=${MGZ_DB}
+      - MGZ_STORE_PATH=${MGZ_STORE_PATH}
+    build:
+      context: python
+  nginx:
+    image: aocrecs
+    depends_on:
+      - server
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    build:
+      context: js
+    ports:
+      - 80:80
+      - 443:443
