@@ -40,7 +40,15 @@ export const OptionInput = ({label, table, name, data}) => {
   const key = 'values'
   const [current_value, params, setter] = searchState(table, name, key)
   const setValue = (value) => {
-    setter(updateAll(params, table, name, value !== '' ? {[key]: [value]} : null))
+    let val = value
+    if (val === 'true') {
+      val = true
+    } else if (val === 'false') {
+      val = false
+    } else if (!isNaN(val)) {
+      val = parseInt(val)
+    }
+    setter(updateAll(params, table, name, value !== '' ? {[key]: [val]} : null))
   }
   return (
     <FormControl style={{minWidth: 120}}>
@@ -52,8 +60,8 @@ export const OptionInput = ({label, table, name, data}) => {
       >
         <MenuItem value=''></MenuItem>
         {data.map((item) =>
-          <MenuItem key={name+item.id} value={item.id}>
-            {item.label} ({item.count.toLocaleString()})
+          <MenuItem key={name+item.value} value={item.value}>
+            {item.label}
           </MenuItem>
         )}
       </Select>
@@ -88,7 +96,7 @@ export const NumberInput = ({label, table, name, validation}) => {
   const [comparator, setComparator] = useState('gte')
   const [, params, setter] = searchState(table, name, comparator)
   const [debouncedSetter] = useDebouncedCallback((key, value) => {
-    setter(updateAll(params, table, name, value !== '' ? {[key]: value} : null))
+    setter(updateAll(params, table, name, value !== '' ? {[key]: parseInt(value)} : null))
   }, DEBOUNCE_MS)
   const setValue = (key, value) => {
     setNumber(value)

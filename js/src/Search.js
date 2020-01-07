@@ -26,16 +26,15 @@ const GeneralSection = ({data}) => {
       <CardContent>
         <Typography variant='h5'>General</Typography>
         <FormGroup>
-          <OptionInput label='Team Size' table='match' name='team_size' data={data.stats.team_sizes} />
-          <OptionInput label='Diplomacy' table='match' name='diplomacy_type' data={data.stats.diplomacy_types} />
-          <OptionInput label='Map' table='match' name='map_name' data={data.stats.maps} />
-          <OptionInput label='Type' table='match' name='type_id' data={data.stats.game_types} />
-          <OptionInput label='Mirror' table='match' name='mirror' data={data.stats.mirror} />
-          <OptionInput label='Rated' table='match' name='rated' data={data.stats.rated} />
-          <OptionInput label='ZR' table='match' name='rms_zr' data={data.stats.rms_zr} />
-          <OptionInput label='Event' table='match' name='event_id' data={data.stats.events} />
-          <OptionInput label='Tournament' table='match' name='tournament_id' data={data.stats.tournaments} />
-          <DateInput label='Played' table='match' name='played' />
+          <TextInput label='Map' table='matches' name='map_name' />
+          <OptionInput label='Diplomacy' table='matches' name='diplomacy_type' data={data.search_options.general.diplomacy_types} />
+          <OptionInput label='Type' table='matches' name='type_id' data={data.search_options.general.game_types} />
+          <OptionInput label='Mirror' table='matches' name='mirror' data={data.search_options.general.mirror} />
+          <OptionInput label='Rated' table='matches' name='rated' data={data.search_options.general.rated} />
+          <OptionInput label='ZR' table='matches' name='rms_zr' data={data.search_options.general.rms_zr} />
+          <OptionInput label='Event' table='matches' name='event_id' data={data.search_options.general.events} />
+          <OptionInput label='Tournament' table='matches' name='tournament_id' data={data.search_options.general.tournaments} />
+          <DateInput label='Played' table='matches' name='played' />
         </FormGroup>
       </CardContent>
     </Card>
@@ -47,15 +46,15 @@ const DatasetSection = ({data, values}) => {
     <Card>
       <CardContent>
         <Typography variant='h5'>Dataset</Typography>
-        <OptionInput label='Dataset' table='match' name='dataset_id' data={data.stats.datasets} />
+        <OptionInput label='Dataset' table='matches' name='dataset_id' data={data.search_options.general.datasets} />
         {findKey(values, 'dataset_id') &&
           <DataQuery
             query={GetSearchOptionsDataset}
-            variables={{dataset_id: values[findKey(values, 'dataset_id')].dataset_id.values[0]}}
+            variables={{dataset_id: parseInt(values[findKey(values, 'dataset_id')].dataset_id.values[0])}}
           >
           {(data) => (
             <FormGroup>
-              <OptionInput label='Civilization' table='player' name='civilization_id' data={data.stats.civilizations} />
+              <OptionInput label='Civilization' table='players' name='civilization_id' data={data.search_options.civilizations} />
             </FormGroup>
           )}
           </DataQuery>
@@ -75,11 +74,11 @@ const PlayerSection = ({data}) => {
       <CardContent>
         <Typography variant='h5'>Player</Typography>
         <FormGroup>
-          <TextInput label='Name' table='player' name='user_name' />
-          <OptionInput label='Winner' table='player' name='winner' data={data.stats.winner} />
-          <OptionInput label='MVP' table='player' name='mvp' data={data.stats.mvp} />
-          <OptionInput label='Color' table='player' name='color_id' data={data.stats.colors} />
-          <NumberInput label='Rate' table='player' name='rate_snapshot' validation={validRate} />
+          <TextInput label='Name' table='players' name='user_name' />
+          <OptionInput label='Winner' table='players' name='winner' data={data.search_options.general.winner} />
+          <OptionInput label='MVP' table='players' name='mvp' data={data.search_options.general.mvp} />
+          <OptionInput label='Color' table='players' name='color_id' data={data.search_options.general.colors} />
+          <NumberInput label='Rate' table='players' name='rate_snapshot' validation={validRate} />
         </FormGroup>
       </CardContent>
     </Card>
@@ -91,7 +90,7 @@ const PlatformSection = ({data, values}) => {
     <Card>
       <CardContent>
         <Typography variant='h5'>Platform</Typography>
-        <OptionInput label='Platform' table='match' name='platform_id' data={data.stats.platforms} />
+        <OptionInput label='Platform' table='matches' name='platform_id' data={data.search_options.general.platforms} />
         {findKey(values, 'platform_id') &&
           <DataQuery
             query={GetSearchOptionsPlatform}
@@ -99,7 +98,7 @@ const PlatformSection = ({data, values}) => {
           >
           {(data) => (
             <FormGroup>
-              <OptionInput label='Ladder' table='match' name='ladder_id' data={data.stats.ladders} />
+              <OptionInput label='Ladder' table='matches' name='ladder_id' data={data.search_options.ladders} />
             </FormGroup>
           )}
           </DataQuery>

@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 export default gql`
 query Ladders($platform_id: String!) {
-  meta_ladders(platform_id: $platform_id) {
+  meta_ladders(platform_id: $platform_id, ladder_ids: [131, 132]) {
     id
     platform_id
     name
@@ -13,7 +13,9 @@ query Ladders($platform_id: String!) {
       user {
         id
         name
-        canonical_name
+        person {
+          name
+        }
       }
     }
   }

@@ -3,19 +3,19 @@ import gql from "graphql-tag";
 export default gql`
   {
     stats {
-      matches
-      series
-      users
+      match_count
+      series_count
+      player_count
       map_count
       by_day {
         date
         count
       }
-      platforms { id label count }
-      languages { id label count }
-      datasets { id label count }
-      diplomacy_types { id label count }
-      game_types { id label count }
+      platforms { name count }
+      languages { name count }
+      datasets { name count }
+      diplomacy { name count }
+      types { name count }
     }
   }
 `;

@@ -20,7 +20,7 @@ import TableRow from '@material-ui/core/TableRow'
 import Typography from '@material-ui/core/Typography'
 
 import Timestamp from 'react-timestamp'
-import {map, flatten, join} from 'lodash'
+import {map, join} from 'lodash'
 
 import EventIcon from 'mdi-react/CalendarRangeIcon'
 
@@ -32,7 +32,6 @@ import WinnerMark from './util/WinnerMark'
 
 import GetEvents from './graphql/Events'
 import GetSeries from './graphql/Series'
-import GetTournament from './graphql/Tournament'
 
 const useStyles = makeStyles({
   card: {
@@ -48,7 +47,7 @@ const useStyles = makeStyles({
 })
 
 const Series = ({id}) => {
-  const field = 'serie'
+  const field = 'series'
   const classes = useStyles()
   return (
     <RelatedMatches query={GetSeries} variables={{id}} field={field}>
@@ -56,7 +55,7 @@ const Series = ({id}) => {
         <Card className={classes.card}>
           <CardIconHeader
             icon={<EventIcon />}
-            title={data.metadata.name}
+            title={data.name}
           />
           <CardContent>
             <Table>
@@ -126,23 +125,19 @@ const Tournament = ({tournament}) => {
           <TableCell>Score</TableCell>
         </TableRow>
       </TableHead>
-      <DataQuery query={GetTournament} variables={{id: tournament.id}}>
-        {(data) => (
-           <TableBody>
-           {flatten(map(data.tournament.rounds, 'series')).map(series => (
-             <TableRow key={series.id}>
-                <TableCell>
-                  <AppLink path={['events', tournament.id, series.id]} text={series.metadata ? series.metadata.name : ''} />
-                </TableCell>
-                {series.participants.map((participant, index) => (
-                  <TableCell key={series.id + ' ' + index}>{participant.name}</TableCell>
-                ))}
-                <TableCell>{join(map(series.participants, 'score'), '-')}</TableCell>
-              </TableRow>
+       <TableBody>
+       {tournament.series.map(series => (
+         <TableRow key={series.id}>
+            <TableCell>
+              <AppLink path={['events', tournament.id, series.id]} text={series.name} />
+            </TableCell>
+            {series.participants.map((participant, index) => (
+              <TableCell key={series.id + ' ' + index}>{participant.name}</TableCell>
             ))}
-          </TableBody>
-        )}
-      </DataQuery>
+            <TableCell>{join(map(series.participants, 'score'), '-')}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
     </Table>
   )
 }

@@ -1,5 +1,5 @@
 export const getMatchTitle = (match, show_map) => {
-  let title = match.type.name + ' ' + match.diplomacy_type
+  let title = match.type + ' ' + match.diplomacy_type
   if (match.diplomacy_type === 'TG') {
     title += ' ' + match.team_size
   }

@@ -11,8 +11,7 @@ services:
     environment:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - MGZ_DB=${MGZ_DB}
-      - MGZ_STORE_PATH=${MGZ_STORE_PATH}
+      - DATABASE_URL=${MGZ_DB}
     build:
       context: python
   nginx:

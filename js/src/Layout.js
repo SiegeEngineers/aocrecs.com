@@ -19,6 +19,8 @@ import CivIcon from 'mdi-react/ChessRookIcon'
 import MapIcon from 'mdi-react/EarthIcon'
 import LadderIcon from 'mdi-react/FormatListNumberedIcon'
 import ReportIcon from 'mdi-react/TableIcon'
+import AboutIcon from 'mdi-react/InformationIcon'
+import UploadIcon from 'mdi-react/FileUploadIcon'
 
 import Main from './Main'
 import Search from './Search'
@@ -29,6 +31,8 @@ import Maps from './Maps'
 import Match from './MatchView'
 import Player from './PlayerView'
 import Reports from './Reports'
+import Upload from './Upload'
+import About from './About'
 
 const drawerWidth = 180
 
@@ -101,6 +105,16 @@ const MENU = [
     link: '/reports',
     title: 'Reports',
     icon: ReportIcon
+  },
+  {
+    link: '/upload',
+    title: 'Upload',
+    icon: UploadIcon
+  },
+  {
+    link: '/about',
+    title: 'About',
+    icon: AboutIcon
   }
 ]
 
@@ -152,6 +166,8 @@ const Layout = () => {
           <Route path='/match/:id?' component={Match} />
           <Route path='/player/:pid?/:id?' component={Player} />
           <Route path='/reports/:y?/:m?' component={Reports} />
+          <Route path='/upload' component={Upload} />
+          <Route path='/about' component={About} />
           <Redirect to='/' />
         </Switch>
       </main>

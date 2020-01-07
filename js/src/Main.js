@@ -28,9 +28,9 @@ const Main = () => {
       {(data) => (
         <div>
           <Grid container spacing={24}>
-            <Grid item><Stat title='Matches' stat={data.stats.matches.toLocaleString()} /></Grid>
-            <Grid item><Stat title='Series' stat={data.stats.series.toLocaleString()} /></Grid>
-            <Grid item><Stat title='Players' stat={data.stats.users.toLocaleString()} /></Grid>
+            <Grid item><Stat title='Matches' stat={data.stats.match_count.toLocaleString()} /></Grid>
+            <Grid item><Stat title='Series' stat={data.stats.series_count.toLocaleString()} /></Grid>
+            <Grid item><Stat title='Players' stat={data.stats.player_count.toLocaleString()} /></Grid>
             <Grid item><Stat title='Maps' stat={data.stats.map_count.toLocaleString()} /></Grid>
           </Grid>
           <Grid container spacing={24}>
@@ -46,7 +46,7 @@ const Main = () => {
               <Card>
                 <CardContent>
                   <Typography variant='h5'>Languages</Typography>
-                  <Chart id="languages" width='500' height='280' type='bar' series={[{data: data.stats.languages.map(i => ({x: i.label, y: i.count}))}]} />
+                  <Chart id="languages" width='500' height='280' type='bar' series={[{data: data.stats.languages.map(i => ({x: i.name, y: i.count}))}]} />
                 </CardContent>
               </Card>
             </Grid>
@@ -54,7 +54,7 @@ const Main = () => {
               <Card>
                 <CardContent>
                   <Typography variant='h5'>Datasets</Typography>
-                  <Chart id="datasets" width='500' height='280' type='bar' series={[{data: data.stats.datasets.map(i => ({x: i.label.split(': ')[1], y: i.count}))}]} />
+                  <Chart id="datasets" width='500' height='280' type='bar' series={[{data: data.stats.datasets.map(i => ({x: i.name, y: i.count}))}]} />
                 </CardContent>
               </Card>
             </Grid>
@@ -62,7 +62,7 @@ const Main = () => {
               <Card>
                 <CardContent>
                   <Typography variant='h5'>Platforms</Typography>
-                  <Chart id="platforms" width='500' height='280' type='bar' series={[{data: data.stats.platforms.map(i => ({x: i.label, y: i.count}))}]} />
+                  <Chart id="platforms" width='500' height='280' type='bar' series={[{data: data.stats.platforms.map(i => ({x: i.name, y: i.count}))}]} />
                 </CardContent>
               </Card>
             </Grid>
@@ -70,7 +70,7 @@ const Main = () => {
               <Card>
                 <CardContent>
                   <Typography variant='h5'>Diplomacy</Typography>
-                  <Chart id="diplomacy" width='500' height='280' type='bar' series={[{data: data.stats.diplomacy_types.map(i => ({x: i.label, y: i.count}))}]} />
+                  <Chart id="diplomacy" width='500' height='280' type='bar' series={[{data: data.stats.diplomacy.map(i => ({x: i.name, y: i.count}))}]} />
                 </CardContent>
               </Card>
             </Grid>
@@ -78,7 +78,7 @@ const Main = () => {
               <Card>
                 <CardContent>
                   <Typography variant='h5'>Match Types</Typography>
-                  <Chart id="types" width='500' height='280' type='bar' series={[{data: data.stats.game_types.map(i => ({x: i.label, y: i.count}))}]} />
+                  <Chart id="types" width='500' height='280' type='bar' series={[{data: data.stats.types.map(i => ({x: i.name, y: i.count}))}]} />
                 </CardContent>
               </Card>
             </Grid>

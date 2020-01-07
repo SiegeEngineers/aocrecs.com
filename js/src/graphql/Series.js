@@ -3,11 +3,9 @@ import gql from 'graphql-tag';
 import MatchFragment from '../graphql/MatchFragment.js';
 
 export default gql`
-query Serie($id: String!, $offset: Int!, $limit: Int!) {
-  serie(id: $id) {
-    metadata {
-      name
-    }
+query Series($id: String!, $offset: Int!, $limit: Int!) {
+  series(id: $id) {
+    name
     played
     sides {
       name

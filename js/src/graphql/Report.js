@@ -2,55 +2,63 @@ import gql from 'graphql-tag';
 
 export default gql`
 query Report($year: Int!, $month: Int!) {
-  report(year: $year, month: $month) {
+  report(platform_id: "voobly", year: $year, month: $month) {
     total_matches
     total_players
-    most_matches(platform_id: "voobly") {
-      platform_id
+    most_matches {
       count
       user {
+        platform_id
         id
         name
-        canonical_name
+        person {
+          name
+        }
       }
     }
 		popular_maps {
       rank
-      name
+      map {
+        name
+      }
       count
       percent
-      change
     }
     rankings_1v1: rankings(platform_id: "voobly", ladder_id: 131) {
       rank
-      user_id
       user {
+        id
+        platform_id
         name
-        canonical_name
+        person {
+          name
+        }
       }
-      platform_id
       rating
       change
     }
     rankings_tg: rankings(platform_id: "voobly", ladder_id: 132) {
       rank
-      user_id
-      user_name
       user {
+        id
         name
-        canonical_name
+        platform_id
+        person {
+          name
+        }
       }
-      platform_id
       rating
       change
     }
     improvement_1v1: most_improvement(platform_id: "voobly", ladder_id: 131) {
       user {
         id
+        platform_id
         name
-        canonical_name
+        person {
+          name
+        }
       }
-      platform_id
       min_rate
       max_rate
       diff_rate
@@ -61,10 +69,12 @@ query Report($year: Int!, $month: Int!) {
     improvement_tg: most_improvement(platform_id: "voobly", ladder_id: 132) {
       user {
         id
+        platform_id
         name
-        canonical_name
+        person {
+          name
+        }
       }
-      platform_id
       min_rate
       max_rate
       diff_rate
@@ -74,9 +84,7 @@ query Report($year: Int!, $month: Int!) {
     }
 		longest_matches {
       id
-      type {
-        name
-      }
+      type
       diplomacy_type
       team_size
       map_name

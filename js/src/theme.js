@@ -19,7 +19,8 @@ const theme = createMuiTheme({
     MuiTableCell: {
       root: {
         padding: '1px',
-        paddingLeft: '3px'
+        paddingLeft: '3px',
+        paddingRight: '3px'
       }
     },
     MuiTableRow: {
@@ -34,6 +35,14 @@ const theme = createMuiTheme({
       root: {
         '&:last-child': {
           paddingBottom: '16px'
+        }
+      }
+    },
+    MuiTab: {
+      root: {
+        minWidth: 0,
+        '@media (min-width: 0px)': {
+          minWidth: 0
         }
       }
     }

@@ -2,22 +2,22 @@ import gql from "graphql-tag";
 
 export default gql`
   {
-    stats {
-      platforms { id label count }
-      datasets { id label count }
-      team_sizes { id label count }
-      diplomacy_types { id label count }
-      maps { id label count }
-      game_types { id label count }
-      population_limits { id label count }
-      events { id label count }
-      tournaments { id label count }
-      mirror { id label count }
-      rated { id label count }
-      rms_zr { id label count }
-      colors { id label count }
-      winner { id label count }
-      mvp { id label count }
+    search_options {
+      general {
+        platforms { value label }
+        datasets { value label }
+        team_sizes { value label }
+        diplomacy_types { value label }
+        game_types { value label }
+        events { value label }
+        tournaments { value label }
+        mirror { value label }
+        rated { value label }
+        rms_zr { value label }
+        colors { value label }
+        winner { value label }
+        mvp { value label }
+      }
     }
   }
 `;

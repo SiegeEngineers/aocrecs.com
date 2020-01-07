@@ -1,20 +1,8 @@
-FROM alpine
-EXPOSE 3000
-VOLUME /usr/src/app/public
-WORKDIR /usr/src/app
-RUN apk add --no-cache \
-        uwsgi-python3 \
-        python3 \
-        python3-dev \
-        build-base \
-        linux-headers \
-        postgresql-dev
+FROM python:3.8.1
+EXPOSE 8000
+WORKDIR /opt/app
 COPY . .
-RUN rm -rf public/*
+RUN apt-get update
+RUN apt-get -y install potrace
 RUN pip3 install --no-cache-dir -e .
-CMD ["uwsgi", "--socket", "0.0.0.0:3000", \
-              "--uid", "uwsgi", \
-              "--plugins", "python3", \
-              "--protocol", "uwsgi", \
-              "--route-run", "fixpathinfo:", \
-              "--wsgi", "wsgi:app"]
+CMD ["uvicorn", "--host", "0.0.0.0", "aocrecs.main:APP"]

@@ -4,7 +4,7 @@ import MatchFragment from "../graphql/MatchFragment.js"
 
 export default gql`
 query Match($match_id: Int!) {
-  match(match_id: $match_id) {
+  match(id: $match_id) {
     ...MatchFragment
   }
 }

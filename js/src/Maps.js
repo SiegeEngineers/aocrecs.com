@@ -74,9 +74,9 @@ const MapTable = ({rows, selected}) => {
               <TableCell>{offset + index + 1}</TableCell>
               <TableCell><AppLink path={['maps', row.name]} text={row.name} /></TableCell>
               <TableCell>
-                {row.event_maps.map((map, i) => [
+                {row.events.map((event, i) => [
                   i > 0 && ', ',
-                  <AppLink path={['events', map.event.id]} text={map.event.name} key={map.event.id} />
+                  <AppLink path={['events', event.id]} text={event.name} key={event.id} />
                 ])}
               </TableCell>
               <TableCell align='right'>{row.count.toLocaleString()}</TableCell>
@@ -102,13 +102,17 @@ const Map = ({name}) => {
         <Card>
           <CardIconHeader icon={<MapIcon />} title={data.name} />
           <CardContent>
-            {data.popular_civs.length > 0 && <div>
-              <Typography variant='h6'>Popular 1v1 Civilizations</Typography>
+            {data.preview_url && <img src={data.preview_url} width="100%" />}
+            {data.top_civilizations.length > 0 && <div>
+              <Typography variant='h6'>Civilizations: Most Wins</Typography>
               <Typography component='span'>
                 <ol>
-                  {data.popular_civs.map((stat) =>
-                    <li key={stat.civilization.cid}>
-                      {stat.civilization.name} ({Math.round(stat.percent * 1000)/10}%)
+                  {data.top_civilizations.map((civ) =>
+                    <li key={civ.id}>
+                      <AppLink
+                        path={['civilizations', civ.dataset_id, civ.id]}
+                        text={civ.name}
+                      />
                     </li>
                   )}
                 </ol>
@@ -128,7 +132,7 @@ const MapsView = ({match}) => {
         <DataQuery query={GetMaps}>
           {(data) => (
             <MapTable
-              rows={data.stats.by_map}
+              rows={data.maps}
               selected={parseInt(match.params.id)}
              />
           )}

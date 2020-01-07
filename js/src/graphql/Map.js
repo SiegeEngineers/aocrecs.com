@@ -6,13 +6,12 @@ export default gql`
 query Map($name: String!, $offset: Int!, $limit: Int!) {
   map(name: $name) {
     name
-    popular_civs {
-      percent
-      civilization {
-        cid
-        name
-      }
+    top_civilizations {
+      id
+      dataset_id
+      name
     }
+    preview_url
     matches(offset: $offset, limit: $limit) {
       count
       hits {

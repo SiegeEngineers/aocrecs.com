@@ -40,6 +40,15 @@ const ChangeIndicator = ({change}) => {
   )
 }
 
+const UserName = ({user}) => {
+  return (
+    <>
+      <AppLink path={['player', user.platform_id, user.id]} text={user.name} />
+      {user.person !== null && user.person.name !== user.name && ' (aka ' + user.person.name + ')'}
+    </>
+  )
+}
+
 const Stat = ({title, stat}) => {
   return (
     <Card>
@@ -103,10 +112,7 @@ const MostImprovementSection = ({data, title}) => {
             {data.map((row, index) =>
               <TableRow key={row.user.id}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>
-                  <AppLink path={['player', row.platform_id, row.user.id]} text={row.user.name} />
-                  {row.user.canonical_name !== null && row.user.canonical_name !== row.user.name && ' (aka ' + row.user.canonical_name + ')'}
-                </TableCell>
+                <TableCell><UserName user={row.user} /></TableCell>
                 <TableCell align='right'>{row.min_rate}</TableCell>
                 <TableCell align='right'>{row.max_rate}</TableCell>
                 <TableCell align='right'>+{row.diff_rate}</TableCell>
@@ -141,10 +147,7 @@ const RankingsSection = ({data, title}) => {
               <TableRow key={row.user_id}>
                 <TableCell><ChangeIndicator change={row.change} /></TableCell>
                 <TableCell>{row.rank}</TableCell>
-                <TableCell>
-                  <AppLink path={['player', row.platform_id, row.user_id]} text={row.user.name} />
-                  {row.user.canonical_name !== null && row.user.canonical_name !== row.user.name && ' (aka ' + row.user.canonical_name + ')'}
-                </TableCell>
+                <TableCell><UserName user={row.user} /></TableCell>
                 <TableCell align='right'>{row.rating}</TableCell>
               </TableRow>
             )}
@@ -175,7 +178,7 @@ const PopularMapsSection = ({data}) => {
               <TableRow key={row.rank}>
                 <TableCell><ChangeIndicator change={row.change} /></TableCell>
                 <TableCell>{row.rank}</TableCell>
-                <TableCell><AppLink path={['maps', row.name]} text={row.name} /></TableCell>
+                <TableCell><AppLink path={['maps', row.map.name]} text={row.map.name} /></TableCell>
                 <TableCell align='right'>{row.count.toLocaleString()}</TableCell>
                 <TableCell align='right'>{Math.round(row.percent * 1000)/10}%</TableCell>
               </TableRow>
@@ -204,10 +207,7 @@ const MostMatchesSection = ({data}) => {
             {data.map((row, index) =>
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>
-                  <AppLink path={['player', row.platform_id, row.user.id]} text={row.user.name} />
-                  {row.user.canonical_name !== null && row.user.canonical_name !== row.user.name && ' (aka ' + row.user.canonical_name + ')'}
-                </TableCell>
+                <TableCell><UserName user={row.user} /></TableCell>
                 <TableCell align='right'>{row.count.toLocaleString()}</TableCell>
               </TableRow>
             )}
@@ -238,7 +238,7 @@ const ReportsView = ({match, history}) => {
       </FormControl>
       <br />
       <br />
-      <DataQuery query={GetReport} variables={{year: report_date.split('-')[0], month: report_date.split('-')[1]}}>
+      <DataQuery query={GetReport} variables={{year: parseInt(report_date.split('-')[0]), month: parseInt(report_date.split('-')[1])}}>
       {(data) => (
         <>
           <Grid container spacing={24}>

@@ -80,7 +80,8 @@ const Chart = ({id, type, timeseries, series, width, height, y_min}) => {
       },
       xaxis: {
         labels: {
-          formatter: (value) => value === 0 ? 0 : (value/1000) + 'k'
+          trim: false,
+          formatter: (value) => value === 0 ? 0 : (value >= 1000000 ? (value/1000000) + 'm' : (value/1000) + 'k')
         }
       },
       yaxis: {

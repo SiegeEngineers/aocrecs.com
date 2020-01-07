@@ -5,37 +5,23 @@ fragment MatchFragment on Match {
   id
   duration_secs
   played
-  type {
-    name
-  }
+  type
   rated
   diplomacy_type
   team_size
   map_name
-  event_map {
-    event {
-      id
-      name
-    }
+  map_events {
+    id
+    name
   }
   platform_match_id
   cheats
-  map_size {
-    name
-  }
-  rms_seed
-  hash
-  map_reveal_choice {
-    name
-  }
+  map_size
+  map_reveal_choice
   population_limit
-  speed {
-    name
-  }
+  speed
   lock_teams
-  difficulty {
-    name
-  }
+  difficulty
   mirror
   dataset {
     name
@@ -48,15 +34,13 @@ fragment MatchFragment on Match {
   }
   dataset_version
   ladder {
-    lid
+    id
     platform_id
     name
   }
   series {
     id
-    metadata {
-      name
-    }
+    name
   }
   tournament {
     id
@@ -70,14 +54,17 @@ fragment MatchFragment on Match {
   winning_team_id
   teams {
     winner
-    members {
+    players {
       name
       color_id
       platform_id
-      user_id
-      user_name
+      user {
+        id
+        name
+        platform_id
+      }
       civilization {
-        cid
+        id
         dataset_id
         name
       }
@@ -93,10 +80,8 @@ fragment MatchFragment on Match {
       technology_score
       society_score
       units_killed
-      hit_points_killed
       units_lost
       buildings_razed
-      hit_points_razed
       buildings_lost
       units_converted
       food_collected
@@ -122,11 +107,6 @@ fragment MatchFragment on Match {
     id
     original_filename
     size
-    compressed_size
-    encoding
-    language
-    parser_version
-    hash
     owner {
       name
     }

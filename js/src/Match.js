@@ -31,6 +31,22 @@ import WinnerMark from './util/WinnerMark'
 import {getMatchTitle} from './util/Shared'
 import GetOdds from './graphql/Odds'
 
+const shortHumanizeDuration = humanizeDuration.humanizer({
+  language: 'shortEn',
+  languages: {
+    shortEn: {
+      y: () => 'y',
+      mo: () => 'mo',
+      w: () => 'w',
+      d: () => 'd',
+      h: () => 'h',
+      m: () => 'm',
+      s: () => 's',
+      ms: () => 'ms',
+    }
+  }
+})
+
 const PLAYER_COLORS = {
   1: '#6599d8',
   2: '#f25f5f',
@@ -54,7 +70,7 @@ const useStyles = makeStyles(theme => ({
     marginRight: '4px'
   },
   tabContent: {
-    padding: '20px'
+    padding: '10px'
   },
   mvpIcon: {
     width: '12px',
@@ -83,8 +99,8 @@ const PlayerName = ({player}) => {
   return (
     <span>
       <div style={{backgroundColor: PLAYER_COLORS[player.color_id + 1]}} className={classes.playerColor} />
-      {player.user_name
-        ? <AppLink path={['player', player.platform_id, player.user_id]} text={player.user_name} />
+      {player.user
+        ? <AppLink path={['player', player.user.platform_id, player.user.id]} text={player.user.name} />
         : player.name
       }
     </span>
@@ -111,7 +127,7 @@ const TeamBody = ({teams, hasTeams, children, span}) => {
       {teams.map((team, index) => (
         <TableBody key={index}>
           {hasTeams && <TeamRow number={index + 1} winner={team.winner} span={span} />}
-          {team.members.map((player, mindex) => (
+          {team.players.map((player, mindex) => (
             <TableRow key={mindex}>
               <TableCell>
                 <WinnerMark winner={!hasTeams && player.winner} className={classes.winner} /> <PlayerName player={player} />
@@ -195,7 +211,7 @@ const Information = ({match}) => {
         <TableCell>Tournament</TableCell><TableCell><AppLink path={['events', match.tournament.id]} text={match.tournament.name} /></TableCell>
       </TableRow>}
       {match.series && <TableRow>
-        <TableCell>Series</TableCell><TableCell><AppLink path={['events', match.tournament.id, match.series.id]} text={match.series.metadata.name} /></TableCell>
+        <TableCell>Series</TableCell><TableCell><AppLink path={['events', match.tournament.id, match.series.id]} text={match.series.name} /></TableCell>
       </TableRow>}
       {!hasTeams && <TableRow>
         <TableCell>Mirror</TableCell><TableCell>{match.mirror ? 'Yes' : 'No'}</TableCell>
@@ -203,32 +219,35 @@ const Information = ({match}) => {
       <TableRow>
         <TableCell>Map</TableCell>
         <TableCell>
-          <AppLink path={['maps', match.map_name]} text={match.map_name} /> ({match.map_size.name})
+          <AppLink path={['maps', match.map_name]} text={match.map_name} /> ({match.map_size})
         </TableCell>
       </TableRow>
-      {match.event_map && <TableRow>
+      {match.map_events && <TableRow>
         <TableCell>Map Event</TableCell>
         <TableCell>
-          <AppLink path={['events', match.event_map.event.id]} text={match.event_map.event.name} />
+          {match.map_events.map((event, i) => [
+            i > 0 && ', ',
+            <AppLink path={['events', event.id]} text={event.name} />
+          ])}
         </TableCell>
       </TableRow>}
       <TableRow>
         <TableCell>Cheats</TableCell><TableCell>{match.cheats ? 'On' : 'Off'}</TableCell>
       </TableRow>
       <TableRow>
-        <TableCell>Reveal Map</TableCell><TableCell>{match.map_reveal_choice.name}</TableCell>
+        <TableCell>Reveal Map</TableCell><TableCell>{match.map_reveal_choice}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell>Population Limit</TableCell><TableCell>{match.population_limit}</TableCell>
       </TableRow>
       <TableRow>
-        <TableCell>Speed</TableCell><TableCell>{match.speed.name}</TableCell>
+        <TableCell>Speed</TableCell><TableCell>{match.speed}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell>Lock Teams</TableCell><TableCell>{match.lock_teams ? 'On' : 'Off'}</TableCell>
       </TableRow>
       <TableRow>
-        <TableCell>Difficulty</TableCell><TableCell>{match.difficulty.name}</TableCell>
+        <TableCell>Difficulty</TableCell><TableCell>{match.difficulty}</TableCell>
       </TableRow>
       {match.dataset && <TableRow>
         <TableCell>Dataset</TableCell><TableCell>{match.dataset.name} {match.dataset_version}</TableCell>
@@ -353,9 +372,9 @@ const Achievements = ({size, teams}) => {
         <TeamBody teams={teams} hasTeams={hasTeams} span={6}>
           {(player) => (
             <>
-              <TableCell align='right'>{humanizeDuration(player.feudal_time_secs * 1000)}</TableCell>
-              <TableCell align='right'>{humanizeDuration(player.castle_time_secs * 1000)}</TableCell>
-              <TableCell align='right'>{humanizeDuration(player.imperial_time_secs * 1000)}</TableCell>
+              <TableCell align='right'>{shortHumanizeDuration(player.feudal_time_secs * 1000)}</TableCell>
+              <TableCell align='right'>{shortHumanizeDuration(player.castle_time_secs * 1000)}</TableCell>
+              <TableCell align='right'>{shortHumanizeDuration(player.imperial_time_secs * 1000)}</TableCell>
               <TableCell align='right'>{player.explored_percent}</TableCell>
               <TableCell align='right'>{player.research_count}</TableCell>
             </>
@@ -414,6 +433,12 @@ const Files = ({files}) => {
   )
 }
 
+const Map = ({match}) => {
+  return (
+    <img src={process.env.REACT_APP_API + "/map/" + match.id} width="100%" />
+  )
+}
+
 const Scenario = ({title, scenario, match}) => {
   return (
     <TableRow>
@@ -436,7 +461,7 @@ const Odds = ({match}) => {
           <TableRow>
             <TableCell>Scenario</TableCell>
             {match.teams.map((team, index) => (
-              <TableCell key={index} align='right'>{hasTeams ? <span>Team {index+1}</span> : <PlayerName player={team.members[0]} />}</TableCell>
+              <TableCell key={index} align='right'>{hasTeams ? <span>Team {index+1}</span> : <PlayerName player={team.players[0]} />}</TableCell>
             ))}
             <TableCell align='center'>Expected Outcome</TableCell>
           </TableRow>
@@ -463,10 +488,11 @@ const Match = ({match}) => {
       <CardIconHeader icon={<AppLink path={['match', match.id]} text={<MatchIcon />} />} title={title}/>
       <CardContent>
         <AppBar position='static'>
-          <Tabs value={tab} onChange={(e, value) => setTab(value)}>
+          <Tabs value={tab} onChange={(e, value) => setTab(value)} variant="fullWidth">
             <Tab label='Players' />
             <Tab label='Information' />
             <Tab label='Achievements' />
+            <Tab label='Map' />
             <Tab label='Odds' />
             <Tab label='Files' />
           </Tabs>
@@ -475,8 +501,9 @@ const Match = ({match}) => {
           {tab === 0 && <Teams size={match.team_size} teams={match.teams} rated={match.rated} />}
           {tab === 1 && <Information match={match} />}
           {tab === 2 && <Achievements size={match.team_size} teams={match.teams} />}
-          {tab === 3 && <Odds match={match} />}
-          {tab === 4 && <Files files={match.files} />}
+          {tab === 3 && <Map match={match} />}
+          {tab === 4 && <Odds match={match} />}
+          {tab === 5 && <Files files={match.files} />}
         </Typography>
       </CardContent>
     </Card>

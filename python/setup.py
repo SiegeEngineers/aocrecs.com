@@ -1,35 +1,32 @@
-"""AoC GraphQL setup."""
+"""aocrecs.com Setup."""
 from setuptools import setup, find_packages
 
 setup(
-    name='aocgql',
-    version='2.0.0',
-    description='Age of Empires II graphql interface.',
-    url='https://github.com/siegeengineers/aoc-graphql/',
+    name='aocrecs',
+    version='3.0.0',
+    description='aocrecs.com API.',
+    url='https://github.com/siegeengineers/aocrecs.com/',
     license='MIT',
     author='happyleaves',
     author_email='happyleaves.tfr@gmail.com',
     packages=find_packages(),
     install_requires=[
-        'coloredlogs>=10.0',
-        'boto3>=1.9.243',
-        'dateparser>=0.7.1',
-        'Flask>=1.0.2',
-        'Flask-Caching>=1.7.2',
-        'Flask-Cors>=3.0.7',
-        'Flask-GraphQL==2.0.0',
-        'graphene>=2.1.8',
-        'graphene-sqlalchemy>=2.2.2',
-        'mgzdb>=1.2.5',
-        'networkx>=2.2',
-        'psycopg2-binary>=2.8.3'
+        'aiocache==0.11.1',
+        'aiodataloader==0.1.2',
+        'ariadne==0.8.0',
+        'asyncpg==0.20.0',
+        'boto3==1.10.46',
+        'coloredlogs==10.0',
+        'databases==0.2.6',
+        'mgzdb>=1.2.6',
+        'networkx==2.4',
+        'python-dateutil==2.8.1',
+        'starlette==0.13.0',
+        'uvicorn==0.10.8'
     ],
-    entry_points = {
-        'console_scripts': ['aocgql=aocgql.__main__:setup'],
-    },
     classifiers=[
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3'
     ]
 )

@@ -8,9 +8,17 @@ export default gql`
     tournaments {
       id
       name
+      series {
+        id
+        name
+        participants {
+          name
+          score
+          winner
+        }
+      }
     }
     maps {
-      id
       name
     }
   }

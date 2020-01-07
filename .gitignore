@@ -2,3 +2,5 @@ node_modules
 build
 *egg-info
 __pycache__
+.env
+venv

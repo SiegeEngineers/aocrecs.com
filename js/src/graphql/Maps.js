@@ -2,19 +2,15 @@ import gql from 'graphql-tag';
 
 export default gql`
 {
-  stats {
-    by_map {
+  maps {
+    name
+    builtin
+    events {
+      id
       name
-      builtin
-      event_maps {
-        event {
-          id
-          name
-        }
-      }
-      count
-      percent
     }
+    count
+    percent
   }
 }
 `

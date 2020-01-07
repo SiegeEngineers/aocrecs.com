@@ -2,9 +2,13 @@ import gql from 'graphql-tag';
 
 export default gql`
 {
-  platforms {
-    id
-    name
+  search_options {
+    general {
+      platforms {
+        value
+        label
+      }
+    }
   }
 }
 `

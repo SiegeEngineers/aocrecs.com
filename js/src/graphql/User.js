@@ -4,12 +4,14 @@ import MatchFragment from '../graphql/MatchFragment.js';
 
 export default gql`
 query User($user_id: String!, $platform_id: String!, $offset: Int!, $limit: Int!) {
-  user(user_id: $user_id, platform_id: $platform_id) {
+  user(id: $user_id, platform_id: $platform_id) {
     id
     name
-    canonical_name
-    aliases
-    meta_ranks {
+    person {
+      name
+      aliases
+    }
+    meta_ranks(ladder_ids: [131, 132]) {
       rating
       rank
       streak
@@ -26,7 +28,7 @@ query User($user_id: String!, $platform_id: String!, $offset: Int!, $limit: Int!
       name
     }
     top_civilization {
-      cid
+      id
       dataset_id
       name
     }

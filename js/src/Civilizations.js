@@ -44,9 +44,9 @@ const CivTable = ({civilizations, selected}) => {
       </TableHead>
       <TableBody>
         {civilizations.map((civilization, index) =>
-          <TableRow key={index} selected={selected === civilization.civilization.cid}>
+          <TableRow key={index} selected={selected === civilization.id}>
             <TableCell>
-              <AppLink path={['civilizations', civilization.civilization.dataset_id, civilization.civilization.cid]} text={civilization.civilization.name} />
+              <AppLink path={['civilizations', civilization.dataset_id, civilization.id]} text={civilization.name} />
             </TableCell>
             <TableCell>{civilization.count.toLocaleString()}</TableCell>
             <TableCell>{Math.round(civilization.percent * 1000)/10}%</TableCell>
@@ -90,8 +90,8 @@ const CivilizationsView = ({match}) => {
           <DataQuery query={GetDatasets}>
             {(data) => (
               <Select value={dataset_id} onChange={(e, v) => setDataset(e.target.value)}>
-                {data.datasets.map((dataset) =>
-                  <MenuItem key={dataset.id} value={dataset.id}>{dataset.name}</MenuItem>
+                {data.search_options.general.datasets.map((dataset) =>
+                  <MenuItem key={dataset.value} value={dataset.value}>{dataset.label}</MenuItem>
                 )}
               </Select>
             )}
@@ -99,14 +99,14 @@ const CivilizationsView = ({match}) => {
         </FormControl>
         <br />
         <br />
-        <DataQuery query={GetCivs} variables={{dataset_id}}>
+        <DataQuery query={GetCivs} variables={{dataset_id: parseInt(dataset_id)}}>
           {(data) => (
-            <CivTable civilizations={data.stats.by_civilization} selected={parseInt(match.params.id)} />
+            <CivTable civilizations={data.civilizations} selected={parseInt(match.params.id)} />
           )}
         </DataQuery>
       </Grid>
       {match.params.id && <Grid item xs={6}>
-        <Civilization id={parseInt(match.params.id)} dataset_id={dataset_id} />
+        <Civilization id={parseInt(match.params.id)} dataset_id={parseInt(dataset_id)} />
       </Grid>}
     </Grid>
   )

@@ -2,13 +2,13 @@ import gql from 'graphql-tag';
 
 export default gql`
 query Odds($match_id: Int!) {
-  match(match_id: $match_id) {
+  match(id: $match_id) {
     odds {
-      teams
-      teams_and_civilizations
-      civilizations
-      civilizations_and_map
-      teams_and_map
+      teams { wins losses percent }
+      teams_and_civilizations { wins losses percent }
+      civilizations { wins losses percent }
+      civilizations_and_map { wins losses percent }
+      teams_and_map { wins losses percent }
     }
   }
 }
