@@ -18,7 +18,7 @@ def get_sides(matches, participants):
             ) for p in match['players']
         })
     return [
-        dict(p, users=[users[u] for u in p['user_ids']])
+        dict(p, users=[users[u] for u in p['user_ids'] if u])
         for p in compute_participants(matches, participants)
     ]
 

@@ -20,7 +20,7 @@ import TableRow from '@material-ui/core/TableRow'
 import Typography from '@material-ui/core/Typography'
 
 import Timestamp from 'react-timestamp'
-import {map, join} from 'lodash'
+import {map, join, sortBy, reverse} from 'lodash'
 
 import EventIcon from 'mdi-react/CalendarRangeIcon'
 
@@ -131,10 +131,10 @@ const Tournament = ({tournament}) => {
             <TableCell>
               <AppLink path={['events', tournament.id, series.id]} text={series.name} />
             </TableCell>
-            {series.participants.map((participant, index) => (
+            {reverse(sortBy(series.participants, 'score')).map((participant, index) => (
               <TableCell key={series.id + ' ' + index}>{participant.name}</TableCell>
             ))}
-            <TableCell>{join(map(series.participants, 'score'), '-')}</TableCell>
+            <TableCell>{join(map(reverse(sortBy(series.participants, 'score')), 'score'), '-')}</TableCell>
           </TableRow>
         ))}
       </TableBody>

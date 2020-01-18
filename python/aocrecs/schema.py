@@ -194,6 +194,7 @@ type Match {
     mirror: Boolean
     dataset_version: String
     version: String
+    postgame: Boolean
     platform_match_id: String
     winning_team_id: Int
     players: [Player]
@@ -249,7 +250,7 @@ type Platform {
 type Player {
     match_id: Int!
     team_id: Int!
-    platform_id: String!
+    platform_id: String
     user: User
     number: Int!
     name: String!

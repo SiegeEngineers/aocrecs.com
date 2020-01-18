@@ -3,6 +3,7 @@ import coloredlogs
 import databases
 
 from ariadne.asgi import GraphQL
+from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
 from starlette.applications import Starlette
 from starlette.config import Config
 from starlette.datastructures import URL
@@ -28,7 +29,8 @@ def new_app():
         Route('/api', GraphQL(
             resolvers.SCHEMA,
             debug=DEBUG,
-            context_value=lambda request: Context(request, database, resolvers.loaders)
+            context_value=lambda request: Context(request, database, resolvers.loaders),
+            extensions=[ApolloTracingExtension]
         ), name='api'),
         Route('/api/download/{file_id:int}', aoc_routes.download, name='download'),
         Route('/api/map/{match_id:int}', aoc_routes.svg_map, name='minimap')

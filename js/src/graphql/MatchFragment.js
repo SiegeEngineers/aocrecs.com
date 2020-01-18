@@ -14,6 +14,7 @@ fragment MatchFragment on Match {
     id
     name
   }
+  postgame
   platform_match_id
   cheats
   map_size

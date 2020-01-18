@@ -96,7 +96,7 @@ async def get_match(keys, context):
         join player_colors on players.color_id=player_colors.id
         join civilizations on players.dataset_id=civilizations.dataset_id and players.civilization_id=civilizations.id
         join datasets on players.dataset_id=datasets.id
-        join platforms on players.platform_id=platforms.id
+        left join platforms on players.platform_id=platforms.id
         where players.match_id=any(:match_id)
     """
     file_query = """
@@ -121,17 +121,17 @@ async def get_match(keys, context):
             starting_resources.name as starting_resources,
             victory_conditions.name as victory_condition,
             played, rated, diplomacy_type, team_size, platform_match_id,
-            cheats, population_limit, lock_teams, mirror, dataset_version,
+            cheats, population_limit, lock_teams, mirror, dataset_version, postgame,
             versions.name as version, extract(epoch from duration)::integer as duration_secs, winning_team_id
         from matches
         join versions on matches.version_id=versions.id
         join datasets on matches.dataset_id=datasets.id
-        join platforms on matches.platform_id=platforms.id
         join difficulties on matches.difficulty_id=difficulties.id
         join game_types on matches.type_id=game_types.id
         join map_reveal_choices on matches.map_reveal_choice_id=map_reveal_choices.id
         join map_sizes on matches.map_size_id=map_sizes.id
         join speeds on matches.speed_id=speeds.id
+        left join platforms on matches.platform_id=platforms.id
         left join starting_ages on matches.starting_age_id=starting_ages.id
         left join starting_resources on matches.starting_resources_id=starting_resources.id
         left join victory_conditions on matches.victory_condition_id=victory_conditions.id
@@ -179,7 +179,7 @@ async def get_match(keys, context):
                 name=match['platform_name'],
                 url=match['platform_url'],
                 match_url=match['platform_match_url']
-            ),
+            ) if match['platform_id'] else None,
             ladder=dict(
                 id=match['ladder_id'],
                 name=match['ladder_name'],

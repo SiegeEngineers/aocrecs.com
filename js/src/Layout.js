@@ -6,6 +6,7 @@ import Drawer from '@material-ui/core/Drawer'
 import AppBar from '@material-ui/core/AppBar'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Toolbar from '@material-ui/core/Toolbar'
+import Link from '@material-ui/core/Link'
 import List from '@material-ui/core/List'
 import Typography from '@material-ui/core/Typography'
 import ListItem from '@material-ui/core/ListItem'
@@ -21,6 +22,7 @@ import LadderIcon from 'mdi-react/FormatListNumberedIcon'
 import ReportIcon from 'mdi-react/TableIcon'
 import AboutIcon from 'mdi-react/InformationIcon'
 import UploadIcon from 'mdi-react/FileUploadIcon'
+import ApiIcon from 'mdi-react/JsonIcon'
 
 import Main from './Main'
 import Search from './Search'
@@ -112,6 +114,11 @@ const MENU = [
     icon: UploadIcon
   },
   {
+    link: '/api',
+    title: 'API',
+    icon: ApiIcon
+  },
+  {
     link: '/about',
     title: 'About',
     icon: AboutIcon
@@ -143,13 +150,20 @@ const Layout = () => {
         <List>
           {MENU.map((link, index) => {
             const Icon = link.icon
-            return (
+            return link.link != '/api' ? (
               <NavLink key={index} to={link.link} className={classes.link}>
                 <ListItem button key={link.title}>
                   <ListItemIcon><Icon /></ListItemIcon>
                   <ListItemText primary={link.title} />
                 </ListItem>
               </NavLink>
+            ) : (
+              <a key={index} href={link.link} className={classes.link}>
+                <ListItem button key={link.title}>
+                  <ListItemIcon><Icon /></ListItemIcon>
+                  <ListItemText primary={link.title} />
+                </ListItem>
+              </a>
             )
           })}
         </List>

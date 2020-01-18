@@ -152,7 +152,7 @@ const rateString = (player) => {
   return out
 }
 
-const Teams = ({size, teams, rated}) => {
+const Teams = ({size, teams, rated, postgame}) => {
   const hasTeams = getHasTeams(size)
   const classes = useStyles()
   return (
@@ -163,20 +163,20 @@ const Teams = ({size, teams, rated}) => {
           <TableCell>Civilization</TableCell>
           {hasTeams && <TableCell>MVP</TableCell>}
           {rated && <TableCell align='right'>Rating</TableCell>}
-          <TableCell align='right'>Score</TableCell>
+          {postgame && <TableCell align='right'>Score</TableCell>}
         </TableRow>
       </TableHead>
       <TeamBody teams={teams} hasTeams={hasTeams} span={5}>
         {(player) => (
           <>
             <TableCell>
-              <AppLink path={['civilizations', player.civilization.dataset_id, player.civilization.cid]} text={player.civilization.name} />
+              <AppLink path={['civilizations', player.civilization.dataset_id, player.civilization.id]} text={player.civilization.name} />
             </TableCell>
             {hasTeams && <TableCell>
               {player.mvp && <MVPIcon className={classes.mvpIcon} />}
             </TableCell>}
             {rated && <TableCell align='right'>{rateString(player)}</TableCell>}
-            <TableCell align='right'>{player.score && player.score.toLocaleString()}</TableCell>
+            {postgame && <TableCell align='right'>{player.score && player.score.toLocaleString()}</TableCell>}
           </>
         )}
       </TeamBody>
@@ -491,19 +491,19 @@ const Match = ({match}) => {
           <Tabs value={tab} onChange={(e, value) => setTab(value)} variant="fullWidth">
             <Tab label='Players' />
             <Tab label='Information' />
-            <Tab label='Achievements' />
             <Tab label='Map' />
             <Tab label='Odds' />
             <Tab label='Files' />
+            {match.postgame && <Tab label='Achievements' />}}
           </Tabs>
         </AppBar>
         <Typography component='div' className={classes.tabContent}>
-          {tab === 0 && <Teams size={match.team_size} teams={match.teams} rated={match.rated} />}
+          {tab === 0 && <Teams size={match.team_size} teams={match.teams} rated={match.rated} postgame={match.postgame} />}
           {tab === 1 && <Information match={match} />}
-          {tab === 2 && <Achievements size={match.team_size} teams={match.teams} />}
-          {tab === 3 && <Map match={match} />}
-          {tab === 4 && <Odds match={match} />}
-          {tab === 5 && <Files files={match.files} />}
+          {tab === 2 && <Map match={match} />}
+          {tab === 3 && <Odds match={match} />}
+          {tab === 4 && <Files files={match.files} />}
+          {tab === 5 && <Achievements size={match.team_size} teams={match.teams} />}
         </Typography>
       </CardContent>
     </Card>

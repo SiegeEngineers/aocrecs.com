@@ -25,7 +25,6 @@ async def compute_ranks(database, filters, platform_id, ladder_id):
     if filters:
         part_1 += " and " + filters[0]
         values.update(filters[1])
-    print(part_1 + part_2, values)
     return await database.fetch_all(part_1 + part_2, values=values)
 
 
