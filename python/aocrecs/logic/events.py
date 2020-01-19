@@ -127,6 +127,7 @@ def compute_participants(matches, challonge_data):
     graph = networkx.DiGraph()
     win_id = 0
     platform_ids = []
+    name_to_user = {}
     for match in matches:
         # Record a win
         win_id += 1
@@ -137,17 +138,18 @@ def compute_participants(matches, challonge_data):
 
         # Add node for each player
         for player in match['players']:
-            graph.add_node(player['user_id'], type='player')
+            name_to_user[player['name']] = player['user_id']
+            graph.add_node(player['name'], type='player')
 
         # Connect winning players to recorded win
         for player in match['winning_team']['players']:
-            graph.add_edge(player['user_id'], win_id)
+            graph.add_edge(player['name'], win_id)
 
         # Connect all players on the same team
         for team in match['teams']:
             for i in team['players']:
                 for j in team['players']:
-                    graph.add_edge(i['user_id'], j['user_id'])
+                    graph.add_edge(i['name'], j['name'])
 
     mgz_data = [{
         'wins': len([node for node in g if graph.nodes[node]['type'] == 'win']),
@@ -155,11 +157,11 @@ def compute_participants(matches, challonge_data):
     } for g in networkx.weakly_connected_components(graph)]
 
     return [{
-        'user_ids': mgz['players'],
+        'user_ids': [name_to_user[n] for n in mgz['players']],
         'winner': challonge['winner'],
         'name': challonge['name'],
         'score': challonge['score'],
-        'platform_id': max(platform_ids)
+        'platform_id': platform_ids[0]
     } for mgz, challonge in zip(
         sorted(mgz_data, key=lambda k: -1 * k['wins']),
         sorted(challonge_data, key=lambda k: -1 * k['score'])

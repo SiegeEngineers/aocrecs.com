@@ -102,6 +102,11 @@ const Series = ({id}) => {
                         </span>
                       )}
                     </div>}
+                    {side.users.length === 0 && <div>
+                        <span>
+                          <WinnerMark winner={side.winner} className={classes.sideWinner} /> {side.name} ({side.score})
+                        </span>
+                    </div>}
                     </td>
                   )}
                 </tr>

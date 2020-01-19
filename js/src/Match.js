@@ -436,7 +436,7 @@ const Files = ({files}) => {
 
 const Map = ({match}) => {
   return (
-    <img src={process.env.REACT_APP_API + "/map/" + match.id} width="100%" />
+    <img src={process.env.REACT_APP_API + "/map/" + match.id} width='100%' alt={match.map_name} />
   )
 }
 

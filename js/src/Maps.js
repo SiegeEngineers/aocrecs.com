@@ -102,7 +102,7 @@ const Map = ({name}) => {
         <Card>
           <CardIconHeader icon={<MapIcon />} title={data.name} />
           <CardContent>
-            {data.preview_url && <img src={data.preview_url} width="100%" />}
+            {data.preview_url && <img src={data.preview_url} width='100%' alt={data.name} />}
             {data.top_civilizations.length > 0 && <div>
               <Typography variant='h6'>Civilizations: Most Wins</Typography>
               <Typography component='span'>

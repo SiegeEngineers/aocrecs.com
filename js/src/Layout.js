@@ -6,7 +6,6 @@ import Drawer from '@material-ui/core/Drawer'
 import AppBar from '@material-ui/core/AppBar'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Toolbar from '@material-ui/core/Toolbar'
-import Link from '@material-ui/core/Link'
 import List from '@material-ui/core/List'
 import Typography from '@material-ui/core/Typography'
 import ListItem from '@material-ui/core/ListItem'
@@ -150,7 +149,7 @@ const Layout = () => {
         <List>
           {MENU.map((link, index) => {
             const Icon = link.icon
-            return link.link != '/api' ? (
+            return link.link !== '/api' ? (
               <NavLink key={index} to={link.link} className={classes.link}>
                 <ListItem button key={link.title}>
                   <ListItemIcon><Icon /></ListItemIcon>
