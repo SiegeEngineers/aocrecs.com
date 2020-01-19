@@ -9,13 +9,13 @@ from aocrecs.util import by_key, compound_where
 async def get_chat(database, match_id):
     """Get match chat."""
     query = """
-        select name, player_number, message, origination, audience, timestamp
+        select name, player_number, message, origination, audience, timestamp, color_id
         from chat join players on chat.player_number=players.number and chat.match_id=players.match_id
         where chat.match_id=:match_id
         order by timestamp
     """
     result = await database.fetch_all(query, values={'match_id': match_id})
-    return [dict(c, player=dict(name=c['name'], number=c['player_number'], match_id=match_id)) for c in result]
+    return [dict(c, player=dict(name=c['name'], number=c['player_number'], match_id=match_id, color_id=c['color_id'])) for c in result]
 
 
 @dataloader_cached(ttl=None)

@@ -30,6 +30,7 @@ import CardIconHeader from './util/CardIconHeader'
 import WinnerMark from './util/WinnerMark'
 import {getMatchTitle} from './util/Shared'
 import GetOdds from './graphql/Odds'
+import GetChat from './graphql/Chat'
 
 const shortHumanizeDuration = humanizeDuration.humanizer({
   language: 'shortEn',
@@ -479,6 +480,36 @@ const Odds = ({match}) => {
     )
 }
 
+const Chat = ({match}) => {
+  return (
+    <DataQuery query={GetChat} variables={{match_id: match.id}}>
+      {(data) => (
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Time</TableCell>
+            <TableCell>Audience</TableCell>
+            <TableCell>Player</TableCell>
+            <TableCell>Message</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {data.match.chat.map(chat => (
+            <TableRow>
+              <TableCell>{chat.origination === 'lobby' ? 'Lobby' : chat.timestamp.split('.')[0]}</TableCell>
+              <TableCell>{chat.audience}</TableCell>
+              <TableCell><PlayerName player={chat.player} /></TableCell>
+              <TableCell>{chat.message}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      )}
+      </DataQuery>
+    )
+}
+
+
 const Match = ({match}) => {
   const [tab, setTab] = useState(0)
   const classes = useStyles()
@@ -494,6 +525,7 @@ const Match = ({match}) => {
             <Tab label='Map' />
             <Tab label='Odds' />
             <Tab label='Files' />
+            <Tab label='Chat' />
             {match.postgame && <Tab label='Achievements' />}}
           </Tabs>
         </AppBar>
@@ -503,7 +535,8 @@ const Match = ({match}) => {
           {tab === 2 && <Map match={match} />}
           {tab === 3 && <Odds match={match} />}
           {tab === 4 && <Files files={match.files} />}
-          {tab === 5 && <Achievements size={match.team_size} teams={match.teams} />}
+          {tab === 5 && <Chat match={match} />}
+          {tab === 6 && <Achievements size={match.team_size} teams={match.teams} />}
         </Typography>
       </CardContent>
     </Card>
