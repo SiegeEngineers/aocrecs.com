@@ -15,7 +15,12 @@ async def get_chat(database, match_id):
         order by timestamp
     """
     result = await database.fetch_all(query, values={'match_id': match_id})
-    return [dict(c, player=dict(name=c['name'], number=c['player_number'], match_id=match_id, color_id=c['color_id'])) for c in result]
+    return [dict(c, player=dict(
+        name=c['name'],
+        number=c['player_number'],
+        match_id=match_id,
+        color_id=c['color_id']
+    )) for c in result]
 
 
 @dataloader_cached(ttl=None)

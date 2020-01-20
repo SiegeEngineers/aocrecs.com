@@ -20,7 +20,7 @@ import TableRow from '@material-ui/core/TableRow'
 import Typography from '@material-ui/core/Typography'
 
 import Timestamp from 'react-timestamp'
-import {map, join, sortBy, reverse} from 'lodash'
+import {map, join, sortBy, reverse, groupBy} from 'lodash'
 
 import EventIcon from 'mdi-react/CalendarRangeIcon'
 
@@ -31,6 +31,7 @@ import RelatedMatches from './util/RelatedMatches'
 import WinnerMark from './util/WinnerMark'
 
 import GetEvents from './graphql/Events'
+import GetEvent from './graphql/Event'
 import GetSeries from './graphql/Series'
 
 const useStyles = makeStyles({
@@ -66,7 +67,7 @@ const Series = ({id}) => {
                 </TableRow>
                 <TableRow>
                   <TableCell>Tournament</TableCell>
-                  <TableCell><AppLink path={['events', data.tournament.id]} text={data.tournament.name} /></TableCell>
+                  <TableCell><AppLink path={['events', data.tournament.event.id, data.tournament.id]} text={data.tournament.name} /></TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Played</TableCell>
@@ -82,6 +83,7 @@ const Series = ({id}) => {
             <Typography component='span'>
               <Typography variant='h6'>Results</Typography>
               <table>
+                <tbody>
                 <tr>
                   {data.sides.map((side, index) =>
                     <td key={index} valign='top'>
@@ -90,15 +92,15 @@ const Series = ({id}) => {
                       <ul>
                         {side.users.filter(user => user.id !== null).map(user =>
                           <li key={user.id}>
-                            <AppLink path={['players', user.id]} text={user.name} />
+                            <AppLink path={['player', user.platform_id, user.id]} text={user.name} />
                           </li>
                         )}
                       </ul>
                     </div>}
                     {side.users.length === 1 && <div>
-                      {side.users.map(user =>
-                        <span>
-                          <WinnerMark winner={side.winner} className={classes.sideWinner} /> <AppLink path={['players', user.id]} text={side.name} /> ({side.score})
+                      {side.users.map((user, i) =>
+                        <span key={i}>
+                          <WinnerMark winner={side.winner} className={classes.sideWinner} /> <AppLink path={['player', user.platform_id, user.id]} text={side.name} /> ({side.score})
                         </span>
                       )}
                     </div>}
@@ -110,6 +112,7 @@ const Series = ({id}) => {
                     </td>
                   )}
                 </tr>
+              </tbody>
               </table>
             </Typography>
           </CardContent>
@@ -134,7 +137,7 @@ const Tournament = ({tournament}) => {
        {tournament.series.map(series => (
          <TableRow key={series.id}>
             <TableCell>
-              <AppLink path={['events', tournament.id, series.id]} text={series.name} />
+              <AppLink path={['events', tournament.event_id, tournament.id, series.id]} text={series.name} />
             </TableCell>
             {reverse(sortBy(series.participants, 'score')).map((participant, index) => (
               <TableCell key={series.id + ' ' + index}>{participant.name}</TableCell>
@@ -154,16 +157,15 @@ const Tournaments = ({tournaments}) => {
       {tournaments.map(tournament => (
         <ExpansionPanel
           key={tournament.id}
-          expanded={match.params.id === tournament.id}
-          onChange={(o, e) => history.push(e ? '/events/' + tournament.id : '/events')}
+          expanded={match.params.tid === tournament.id}
+          onChange={(o, e) => history.push(e ? '/events/' + tournament.event_id + '/' + tournament.id : '/events/' + tournament.event_id)}
         >
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
             <Typography>
-              <AppLink path={['events', tournament.id]} text={tournament.name} />
+              <AppLink path={['events', tournament.event_id, tournament.id]} text={tournament.name} />
             </Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
-
             <Tournament tournament={tournament}/>
           </ExpansionPanelDetails>
         </ExpansionPanel>
@@ -183,7 +185,9 @@ const MapTable = ({rows}) => {
       <TableBody>
         {rows.map((row, index) =>
           <TableRow key={index}>
-            <TableCell>{row.name}</TableCell>
+            <TableCell>
+              <AppLink path={['maps', row.name]} text={row.name} />
+            </TableCell>
           </TableRow>
         )}
       </TableBody>
@@ -193,26 +197,30 @@ const MapTable = ({rows}) => {
 }
 
 
-const Event = ({event}) => {
+const Event = ({id}) => {
   const [tab, setTab] = useState(0)
   const classes = useStyles()
   return (
-    <>
-    <AppBar position='static'>
-      <Tabs value={tab} onChange={(e, value) => setTab(value)}>
-        <Tab label='Tournaments' />
-        <Tab label='Maps' />
-        <Tab label='Participants' />
-      </Tabs>
-    </AppBar>
-    <Typography component='div' className={classes.tabContent}>
-      {tab === 0 && <Tournaments tournaments={event.tournaments} />}
-      {tab === 1 && <MapTable rows={event.maps} />}
-      {tab === 2 && <p>participants go here</p>}
-    </Typography>
-    </>
+    <DataQuery query={GetEvent} variables={{id}}>
+    {(data) => (
+      <>
+        <Typography variant='h5'>{data.event.name} ({data.event.year})</Typography>
+        <AppBar position='static'>
+          <Tabs value={tab} onChange={(e, value) => setTab(value)}>
+            <Tab label='Tournaments' />
+            <Tab label='Maps' />
+          </Tabs>
+        </AppBar>
+        <Typography component='div' className={classes.tabContent}>
+          {tab === 0 && <Tournaments tournaments={data.event.tournaments} />}
+          {tab === 1 && <MapTable rows={data.event.maps} />}
+        </Typography>
+      </>
+    )}
+    </DataQuery>
   )
 }
+
 
 const EventsView = ({match, history}) => {
   return (
@@ -220,12 +228,24 @@ const EventsView = ({match, history}) => {
       {(data) => (
         <Grid container spacing={24}>
           <Grid item xs={6}>
-            {data.events.map(event => (
-              <div key={event.id}>
-                <Typography variant='h6'>{event.name}</Typography>
-                <Event event={event} />
+            {match.params.eid ?
+              <>
+                <Typography><AppLink path={['events']} text="< Back to Events" /></Typography>
+                <Event id={match.params.eid} />
+              </> :
+              <>
+              {reverse(Object.keys(groupBy(data.events, 'year'))).map(year => (
+                <div key={year}>
+                <Typography variant='h5'>{year}</Typography>
+                <div>
+                  {groupBy(data.events, 'year')[year].map(event => (
+                    <Typography key={event.id}><AppLink path={['events', event.id]} text={event.name} /></Typography>
+                  ))}
+                </div>
+                <br />
               </div>
             ))}
+            </>}
           </Grid>
           {match.params.sid && <Grid item xs={6}>
             <Series id={match.params.sid} />
@@ -235,5 +255,6 @@ const EventsView = ({match, history}) => {
     </DataQuery>
   )
 }
+
 
 export default EventsView

@@ -228,7 +228,7 @@ const Information = ({match}) => {
         <TableCell>
           {match.map_events.map((event, i) => [
             i > 0 && ', ',
-            <AppLink path={['events', event.id]} text={event.name} />
+            <AppLink key={event.id} path={['events', event.id]} text={event.name} />
           ])}
         </TableCell>
       </TableRow>}
@@ -494,8 +494,8 @@ const Chat = ({match}) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.match.chat.map(chat => (
-            <TableRow>
+          {data.match.chat.map((chat, i) => (
+            <TableRow key={i}>
               <TableCell>{chat.origination === 'lobby' ? 'Lobby' : chat.timestamp.split('.')[0]}</TableCell>
               <TableCell>{chat.audience}</TableCell>
               <TableCell><PlayerName player={chat.player} /></TableCell>

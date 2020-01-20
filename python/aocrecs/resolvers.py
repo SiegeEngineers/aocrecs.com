@@ -174,9 +174,16 @@ async def resolve_series(obj, info, id):
 async def resolve_events(obj, info):
     return await events.get_events(info.context.database)
 
+
+@query.field('event')
+async def resolve_event(obj, info, id):
+    return await events.get_event(info.context.database, id)
+
+
 @query.field('search')
 async def resolve_search(obj, info):
     return {}
+
 
 @search_result.field('matches')
 async def resolve_search_matches(obj, info, params, offset, limit):

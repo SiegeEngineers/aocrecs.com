@@ -24,6 +24,8 @@ services:
       - ./data/certbot/www:/var/www/certbot
     build:
       context: js
+      args:
+        GTM: ${MGZ_GTM}
     ports:
       - 80:80
       - 443:443

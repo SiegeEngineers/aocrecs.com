@@ -34,12 +34,12 @@ const Information = ({user}) => {
       <Table>
         <TableBody>
           {user.person && user.person.aliases.length > 0 && <TableRow><TableCell>Aliases</TableCell><TableCell>{user.person.aliases.join(', ')}</TableCell></TableRow>}
-          <TableRow><TableCell>Most Wins: Map</TableCell><TableCell>
+          {user.top_map && <TableRow><TableCell>Most Wins: Map</TableCell><TableCell>
               <AppLink path={['maps', user.top_map.name]} text={user.top_map.name} />
-          </TableCell></TableRow>
-          <TableRow><TableCell>Most Wins: Civilization</TableCell><TableCell>
+          </TableCell></TableRow>}
+          {user.top_civilization && <TableRow><TableCell>Most Wins: Civilization</TableCell><TableCell>
               <AppLink path={['civilizations', user.top_civilization.dataset_id, user.top_civilization.id]} text={user.top_civilization.name} />
-          </TableCell></TableRow>
+          </TableCell></TableRow>}
           <TableRow><TableCell>Most Matches: Dataset</TableCell><TableCell>{user.top_dataset.name}</TableCell></TableRow>
         </TableBody>
       </Table>

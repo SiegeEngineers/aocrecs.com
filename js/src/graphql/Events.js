@@ -4,23 +4,8 @@ export default gql`
 {
   events {
     id
+    year
     name
-    tournaments {
-      id
-      name
-      series {
-        id
-        name
-        participants {
-          name
-          score
-          winner
-        }
-      }
-    }
-    maps {
-      name
-    }
   }
 }
 `;

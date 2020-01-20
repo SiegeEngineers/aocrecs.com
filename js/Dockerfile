@@ -4,7 +4,8 @@ COPY package.json yarn.lock ./
 RUN yarn
 COPY public ./public
 COPY src ./src
-RUN REACT_APP_API="/api" yarn build
+ARG GTM
+RUN REACT_APP_API="/api" REACT_APP_GTM=${GTM} yarn build
 
 FROM nginx
 COPY aocrecs.conf /etc/nginx/conf.d/default.conf

@@ -12,6 +12,7 @@ type Query {
     match(id: Int!): Match
     search: SearchResult
     search_options: SearchOptions
+    event(id: String!): Event
     events: [Event]
     series(id: String!): Series
     datasets: [Dataset]
@@ -327,6 +328,7 @@ type Chat {
 
 type Event {
     id: String!
+    year: Int!
     name: String!
     tournaments: [Tournament]
     maps: [Map]

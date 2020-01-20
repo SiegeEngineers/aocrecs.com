@@ -111,11 +111,11 @@ async def report(database, platform_id, year, month, limit):
         where extract(year from played)=:year and extract(month from played)=:month
     """
     most_matches_query = """
-        select players.user_id, players.user_name, count(matches.id) as count
+        select players.user_id, players.platform_id, players.user_name, count(matches.id) as count
         from players join matches on players.match_id=matches.id
         where players.user_id != '' and
             extract(year from matches.played)=:year and extract(month from matches.played)=:month
-        group by players.user_id, players.user_name
+        group by players.user_id, players.platform_id, players.user_name
         order by count(matches.id) desc
         limit :limit
     """
@@ -146,7 +146,7 @@ async def report(database, platform_id, year, month, limit):
         'total_matches': total_matches['count'],
         'total_players': total_players['count'],
         'most_matches': [dict(
-            user=dict(id=m['user_id'], platform_id=platform_id, name=m['user_name']),
+            user=dict(id=m['user_id'], platform_id=m['platform_id'], name=m['user_name']),
             rank=i + 1,
             count=m['count']
         ) for i, m in enumerate(most_matches)],

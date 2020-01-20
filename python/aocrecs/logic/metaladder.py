@@ -34,19 +34,24 @@ async def compute_rank(database, user_id, filters, platform_id, ladder_id):
     for i, player in enumerate(results):
         if player['user_id'] == user_id:
             return {'rank': i + 1, 'rating': player['rating']}
-    return {}
+    return None
 
 
-@cached(ttl=1440)
 async def get_meta_ranks(database, user_id, platform_id, ladder_ids):
     """Get ladder ranks for a given user."""
     query = 'select id, platform_id, name from ladders where platform_id=:platform_id and id = any(:ladder_ids)'
     results = await database.fetch_all(query, values={'platform_id': platform_id, 'ladder_ids': ladder_ids})
-    return [dict(
-        await compute_rank(database, user_id, None, platform_id, ladder['id']),
-        ladder=dict(ladder),
-        user=dict(id=user_id, platform_id=platform_id)
-    ) for ladder in results]
+    ranks = []
+    for ladder in results:
+        rank = await compute_rank(database, user_id, None, platform_id, ladder['id'])
+        if rank is None:
+            continue
+        ranks.append(dict(
+            rank,
+            ladder=dict(ladder),
+            user=dict(id=user_id, platform_id=platform_id)
+        ))
+    return ranks
 
 
 @cached(ttl=None)

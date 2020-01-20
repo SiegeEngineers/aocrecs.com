@@ -68,6 +68,7 @@ async def get_user(database, user_id, platform_id):
 @cached(ttl=1440)
 async def get_top_map(database, user_id, platform_id):
     """Get top map for user."""
+    print(user_id, platform_id)
     query = """
         select map_name as name
         from players join matches on players.match_id=matches.id
@@ -75,7 +76,10 @@ async def get_top_map(database, user_id, platform_id):
         group by map_name
         order by count(id) desc limit 1
     """
-    return dict(await database.fetch_one(query, values={'id': user_id, 'platform_id': platform_id}))
+    top = await database.fetch_one(query, values={'id': user_id, 'platform_id': platform_id})
+    if top:
+        return dict(top)
+    return None
 
 
 @cached(ttl=1440)
@@ -88,7 +92,10 @@ async def get_top_civilization(database, user_id, platform_id):
         group by civilization_id, civilizations.name, civilizations.dataset_id
         order by count(match_id) desc limit 1
     """
-    return dict(await database.fetch_one(query, values={'id': user_id, 'platform_id': platform_id}))
+    top = await database.fetch_one(query, values={'id': user_id, 'platform_id': platform_id})
+    if top:
+        return dict(top)
+    return None
 
 
 @cached(ttl=1440)

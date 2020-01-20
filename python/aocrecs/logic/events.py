@@ -57,48 +57,56 @@ async def get_series(database, series_id):
     )
 
 
-@cached(ttl=None)
-async def get_events(database): # pylint: disable=too-many-locals
-    """Get events."""
-    events_query = 'select id, name from events'
-    tournaments_query = 'select id, event_id, name from tournaments'
+async def get_event(database, event_id):
+    """Get an event."""
+    events_query = 'select id, name, year from events where id=:event_id'
+    tournaments_query = 'select id, event_id, name from tournaments where event_id=:event_id'
     series_query = """
         select
             series.id, series.played, series_metadata.name, rounds.tournament_id
         from series
             join rounds on series.round_id=rounds.id
+            join tournaments on rounds.tournament_id=tournaments.id
             join series_metadata on series.id=series_metadata.series_id
+        where tournaments.event_id=:event_id
     """
-    participants_query = 'select series_id, name, score, winner from participants'
-    matches_query = 'select id, series_id from matches where series_id <> \'\''
-    maps_query = 'select id, event_id, name from event_maps'
-    events, tournaments, series, participants, matches, maps = await asyncio.gather(
-        database.fetch_all(events_query),
-        database.fetch_all(tournaments_query),
-        database.fetch_all(series_query),
-        database.fetch_all(participants_query),
-        database.fetch_all(matches_query),
-        database.fetch_all(maps_query)
+    participants_query = """
+        select series_id, participants.name, score, winner
+        from participants
+            join series on participants.series_id=series.id
+            join rounds on series.round_id=rounds.id
+            join tournaments on rounds.tournament_id=tournaments.id
+        where tournaments.event_id=:event_id
+    """
+    maps_query = 'select id, event_id, name from event_maps where event_id=:event_id'
+    event, tournaments, series, maps, participants = await asyncio.gather(
+        database.fetch_one(events_query, values={'event_id': event_id}),
+        database.fetch_all(tournaments_query, values={'event_id': event_id}),
+        database.fetch_all(series_query, values={'event_id': event_id}),
+        database.fetch_all(maps_query, values={'event_id': event_id}),
+        database.fetch_all(participants_query, values={'event_id': event_id})
     )
-    tournament_data = by_key(tournaments, 'event_id')
     series_data = by_key(series, 'tournament_id')
     participant_data = by_key(participants, 'series_id')
-    match_data = by_key(matches, 'series_id')
-    map_data = by_key(maps, 'event_id')
-    return [
-        dict(
-            event,
-            maps=map_data[event['id']],
-            tournaments=[dict(
-                tournament,
-                series=[dict(
-                    series_,
-                    participants=participant_data[series_['id']],
-                    match_ids=[m['id'] for m in match_data[series_['id']]]
-                ) for series_ in series_data[tournament['id']]]
-            ) for tournament in tournament_data[event['id']]]
-        ) for event in events
-    ]
+    return dict(
+        event,
+        maps=[dict(m) for m in maps],
+        tournaments=[dict(
+            tournament,
+            series=[dict(
+                series_,
+                participants=participant_data[series_['id']],
+            ) for series_ in series_data[tournament['id']]]
+        ) for tournament in tournaments]
+    )
+
+
+@cached(ttl=None)
+async def get_events(database):
+    """Get events."""
+    events_query = 'select id, name, year from events order by year, name'
+    events = await database.fetch_all(events_query)
+    return [dict(e) for e in events]
 
 
 def compute_participants(matches, challonge_data):

@@ -14,12 +14,14 @@ query Series($id: String!, $offset: Int!, $limit: Int!) {
       users {
         id
         name
+        platform_id
       }
     }
     tournament {
       id
       name
       event {
+        id
         name
       }
     }

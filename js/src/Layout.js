@@ -172,7 +172,7 @@ const Layout = () => {
         <Switch>
           <Route exact path='/' component={Main} />
           <Route path='/search' component={Search} />
-          <Route path='/events/:id?/:sid?' component={Events} />
+          <Route path='/events/:eid?/:tid?/:sid?' component={Events} />
           <Route path='/ladders/:pid?/:id?/:vid?' component={Ladders} />
           <Route path='/civilizations/:did?/:id?' component={Civilizations} />
           <Route path='/maps/:id?' component={Maps} />

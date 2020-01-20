@@ -4,3 +4,4 @@ build
 __pycache__
 .env
 venv
+js/yarn-error.log
