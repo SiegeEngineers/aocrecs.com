@@ -68,7 +68,7 @@ const RankTable = ({platform_id, ladder_id, ranks, selected}) => {
 
 const LaddersView = ({match, history}) => {
   const ladder_id = parseInt(match.params.id)
-  const [platform_id, setPlatform] = useState('voobly')
+  const [platform_id, setPlatform] = useState(match.params.pid ? match.params.pid : 'voobly')
   return (
     <div>
         <FormControl>

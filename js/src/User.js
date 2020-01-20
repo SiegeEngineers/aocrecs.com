@@ -64,7 +64,7 @@ const Rankings = ({user}) => {
           {user.meta_ranks.map(rank => (
             <TableRow key={rank.ladder.id}>
               <TableCell>
-                <Typography noWrap><AppLink path={['ladders', rank.ladder.id]} text={rank.ladder.name} /></Typography>
+                <Typography noWrap><AppLink path={['ladders', rank.ladder.platform_id, rank.ladder.id]} text={rank.ladder.name} /></Typography>
               </TableCell>
               <TableCell align='right'>{rank.rank}</TableCell>
               <TableCell align='right'>{rank.rating}</TableCell>

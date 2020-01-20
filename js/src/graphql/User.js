@@ -16,6 +16,7 @@ query User($user_id: String!, $platform_id: String!, $offset: Int!, $limit: Int!
       rank
       streak
       ladder {
+        platform_id
         id
         name
       }
