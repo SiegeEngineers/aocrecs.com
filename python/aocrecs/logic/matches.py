@@ -126,7 +126,7 @@ async def get_match(keys, context):
             starting_resources.name as starting_resources,
             victory_conditions.name as victory_condition,
             played, rated, diplomacy_type, team_size, platform_match_id,
-            cheats, population_limit, lock_teams, mirror, dataset_version, postgame,
+            cheats, population_limit, lock_teams, mirror, dataset_version, postgame, has_playback,
             versions.name as version, extract(epoch from duration)::integer as duration_secs, winning_team_id
         from matches
         join versions on matches.version_id=versions.id

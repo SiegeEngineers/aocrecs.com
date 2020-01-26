@@ -5,6 +5,7 @@ fragment MatchFragment on Match {
   id
   duration_secs
   played
+  has_playback
   type
   rated
   diplomacy_type

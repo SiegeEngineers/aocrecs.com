@@ -4,7 +4,8 @@ from ariadne import QueryType, ObjectType, make_executable_schema, ScalarType
 from aocrecs.dataloaders import Loaders
 from aocrecs.logic import (
     search, metaladder, report, search_options, events,
-    matches, stats as stat, maps, civilizations, users, odds
+    matches, stats as stat, maps, civilizations, users, odds,
+    playback
 )
 from aocrecs.schema import TYPE_DEFS
 
@@ -45,6 +46,7 @@ search_options_ = ObjectType('SearchOptions')
 search_result = ObjectType('SearchResult')
 report_ = ObjectType('Report')
 stat_user = ObjectType('StatUser')
+graph = ObjectType('Graph')
 
 
 @query.field('reports')
@@ -247,14 +249,29 @@ async def resolve_chat(obj, info):
     return await matches.get_chat(info.context.database, obj['id'])
 
 
-@loaders.register('research_by_player')
-def load_research_by_player(keys, context):
+@match.field('graph')
+async def resolve_graph(obj, info):
+    return await playback.get_graph(info.context.database, obj['id'])
+
+
+@loaders.register('units_trained')
+def load_units_trained(keys, context):
+    return playback.get_units_trained(keys, context.database)
+
+
+@player.field('units_trained')
+async def resolve_units_trained(obj, info):
+    return await info.context.loaders.units_trained.load((obj['match_id'], obj['number']))
+
+
+@loaders.register('research')
+def load_research(keys, context):
     return matches.get_research_by_player(keys, context.database)
 
 
 @player.field('research')
 async def resolve_research(obj, info):
-    return await info.context.loaders.research_by_player.load((obj['match_id'], obj['number']))
+    return await info.context.loaders.research.load((obj['match_id'], obj['number']))
 
 
 @query.field('map')
@@ -320,5 +337,6 @@ async def resolve_by_day(obj, info):
 SCHEMA = make_executable_schema(TYPE_DEFS, [
     query, map_, stats, datetime_, research, player, chat, match,
     team, file_, hits, side, series, civilization, event, meta_ladder,
-    user, rank, search_options_, stat_user, report_, search_result
+    user, rank, search_options_, stat_user, report_, search_result,
+    graph
 ])

@@ -52,6 +52,7 @@ async def general(database):
         'rated': bool_option(),
         'mvp': bool_option(),
         'winner': bool_option(),
+        'playback': bool_option(),
         'colors': list(map(dict, colors)),
         'diplomacy_types': diplo_options(),
         'game_types': list(map(dict, game_types)),

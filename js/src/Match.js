@@ -17,6 +17,8 @@ import Typography from '@material-ui/core/Typography'
 import Timestamp from 'react-timestamp'
 import humanizeDuration from 'humanize-duration'
 import {upperFirst} from 'lodash'
+import {ForceGraph3D, ForceGraph2D} from 'react-force-graph'
+import SpriteText from 'three-spritetext'
 
 import MatchIcon from 'mdi-react/SwordCrossIcon'
 import MVPIcon from 'mdi-react/StarIcon'
@@ -31,6 +33,7 @@ import WinnerMark from './util/WinnerMark'
 import {getMatchTitle} from './util/Shared'
 import GetOdds from './graphql/Odds'
 import GetChat from './graphql/Chat'
+import GetGraph from './graphql/Graph'
 
 const shortHumanizeDuration = humanizeDuration.humanizer({
   language: 'shortEn',
@@ -509,6 +512,40 @@ const Chat = ({match}) => {
     )
 }
 
+const Graph = ({match}) => {
+  return (
+    <DataQuery query={GetGraph} variables={{match_id: match.id}}>
+      {(data) => (
+        <ForceGraph3D
+          width={800}
+          height={800}
+          graphData={data.match.graph}
+          showNavInfo={false}
+          linkWidth={2}
+          linkOpacity={1}
+          linkDirectionalArrowLength={10}
+          linkDirectionalArrowRelPos={1}
+          nodeThreeObject={node => {
+          const sprite = new SpriteText(node.name);
+            //sprite.color = node.color;
+          sprite.textHeight = 8;
+           return sprite;
+         }}
+         //nodeCanvasObject={(node, ctx, globalScale) => {
+        //  const label = node.name;
+        //   const fontSize = 12/globalScale;
+        //   ctx.font = `${fontSize}px Roboto`;
+        //   const textWidth = ctx.measureText(label).width;
+        //   const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
+        //   ctx.textAlign = 'center';
+        //   ctx.textBaseline = 'middle';
+        //   ctx.fillText(label, node.x, node.y);
+        // }}
+        />
+      )}
+    </DataQuery>
+  )
+}
 
 const Match = ({match}) => {
   const [tab, setTab] = useState(0)
@@ -527,6 +564,7 @@ const Match = ({match}) => {
             <Tab label='Files' />
             <Tab label='Chat' />
             {match.postgame && <Tab label='Achievements' />}}
+            {match.has_playback && <Tab label='Graph' />}}
           </Tabs>
         </AppBar>
         <Typography component='div' className={classes.tabContent}>
@@ -537,6 +575,7 @@ const Match = ({match}) => {
           {tab === 4 && <Files files={match.files} />}
           {tab === 5 && <Chat match={match} />}
           {tab === 6 && <Achievements size={match.team_size} teams={match.teams} />}
+          {tab === 7 && <Graph match={match} />}
         </Typography>
       </CardContent>
     </Card>

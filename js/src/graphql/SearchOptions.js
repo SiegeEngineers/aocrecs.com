@@ -14,6 +14,7 @@ export default gql`
         mirror { value label }
         rated { value label }
         rms_zr { value label }
+        playback { value label }
         colors { value label }
         winner { value label }
         mvp { value label }

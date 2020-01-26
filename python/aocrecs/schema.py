@@ -117,6 +117,7 @@ type SearchOptionsGeneral {
     mirror: [KeyValue]
     rated: [KeyValue]
     rms_zr: [KeyValue]
+    playback: [KeyValue]
     events: [KeyValue]
     tournaments: [KeyValue]
     winner: [KeyValue]
@@ -186,6 +187,7 @@ type Match {
     map_events: [Event]
     duration_secs: Int
     played: Datetime
+    has_playback: Boolean
     rated: Boolean
     diplomacy_type: String
     team_size: String
@@ -220,6 +222,29 @@ type Match {
     series: Series
     minimap_link: String!
     odds: Odds
+    graph: Graph
+}
+
+type TrainedCount {
+    player_number: Int!
+    object_id: Int!
+    name: String!
+    count: Int!
+}
+
+type Graph {
+    nodes: [GraphNode]
+    links: [GraphLink]
+}
+
+type GraphNode {
+    id: Int!
+    name: String!
+}
+
+type GraphLink {
+    source: Int!
+    target: Int!
 }
 
 type Odds {
@@ -293,6 +318,7 @@ type Player {
     research: [Research]
     civilization: Civilization
     timeseries: [Timeseries]
+    units_trained: [TrainedCount]
 }
 
 type Timeseries {
