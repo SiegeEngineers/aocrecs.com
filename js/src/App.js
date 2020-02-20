@@ -13,6 +13,7 @@ import Layout from './Layout.js'
 const cache = new InMemoryCache({
   dataIdFromObject: object => {
     switch (object.__typename) {
+      case 'User': return `${object.platform_id}:${object.id}`
       default: return defaultDataIdFromObject(object)
     }
   }

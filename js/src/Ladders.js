@@ -16,6 +16,8 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Typography from '@material-ui/core/Typography'
 
+import ReactCountryFlag from 'react-country-flag'
+
 import AppLink from './util/AppLink'
 import DataQuery from './util/DataQuery'
 import RelatedMatches from './util/RelatedMatches'
@@ -43,7 +45,8 @@ const RankTable = ({platform_id, ladder_id, ranks, selected}) => {
       <TableHead>
         <TableRow>
           <TableCell>Rank</TableCell>
-          <TableCell>Name</TableCell>
+          <TableCell>Account</TableCell>
+          <TableCell>Player</TableCell>
           <TableCell align='right'>Rating</TableCell>
           <TableCell align='right'>Streak</TableCell>
         </TableRow>
@@ -54,7 +57,9 @@ const RankTable = ({platform_id, ladder_id, ranks, selected}) => {
             <TableCell>{rank.rank}</TableCell>
             <TableCell>
               <AppLink path={['ladders', platform_id, ladder_id, rank.user.id]} text={rank.user.name} />
-              {rank.user.person && rank.user.person.name !== rank.user.name && ' (aka ' + rank.user.person.name + ')'}
+            </TableCell>
+            <TableCell>
+              {rank.user.person && <span>{rank.user.person.country && <ReactCountryFlag countryCode={rank.user.person.country} title={rank.user.person.country.toUpperCase()} svg />} <AppLink path={['players', rank.user.person.id]} text={rank.user.person.name} /></span>}
             </TableCell>
             <TableCell align='right'>{rank.rating}</TableCell>
             <TableCell align='right'>{rank.streak > 0 ? '+' + rank.streak : rank.streak}</TableCell>

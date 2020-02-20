@@ -15,6 +15,7 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Typography from '@material-ui/core/Typography'
 
+import ReactCountryFlag from 'react-country-flag'
 import {format, subMonths} from 'date-fns'
 import humanizeDuration from 'humanize-duration'
 
@@ -42,9 +43,14 @@ const ChangeIndicator = ({change}) => {
 
 const UserName = ({user}) => {
   return (
+    <AppLink path={['user', user.platform_id, user.id]} text={user.name} />
+  )
+}
+
+const PersonName = ({user}) => {
+  return (
     <>
-      <AppLink path={['player', user.platform_id, user.id]} text={user.name} />
-      {user.person !== null && user.person.name !== user.name && ' (aka ' + user.person.name + ')'}
+    {user.person.country && <ReactCountryFlag countryCode={user.person.country} title={user.person.country.toUpperCase()} svg />} <AppLink path={['players', user.person.id]} text={user.person.name} />
     </>
   )
 }
@@ -99,7 +105,7 @@ const MostImprovementSection = ({data, title}) => {
           <TableHead>
             <TableRow>
               <TableCell></TableCell>
-              <TableCell>Player</TableCell>
+              <TableCell>Account</TableCell>
               <TableCell align='right'>Lowest</TableCell>
               <TableCell align='right'>Highest</TableCell>
               <TableCell align='right'>Difference</TableCell>
@@ -138,6 +144,7 @@ const RankingsSection = ({data, title}) => {
             <TableRow>
               <TableCell></TableCell>
               <TableCell></TableCell>
+              <TableCell>Account</TableCell>
               <TableCell>Player</TableCell>
               <TableCell align='right'>Rating</TableCell>
             </TableRow>
@@ -148,6 +155,7 @@ const RankingsSection = ({data, title}) => {
                 <TableCell><ChangeIndicator change={row.change} /></TableCell>
                 <TableCell>{row.rank}</TableCell>
                 <TableCell><UserName user={row.user} /></TableCell>
+                <TableCell>{row.user.person && <PersonName user={row.user} />}</TableCell>
                 <TableCell align='right'>{row.rating}</TableCell>
               </TableRow>
             )}
@@ -199,7 +207,7 @@ const MostMatchesSection = ({data}) => {
           <TableHead>
             <TableRow>
               <TableCell></TableCell>
-              <TableCell>Player</TableCell>
+              <TableCell>Account</TableCell>
               <TableCell align='right'>Matches</TableCell>
             </TableRow>
           </TableHead>

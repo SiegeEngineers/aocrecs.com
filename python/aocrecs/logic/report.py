@@ -61,7 +61,8 @@ async def rankings(database, platform_id, ladder_id, year, month, limit): # pyli
             user=dict(
                 id=r['user_id'],
                 name=r['user_name'] if r['user_name'] else r['name'],
-                platform_id=platform_id
+                platform_id=platform_id,
+                person=dict(id=r['person_id'], name=r['person_name'], country=r['country']) if r['person_id'] else None
             )
         )
         for i, r in enumerate(diff(current[:limit], previous, 'user_id'))
@@ -98,7 +99,7 @@ async def most_improvement(database, platform_id, ladder_id, year, month, limit)
 
 
 @cached(ttl=None)
-async def report(database, platform_id, year, month, limit):
+async def report(database, year, month, platform_id, limit):
     """Get a report."""
     matches_query = """
         select count(*) as count

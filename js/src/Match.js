@@ -101,7 +101,7 @@ const PlayerName = ({player}) => {
     <span>
       <div style={{backgroundColor: PLAYER_COLORS[player.color_id + 1]}} className={classes.playerColor} />
       {player.user
-        ? <AppLink path={['player', player.user.platform_id, player.user.id]} text={player.user.name} />
+        ? <AppLink path={['user', player.user.platform_id, player.user.id]} text={player.user.name} />
         : player.name
       }
     </span>

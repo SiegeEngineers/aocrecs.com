@@ -5,7 +5,7 @@ import RelatedMatches from './util/RelatedMatches'
 
 import GetUser from './graphql/User'
 
-const PlayerView = ({match}) => {
+const UserView = ({match}) => {
   const platform_id = match.params.pid
   return (
     <RelatedMatches
@@ -20,4 +20,4 @@ const PlayerView = ({match}) => {
   )
 }
 
-export default PlayerView
+export default UserView

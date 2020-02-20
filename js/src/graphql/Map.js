@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 
-import MatchFragment from '../graphql/MatchFragment.js';
+import MatchFragment from '../graphql/MatchFragment.js'
 
 export default gql`
 query Map($name: String!, $offset: Int!, $limit: Int!) {

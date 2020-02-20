@@ -1,74 +1,110 @@
 """Users."""
 import asyncio
 
-from aocrecs.cache import cached, dataloader_cached
-from aocrecs.util import by_key, compound_where
+from aocrecs.cache import cached
 
 
-@dataloader_cached(ttl=1440)
-async def get_person(keys, context): # pylint: disable=too-many-locals
-    """Get person."""
-    where, values = compound_where(keys, ('user_id', 'platform_id'))
+@cached(ttl=1440)
+async def get_people(database):
+    """Get all people."""
+    query = """
+        select people.id, people.name, people.country, count(distinct match_id) as match_count
+        from people join users on people.id=users.person_id
+        join players on users.id=players.user_id and players.platform_id=users.platform_id
+        group by people.id, people.name, people.country
+        order by people.name
+    """
+    return list(map(dict, await database.fetch_all(query)))
+
+
+@cached(ttl=1440)
+async def get_person(database, person_id):
+    """Get a person."""
+    person_query = """
+        select id, name, country from people
+        where id=:person_id
+    """
     account_query = """
-        select canonical_players.user_id as id, canonical_players.platform_id, max(players.name) as name
-        from canonical_players
-        join (select name from canonical_players where {}) as s on canonical_players.name=s.name
-        join players on players.user_id=canonical_players.user_id and players.platform_id=canonical_players.platform_id
-        where players.human=true
-        group by canonical_players.user_id, canonical_players.platform_id
-    """.format(where)
+        select users.id, users.platform_id, max(players.name) as name, platforms.name as platform_name
+        from users join players on players.user_id=users.id and players.platform_id=users.platform_id
+        join platforms on users.platform_id=platforms.id
+        where person_id=:person_id
+        group by users.id, users.platform_id, platforms.name
+        order by platforms.name, max(players.name)
+    """
+    event_query = """
+        select distinct events.id, events.name, events.year
+        from people join users on people.id=users.person_id
+        join players on users.id=players.user_id and players.platform_id=users.platform_id
+        join matches on players.match_id=matches.id
+        join events on events.id=matches.event_id
+        where person_id=:person_id
+        order by events.year desc
+    """
     alias_query = """
-        select distinct canonical_players.user_id as id, players.name as player_name, players.user_name as user_name, canonical_players.name as person_name, canonical_players.platform_id
-        from canonical_players
-        join (select name from canonical_players where {}) as s on canonical_players.name=s.name
-        join players on players.user_id=canonical_players.user_id and players.platform_id=canonical_players.platform_id
-        where players.human=true
-    """.format(where)
-    accounts, aliases = await asyncio.gather(
-        context.database.fetch_all(account_query, values=values),
-        context.database.fetch_all(alias_query, values=values)
+        select distinct players.name, players.user_name
+        from users join players on players.user_id=users.id and players.platform_id=users.platform_id
+        where person_id=:person_id
+    """
+    person, accounts, aliases, events = await asyncio.gather(
+        database.fetch_one(person_query, values=dict(person_id=person_id)),
+        database.fetch_all(account_query, values=dict(person_id=person_id)),
+        database.fetch_all(alias_query, values=dict(person_id=person_id)),
+        database.fetch_all(event_query, values=dict(person_id=person_id))
     )
-
-    account_data = by_key(accounts, ('id', 'platform_id'))
-    alias_data = by_key(aliases, ('id', 'platform_id'))
-
-    out = {}
-    for key, aliases_ in alias_data.items():
-        person_name = None
-        alias_set = set()
-        for row in aliases_:
-            person_name = row['person_name']
-            alias_set.add(row['player_name'])
-            if row['user_name']:
-                alias_set.add(row['user_name'])
-        person = None
-        if person_name:
-            person = dict(
-                name=person_name,
-                aliases=list(alias_set),
-                accounts=account_data.get(key, [])
-            )
-        out[key] = person
-    return out
+    aliases_set = set()
+    for row in aliases:
+        if row['name']:
+            aliases_set.add(row['name'])
+        if row['user_name']:
+            aliases_set.add(row['user_name'])
+    return dict(
+        person,
+        accounts=[
+            dict(
+                id=a['id'],
+                name=a['name'],
+                platform_id=a['platform_id'],
+                platform=dict(id=a['platform_id'], name=a['platform_name'])
+            ) for a in accounts
+        ],
+        aliases=list(aliases_set),
+        events=[dict(e) for e in events]
+    )
 
 
 @cached(ttl=1440)
 async def get_user(database, user_id, platform_id):
     """Get user."""
     query = """
-        select user_name, name
-        from players
-        where user_id=:id and platform_id=:platform_id
-        order by match_id desc limit 1
+        select u.user_id, u.name, u.user_name, people.id as person_id, people.name as person_name, people.country
+        from (
+            select user_name, name, user_id
+            from players join matches on players.match_id=matches.id
+            where players.user_id=:user_id and players.platform_id=:platform_id
+            order by matches.played desc limit 1
+        ) as u join users on u.user_id=users.id
+        left join people on users.person_id=people.id
     """
-    names = await database.fetch_one(query, values={'id': user_id, 'platform_id': platform_id})
-    return dict(id=user_id, platform_id=platform_id, name=names['user_name'] or names['name'])
+    user = await database.fetch_one(query, values={'user_id': user_id, 'platform_id': platform_id})
+    person = None
+    if user['person_name']:
+        person = dict(
+            id=user['person_id'],
+            name=user['person_name'],
+            country=user['country']
+        )
+    return dict(
+        id=user_id,
+        platform_id=platform_id,
+        name=user['user_name'] or user['name'],
+        person=person
+    )
 
 
 @cached(ttl=1440)
 async def get_top_map(database, user_id, platform_id):
     """Get top map for user."""
-    print(user_id, platform_id)
     query = """
         select map_name as name
         from players join matches on players.match_id=matches.id

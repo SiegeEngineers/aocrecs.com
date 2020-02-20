@@ -8,8 +8,9 @@ query User($user_id: String!, $platform_id: String!, $offset: Int!, $limit: Int!
     id
     name
     person {
+      id
       name
-      aliases
+      country
     }
     meta_ranks(ladder_ids: [131, 132]) {
       rating

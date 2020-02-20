@@ -11,6 +11,8 @@ import TableRow from '@material-ui/core/TableRow'
 import Typography from '@material-ui/core/Typography'
 import UserIcon from 'mdi-react/AccountIcon'
 
+import ReactCountryFlag from 'react-country-flag'
+
 import Chart from './util/Chart'
 
 import AppLink from './util/AppLink'
@@ -33,7 +35,6 @@ const Information = ({user}) => {
       <Typography variant='h5'>Information</Typography>
       <Table>
         <TableBody>
-          {user.person && user.person.aliases.length > 0 && <TableRow><TableCell>Aliases</TableCell><TableCell>{user.person.aliases.join(', ')}</TableCell></TableRow>}
           {user.top_map && <TableRow><TableCell>Most Wins: Map</TableCell><TableCell>
               <AppLink path={['maps', user.top_map.name]} text={user.top_map.name} />
           </TableCell></TableRow>}
@@ -77,12 +78,13 @@ const Rankings = ({user}) => {
   )
 }
 
+
 const User = ({user}) => {
   return (
     <Card>
       <CardIconHeader
-        icon={<UserIcon />}
-        title={user.name + (user.canonical_name && user.canonical_name !== user.name ? ' (aka ' + user.canonical_name + ')': '')}
+        icon={user.person && user.person.country ? <ReactCountryFlag countryCode={user.person.country} title={user.person.country.toUpperCase()} svg /> : <UserIcon/>}
+        title={user.name + (user.person ? ' (aka ' + user.person.name + ')': '')}
       />
       <CardContent>
         <Grid container spacing={24}>

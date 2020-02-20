@@ -12,7 +12,9 @@ query Report($year: Int!, $month: Int!) {
         id
         name
         person {
+          id
           name
+          country
         }
       }
     }
@@ -31,7 +33,9 @@ query Report($year: Int!, $month: Int!) {
         platform_id
         name
         person {
+          id
           name
+          country
         }
       }
       rating
@@ -44,7 +48,9 @@ query Report($year: Int!, $month: Int!) {
         name
         platform_id
         person {
+          id
           name
+          country
         }
       }
       rating

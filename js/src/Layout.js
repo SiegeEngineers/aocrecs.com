@@ -17,6 +17,7 @@ import HomeIcon from 'mdi-react/HomeIcon'
 import SearchIcon from 'mdi-react/SearchIcon'
 import CivIcon from 'mdi-react/ChessRookIcon'
 import MapIcon from 'mdi-react/EarthIcon'
+import PlayerIcon from 'mdi-react/AccountIcon'
 import LadderIcon from 'mdi-react/FormatListNumberedIcon'
 import ReportIcon from 'mdi-react/TableIcon'
 import AboutIcon from 'mdi-react/InformationIcon'
@@ -30,7 +31,8 @@ import Ladders from './Ladders'
 import Civilizations from './Civilizations'
 import Maps from './Maps'
 import Match from './MatchView'
-import Player from './PlayerView'
+import User from './UserView'
+import Players from './Players'
 import Reports from './Reports'
 import Upload from './Upload'
 import About from './About'
@@ -101,6 +103,11 @@ const MENU = [
     link: '/maps',
     title: 'Maps',
     icon: MapIcon
+  },
+  {
+    link: '/players',
+    title: 'Players',
+    icon: PlayerIcon
   },
   {
     link: '/reports',
@@ -176,8 +183,9 @@ const Layout = () => {
           <Route path='/ladders/:pid?/:id?/:vid?' component={Ladders} />
           <Route path='/civilizations/:did?/:id?' component={Civilizations} />
           <Route path='/maps/:id?' component={Maps} />
+          <Route path='/players/:id?' component={Players} />
           <Route path='/match/:id?' component={Match} />
-          <Route path='/player/:pid?/:id?' component={Player} />
+          <Route path='/user/:pid?/:id?' component={User} />
           <Route path='/reports/:y?/:m?' component={Reports} />
           <Route path='/upload' component={Upload} />
           <Route path='/about' component={About} />

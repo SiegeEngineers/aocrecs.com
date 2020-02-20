@@ -21,6 +21,8 @@ type Query {
     user(id: String!, platform_id: String!): User
     report(year: Int!, month: Int!, platform_id: String!, limit: Int = 25): Report
     reports: [ReportOption]
+    person(id: Int!): Person
+    people: [Person]
 }
 
 type SearchResult {
@@ -372,6 +374,7 @@ type Participant {
 type User {
     id: String!
     platform_id: String!
+    platform: Platform
     name: String!
     person: Person
     meta_ranks(ladder_ids: [Int]): [Rank]
@@ -382,9 +385,14 @@ type User {
 }
 
 type Person {
+    id: Int!
+    country: String
     name: String!
+    match_count: Int!
     aliases: [String]
     accounts: [User]
+    events: [Event]
+    matches(offset: Int = 0, limit: Int = 10): Hits
 }
 
 scalar Datetime

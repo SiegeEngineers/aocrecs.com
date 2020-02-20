@@ -92,7 +92,7 @@ const Series = ({id}) => {
                       <ul>
                         {side.users.filter(user => user.id !== null).map(user =>
                           <li key={user.id}>
-                            <AppLink path={['player', user.platform_id, user.id]} text={user.name} />
+                            <AppLink path={['user', user.platform_id, user.id]} text={user.name} />
                           </li>
                         )}
                       </ul>
@@ -100,7 +100,7 @@ const Series = ({id}) => {
                     {side.users.length === 1 && <div>
                       {side.users.map((user, i) =>
                         <span key={i}>
-                          <WinnerMark winner={side.winner} className={classes.sideWinner} /> <AppLink path={['player', user.platform_id, user.id]} text={side.name} /> ({side.score})
+                          <WinnerMark winner={side.winner} className={classes.sideWinner} /> <AppLink path={['user', user.platform_id, user.id]} text={side.name} /> ({side.score})
                         </span>
                       )}
                     </div>}
