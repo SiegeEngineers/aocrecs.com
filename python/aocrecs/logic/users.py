@@ -11,6 +11,7 @@ async def get_people(database):
         select people.id, people.name, people.country, count(distinct match_id) as match_count
         from people join users on people.id=users.person_id
         join players on users.id=players.user_id and players.platform_id=users.platform_id
+        where players.human=true
         group by people.id, people.name, people.country
         order by people.name
     """
@@ -28,7 +29,7 @@ async def get_person(database, person_id):
         select users.id, users.platform_id, max(players.name) as name, platforms.name as platform_name
         from users join players on players.user_id=users.id and players.platform_id=users.platform_id
         join platforms on users.platform_id=platforms.id
-        where person_id=:person_id
+        where person_id=:person_id and players.human=true
         group by users.id, users.platform_id, platforms.name
         order by platforms.name, max(players.name)
     """
@@ -38,13 +39,13 @@ async def get_person(database, person_id):
         join players on users.id=players.user_id and players.platform_id=users.platform_id
         join matches on players.match_id=matches.id
         join events on events.id=matches.event_id
-        where person_id=:person_id
+        where person_id=:person_id and players.human=true
         order by events.year desc
     """
     alias_query = """
         select distinct players.name, players.user_name
         from users join players on players.user_id=users.id and players.platform_id=users.platform_id
-        where person_id=:person_id
+        where person_id=:person_id and players.human=true
     """
     person, accounts, aliases, events = await asyncio.gather(
         database.fetch_one(person_query, values=dict(person_id=person_id)),
@@ -81,7 +82,7 @@ async def get_user(database, user_id, platform_id):
         from (
             select user_name, name, user_id
             from players join matches on players.match_id=matches.id
-            where players.user_id=:user_id and players.platform_id=:platform_id
+            where players.user_id=:user_id and players.platform_id=:platform_id and players.human=true
             order by matches.played desc limit 1
         ) as u join users on u.user_id=users.id
         left join people on users.person_id=people.id
@@ -108,7 +109,7 @@ async def get_top_map(database, user_id, platform_id):
     query = """
         select map_name as name
         from players join matches on players.match_id=matches.id
-        where user_id=:id and matches.platform_id=:platform_id and winner=true
+        where user_id=:id and matches.platform_id=:platform_id and winner=true and human=true
         group by map_name
         order by count(id) desc limit 1
     """
@@ -124,7 +125,7 @@ async def get_top_civilization(database, user_id, platform_id):
     query = """
         select civilization_id as id, civilizations.name, civilizations.dataset_id
         from players join civilizations on players.dataset_id=civilizations.dataset_id and players.civilization_id=civilizations.id
-        where user_id=:id and platform_id=:platform_id and winner=true
+        where user_id=:id and platform_id=:platform_id and winner=true and human=true
         group by civilization_id, civilizations.name, civilizations.dataset_id
         order by count(match_id) desc limit 1
     """
@@ -140,7 +141,7 @@ async def get_top_dataset(database, user_id, platform_id):
     query = """
         select dataset_id as id, datasets.name
         from players join datasets on players.dataset_id=datasets.id
-        where user_id=:id and platform_id=:platform_id
+        where user_id=:id and platform_id=:platform_id and human=true
         group by dataset_id, datasets.name
         order by count(match_id) desc limit 1
     """
