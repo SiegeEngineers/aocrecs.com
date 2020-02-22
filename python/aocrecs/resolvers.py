@@ -1,5 +1,5 @@
 """GraphQL resolvers."""
-from ariadne import QueryType, ObjectType, make_executable_schema, ScalarType
+from ariadne import QueryType, ObjectType, make_executable_schema, ScalarType, upload_scalar, MutationType
 
 from aocrecs.dataloaders import Loaders
 from aocrecs.logic import (
@@ -7,6 +7,7 @@ from aocrecs.logic import (
     matches, stats as stat, maps, civilizations, users, odds
 )
 from aocrecs.schema import TYPE_DEFS
+from aocrecs.upload import add_rec
 
 # Unhelpful rules for resolver boilerplate.
 # pylint: disable=unused-argument, missing-function-docstring, invalid-name, redefined-builtin
@@ -24,6 +25,7 @@ def serialize_datetime(value):
 
 
 query = QueryType()
+mutation = MutationType()
 map_ = ObjectType('Map')
 civilization = ObjectType('Civilization')
 stats = ObjectType('Stats')
@@ -324,9 +326,20 @@ async def resolve_person_matches(obj, info, offset, limit):
     return await search.get_hits(info.context, params, offset, limit)
 
 
+@mutation.field('upload')
+async def resolve_upload(obj, info, rec_file):
+    return add_rec(
+        rec_file.filename,
+        await rec_file.read(),
+        str(info.context.request.app.state.database_url),
+        info.context.request.app.state.voobly_username,
+        str(info.context.request.app.state.voobly_password)
+    )
+
+
 SCHEMA = make_executable_schema(TYPE_DEFS, [
     query, map_, stats, datetime_, research, player, chat, match,
     team, file_, hits, side, series, civilization, event, meta_ladder,
     user, rank, search_options_, stat_user, report_, search_result,
-    person
+    person, upload_scalar, mutation
 ])

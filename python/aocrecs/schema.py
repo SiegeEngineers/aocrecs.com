@@ -395,6 +395,17 @@ type Person {
     matches(offset: Int = 0, limit: Int = 10): Hits
 }
 
+type Mutation {
+    upload(rec_file: Upload!): UploadResult!
+}
+
+type UploadResult {
+    success: Boolean!
+    message: String
+    match_id: Int
+}
+
 scalar Datetime
 scalar Dict
+scalar Upload
 """)
