@@ -206,13 +206,13 @@ const Information = ({match}) => {
         <TableCell>Rated</TableCell><TableCell>{match.rated ? 'Yes' : 'No'}</TableCell>
       </TableRow>
       {match.series && match.tournament && match.event && <TableRow>
-        <TableCell>Event</TableCell><TableCell>{match.event.name}</TableCell>
+        <TableCell>Event</TableCell><TableCell><AppLink path={['events', match.event.id]} text={match.event.name} /></TableCell>
       </TableRow>}
       {match.series && match.tournament && <TableRow>
-        <TableCell>Tournament</TableCell><TableCell><AppLink path={['events', match.tournament.id]} text={match.tournament.name} /></TableCell>
+        <TableCell>Tournament</TableCell><TableCell><AppLink path={['events', match.event.id, match.tournament.id]} text={match.tournament.name} /></TableCell>
       </TableRow>}
       {match.series && <TableRow>
-        <TableCell>Series</TableCell><TableCell><AppLink path={['events', match.tournament.id, match.series.id]} text={match.series.name} /></TableCell>
+        <TableCell>Series</TableCell><TableCell><AppLink path={['events', match.event.id, match.tournament.id, match.series.id]} text={match.series.name} /></TableCell>
       </TableRow>}
       {!hasTeams && <TableRow>
         <TableCell>Mirror</TableCell><TableCell>{match.mirror ? 'Yes' : 'No'}</TableCell>
@@ -256,7 +256,13 @@ const Information = ({match}) => {
       <TableRow>
         <TableCell>Version</TableCell><TableCell>{upperFirst(match.version)}</TableCell>
       </TableRow>
-      {match.platform && <TableRow>
+      {match.platform && match.platform.url === '' && <TableRow>
+        <TableCell>Platform</TableCell>
+        <TableCell>
+          {match.platform.name}
+        </TableCell>
+      </TableRow>}
+      {match.platform && match.platform.url !== '' && <TableRow>
         <TableCell>Platform</TableCell>
         <TableCell>
           <Link href={match.platform.url} underline='always' target='_blank'>{match.platform.name}</Link>
