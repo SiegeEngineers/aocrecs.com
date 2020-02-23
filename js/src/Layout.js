@@ -55,7 +55,7 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing.unit * 3,
+    padding: theme.spacing.unit,
   },
   toolbar: theme.mixins.toolbar,
   logo: {
@@ -66,7 +66,8 @@ const useStyles = makeStyles(theme => ({
     fontFamily: 'Times New Roman',
   },
   link: {
-    textDecoration: 'none'
+    textDecoration: 'none',
+    color: 'white'
   }
 }))
 

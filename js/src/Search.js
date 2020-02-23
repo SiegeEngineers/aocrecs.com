@@ -148,7 +148,6 @@ const Search = ({match}) => {
   return (
     <div>
       <Form />
-      <br />
       <Results params={values} />
     </div>
   )

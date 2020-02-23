@@ -503,7 +503,8 @@ async def run():
     database = databases.Database(DATABASE_URL)
     await database.connect()
     rows = []
-    filters = ('matches.event_id=any(:event_id)', dict(event_id=['hc', 'hc2']))
+    #filters = ('matches.event_id=any(:event_id)', dict(event_id=['hc', 'hc2']))a
+    filters = ('matches.hc=true', dict())
     p = await players(database, filters)
     rows.append(add_header(p))
     #rows += await asyncio.gather(
@@ -511,7 +512,8 @@ async def run():
     #)
     client = pygsheets.authorize(service_file='gsheet_credentials.json')
     #sh = client.open('HC2 Recorded Game Statistics')
-    sh = client.open('HC3 Player Recorded Game Statistics')
+    #sh = client.open('HC3 Player Recorded Game Statistics')
+    sh = client.open('HC Player Recorded Game Statistics')
     rows += await add_wrapped(database, p, filters, *METRICS)
     wks = sh.worksheet_by_title('Summary')
     wks.clear(fields='*')

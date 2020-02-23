@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import {makeStyles} from '@material-ui/styles'
 
 import AppBar from '@material-ui/core/AppBar'
+import Button from '@material-ui/core/Button'
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
 import Link from '@material-ui/core/Link'
@@ -562,7 +563,7 @@ const Match = ({match}) => {
       <CardIconHeader icon={<AppLink path={['match', match.id]} text={<MatchIcon />} />} title={title}/>
       <CardContent>
         <AppBar position='static'>
-          <Tabs value={tab} onChange={(e, value) => setTab(value)} variant="fullWidth">
+          <Tabs value={tab} onChange={(e, value) => setTab(value)}>
             <Tab label='Players' />
             <Tab label='Information' />
             <Tab label='Map' />
@@ -583,6 +584,7 @@ const Match = ({match}) => {
           {tab === 6 && <Achievements size={match.team_size} teams={match.teams} />}
           {tab === 7 && <Graph match={match} />}
         </Typography>
+        {match.has_playback && <AppLink path={['match', match.id]} text={<Button variant="contained" color="primary">Extended Stats</Button>} />}
       </CardContent>
     </Card>
   )

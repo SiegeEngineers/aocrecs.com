@@ -31,6 +31,11 @@ const theme = createMuiTheme({
         height: '26px'
       }
     },
+    MuiCard: {
+      root: {
+        margin: '6px'
+      }
+    },
     MuiCardContent: {
       root: {
         '&:last-child': {
