@@ -7,6 +7,8 @@ export default gql`
     name
     country
     match_count
+    first_year
+    last_year
   }
 }
 `

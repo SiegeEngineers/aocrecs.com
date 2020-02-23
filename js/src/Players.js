@@ -36,6 +36,7 @@ const PeopleTable = ({rows, selected}) => {
         <TableRow>
           <TableCell align='right'></TableCell>
           <TableCell>Name</TableCell>
+          <TableCell>Activity</TableCell>
           <TableCell align='right'>Matches</TableCell>
         </TableRow>
       </TableHead>
@@ -44,7 +45,9 @@ const PeopleTable = ({rows, selected}) => {
           <TableRow key={index} selected={selected === row.id}>
             <TableCell align='right'>{row.country && <ReactCountryFlag countryCode={row.country} title={row.country.toUpperCase()} svg />}</TableCell>
             <TableCell><AppLink path={['players', row.id]} text={row.name} /></TableCell>
+            <TableCell>{row.first_year} - {row.last_year}</TableCell>
             <TableCell align='right'>{row.match_count.toLocaleString()}</TableCell>
+
           </TableRow>
         )}
       </TableBody>

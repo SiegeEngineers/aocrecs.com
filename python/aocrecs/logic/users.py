@@ -8,9 +8,12 @@ from aocrecs.cache import cached
 async def get_people(database):
     """Get all people."""
     query = """
-        select people.id, people.name, people.country, count(distinct match_id) as match_count
+        select
+            people.id, people.name, people.country, count(distinct match_id) as match_count,
+            min(extract(year from matches.played)) as first_year, max(extract(year from matches.played)) as last_year
         from people join users on people.id=users.person_id
         join players on users.id=players.user_id and players.platform_id=users.platform_id
+        join matches on players.match_id=matches.id
         where players.human=true
         group by people.id, people.name, people.country
         order by people.name

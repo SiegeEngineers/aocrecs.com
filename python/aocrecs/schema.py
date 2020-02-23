@@ -389,6 +389,8 @@ type Person {
     country: String
     name: String!
     match_count: Int!
+    first_year: Int!
+    last_year: Int!
     aliases: [String]
     accounts: [User]
     events: [Event]
