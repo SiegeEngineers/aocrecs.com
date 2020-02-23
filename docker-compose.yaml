@@ -12,6 +12,8 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - DATABASE_URL=${MGZ_DB}
+      - VOOBLY_USERNAME=${VOOBLY_USERNAME}
+      - VOOBLY_PASSWORD=${VOOBLY_PASSWORD}
     build:
       context: python
   nginx:

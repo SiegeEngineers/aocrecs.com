@@ -1,5 +1,5 @@
 """GraphQL resolvers."""
-from ariadne import QueryType, ObjectType, make_executable_schema, ScalarType
+from ariadne import QueryType, ObjectType, make_executable_schema, ScalarType, upload_scalar, MutationType
 
 from aocrecs.dataloaders import Loaders
 from aocrecs.logic import (
@@ -8,6 +8,7 @@ from aocrecs.logic import (
     playback
 )
 from aocrecs.schema import TYPE_DEFS
+from aocrecs.upload import add_rec
 
 # Unhelpful rules for resolver boilerplate.
 # pylint: disable=unused-argument, missing-function-docstring, invalid-name, redefined-builtin
@@ -25,6 +26,7 @@ def serialize_datetime(value):
 
 
 query = QueryType()
+mutation = MutationType()
 map_ = ObjectType('Map')
 civilization = ObjectType('Civilization')
 stats = ObjectType('Stats')
@@ -47,6 +49,7 @@ search_result = ObjectType('SearchResult')
 report_ = ObjectType('Report')
 stat_user = ObjectType('StatUser')
 graph = ObjectType('Graph')
+person = ObjectType('Person')
 
 
 @query.field('reports')
@@ -101,11 +104,6 @@ async def resolve_user(obj, info, id, platform_id):
     return await users.get_user(info.context.database, id, platform_id)
 
 
-@user.field('person')
-async def resolve_person(obj, info):
-    return await info.context.loaders.person.load((obj['id'], obj['platform_id']))
-
-
 @user.field('top_map')
 async def resolve_top_map(obj, info):
     return await users.get_top_map(info.context.database, obj['id'], obj['platform_id'])
@@ -130,6 +128,16 @@ async def resolve_user_matches(obj, info, offset, limit):
 @user.field('meta_ranks')
 async def resolve_meta_ranks(obj, info, ladder_ids):
     return await metaladder.get_meta_ranks(info.context.database, obj['id'], obj['platform_id'], ladder_ids)
+
+
+@query.field('people')
+async def resolve_people(obj, info):
+    return await users.get_people(info.context.database)
+
+
+@query.field('person')
+async def resolve_person(obj, info, id):
+    return await users.get_person(info.context.database, id)
 
 
 @query.field('meta_ladders')
@@ -222,11 +230,6 @@ def load_map_events(keys, context):
 @match.field('map_events')
 async def resolve_match_map_events(obj, info):
     return await info.context.loaders.map_events.load(obj['map_name'])
-
-
-@loaders.register('person')
-def load_person(keys, context):
-    return users.get_person(keys, context)
 
 
 @loaders.register('match')
@@ -334,9 +337,26 @@ async def resolve_by_day(obj, info):
     return await stat.by_day(info.context.database)
 
 
+@person.field('matches')
+async def resolve_person_matches(obj, info, offset, limit):
+    params = {'players': {'user_id': {'values': [a['id'] for a in obj['accounts']]}}}
+    return await search.get_hits(info.context, params, offset, limit)
+
+
+@mutation.field('upload')
+async def resolve_upload(obj, info, rec_file):
+    return add_rec(
+        rec_file.filename,
+        await rec_file.read(),
+        str(info.context.request.app.state.database_url),
+        info.context.request.app.state.voobly_username,
+        str(info.context.request.app.state.voobly_password)
+    )
+
+
 SCHEMA = make_executable_schema(TYPE_DEFS, [
     query, map_, stats, datetime_, research, player, chat, match,
     team, file_, hits, side, series, civilization, event, meta_ladder,
     user, rank, search_options_, stat_user, report_, search_result,
-    graph
+    graph, person, upload_scalar, mutation
 ])

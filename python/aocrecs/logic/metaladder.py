@@ -8,7 +8,8 @@ from aocrecs.cache import cached
 async def compute_ranks(database, filters, platform_id, ladder_id):
     """Compute ranks of all ladder participants."""
     part_1 = """
-        select players.user_id, players.name, players.user_name, players.rate_after as rating
+        select players.user_id, players.name, players.user_name, players.rate_after as rating,
+        people.name as person_name, people.country, people.id as person_id
         from players join matches on players.match_id=matches.id
             join (
                 select user_id, max(played) as maxdate
@@ -18,6 +19,8 @@ async def compute_ranks(database, filters, platform_id, ladder_id):
     part_2 = """
                 group by user_id
             ) as s on players.user_id=s.user_id and matches.played=s.maxdate
+        join users on s.user_id=users.id and users.platform_id=:platform_id
+        left join people on users.person_id=people.id
         where matches.platform_id=:platform_id and matches.ladder_id=:ladder_id and players.rate_after > 0
         order by players.rate_after desc
     """
@@ -115,7 +118,8 @@ async def get_ranks(database, platform_id, ladder_id, limit):
             user=dict(
                 id=r['user_id'],
                 name=r['user_name'] if r['user_name'] else r['name'],
-                platform_id=platform_id
+                platform_id=platform_id,
+                person=dict(id=r['person_id'], name=r['person_name'], country=r['country']) if r['person_id'] else None
             ),
             ladder=dict(
                 id=ladder_id

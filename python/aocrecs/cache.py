@@ -4,7 +4,7 @@ from collections import defaultdict
 from aiocache import cached as aio_cached, multi_cached
 
 
-CACHEABLE_TYPES = [int, str, dict, list, defaultdict]
+CACHEABLE_TYPES = [int, str, dict, list, tuple, defaultdict]
 DEFAULT_TTL = 60
 
 

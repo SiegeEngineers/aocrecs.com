@@ -61,7 +61,8 @@ async def rankings(database, platform_id, ladder_id, year, month, limit): # pyli
             user=dict(
                 id=r['user_id'],
                 name=r['user_name'] if r['user_name'] else r['name'],
-                platform_id=platform_id
+                platform_id=platform_id,
+                person=dict(id=r['person_id'], name=r['person_name'], country=r['country']) if r['person_id'] else None
             )
         )
         for i, r in enumerate(diff(current[:limit], previous, 'user_id'))
@@ -72,7 +73,7 @@ async def rankings(database, platform_id, ladder_id, year, month, limit): # pyli
 async def most_improvement(database, platform_id, ladder_id, year, month, limit): # pylint: disable=too-many-arguments
     """Get most improvement for report interval."""
     query = """
-    select max(players.user_id) as user_id, max(players.user_name) as user_name, min(players.rate_snapshot) as min_rate,
+    select max(players.user_id) as user_id, max(players.user_name) as user_name, max(players.name) as name, min(players.rate_snapshot) as min_rate,
         max(players.rate_snapshot) as max_rate, max(players.rate_snapshot) - min(players.rate_snapshot) as diff_rate,
         count(matches.id) as count,
         sum(case when players.winner is true then 1 else 0 end) as wins,
@@ -92,7 +93,7 @@ async def most_improvement(database, platform_id, ladder_id, year, month, limit)
         dict(
             r,
             rank=i + 1,
-            user=dict(id=r['user_id'], platform_id=platform_id, name=r['user_name'])
+            user=dict(id=r['user_id'], platform_id=platform_id, name=r['user_name'] if r['user_name'] else r['name'])
         ) for i, r in enumerate(results)
     ]
 

@@ -14,6 +14,8 @@ query Ladders($platform_id: String!) {
         id
         name
         person {
+          id
+          country
           name
         }
       }
