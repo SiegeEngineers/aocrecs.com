@@ -3,6 +3,7 @@ import gql from 'graphql-tag';
 export default gql`
 query Odds($match_id: Int!) {
   match(id: $match_id) {
+    id
     odds {
       teams { wins losses percent }
       teams_and_civilizations { wins losses percent }

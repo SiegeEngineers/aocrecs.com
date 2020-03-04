@@ -19,7 +19,7 @@ type Query {
     platforms: [Platform]
     meta_ladders(platform_id: String!, ladder_ids: [Int]): [Ladder]
     user(id: String!, platform_id: String!): User
-    report(year: Int!, month: Int!, platform_id: String!, limit: Int = 25): Report
+    report(year: Int!, month: Int!, limit: Int = 25): Report
     reports: [ReportOption]
     person(id: Int!): Person
     people: [Person]
@@ -186,7 +186,14 @@ type File {
 type Match {
     id: Int!
     map_name: String!
+    rms_seed: Int
+    rms_custom: Int
+    guard_state: Boolean
+    fixed_positions: Boolean
+    direct_placement: Boolean
+    effect_quantity: Boolean
     map_events: [Event]
+    duration: Datetime
     duration_secs: Int
     played: Datetime
     has_playback: Boolean
@@ -225,11 +232,37 @@ type Match {
     minimap_link: String!
     odds: Odds
     graph: Graph
+    market: [MarketPrice]
+    tribute: [Tribute]
+}
+
+type Tribute {
+    timestamp: Datetime!
+    timestamp_secs: Int!
+    from_player: Player!
+    to_player: Player!
+    resource: String!
+    spent: Int!
+    received: Int!
+    fee: Int!
+}
+
+type MarketPrice {
+    timestamp: Datetime!
+    timestamp_secs: Int!
+    sell_food: Int!
+    sell_wood: Int!
+    sell_stone: Int!
+    buy_food: Int!
+    buy_wood: Int!
+    buy_stone: Int!
 }
 
 type TrainedCount {
     player_number: Int!
     object_id: Int!
+    timestamp_secs: Int!
+    timestamp: Datetime!
     name: String!
     count: Int!
 }
@@ -242,6 +275,7 @@ type Graph {
 type GraphNode {
     id: Int!
     name: String!
+    color_id: Int
 }
 
 type GraphLink {
@@ -308,6 +342,9 @@ type Player {
     tribute_received: Int
     trade_gold: Int
     relic_gold: Int
+    feudal_time: Datetime
+    castle_time: Datetime
+    imperial_time: Datetime
     feudal_time_secs: Int
     castle_time_secs: Int
     imperial_time_secs: Int
@@ -320,16 +357,99 @@ type Player {
     research: [Research]
     civilization: Civilization
     timeseries: [Timeseries]
+    apm: [APM]
+    map_control: [MapControl]
     units_trained: [TrainedCount]
+    flags: [Flag]
+    metrics: Metrics
+    villager_allocation: [VillagerAllocation]
+    trade_carts: [ObjectCount]
+    villagers: [ObjectCount]
+    transactions: [Transaction]
+}
+
+type Transaction {
+    timestamp: Datetime!
+    timestamp_secs: Int!
+    sold_resource: String!
+    sold_amount: Int!
+    bought_resource: String!
+    bought_amount: Int
+}
+
+type ObjectCount {
+    timestamp: Datetime!
+    timestamp_secs: Int!
+    count: Int!
+}
+
+type MapControl {
+    timestamp: Datetime!
+    timestamp_secs: Int!
+    control_percent: Int!
+}
+
+type APM {
+    timestamp: Datetime!
+    timestamp_secs: Int!
+    actions: Int!
+}
+
+type VillagerAllocation {
+    timestamp: Datetime!
+    timestamp_secs: Int!
+    name: String!
+    count: Int!
+}
+
+type Metrics {
+    total_tcs: Int!
+    average_floating_resources: Int!
+    dark_age_tc_idle: Datetime!
+    seconds_housed: Datetime!
+    seconds_villagers_idle: Datetime
+    seconds_popcapped: Datetime!
+}
+
+type Flag {
+    type: String!
+    name: String!
+    count: Int
+    evidence: [Evidence]
+}
+
+type Evidence {
+    timestamp: Datetime!
+    value: String
 }
 
 type Timeseries {
     timestamp: Datetime
-    food: Int!
-    wood: Int!
-    stone: Int!
-    gold: Int!
-    population: Int!
+    timestamp_secs: Int!
+    total_food: Int!
+    total_wood: Int!
+    total_stone: Int!
+    total_gold: Int!
+    population: Float!
+    military: Float!
+    percent_explored: Float!
+    relic_gold: Int!
+    trade_profit: Int!
+    tribute_sent: Int!
+    tribute_received: Int!
+    value_current_buildings: Int!
+    value_current_units: Int!
+    value_lost_buildings: Int!
+    value_lost_units: Int!
+    value_objects_destroyed: Int!
+    value_spent_objects: Int!
+    value_spent_research: Int!
+    roi: Float!
+    damage: Float!
+    kills: Int!
+    deaths: Int!
+    razes: Int!
+    kd_delta: Int!
 }
 
 type Team {
@@ -343,7 +463,9 @@ type Research {
     id: Int!
     name: String!
     started: Datetime!
+    started_secs: Int!
     finished: Datetime
+    finished_secs: Int
 }
 
 type Chat {

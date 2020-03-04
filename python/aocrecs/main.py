@@ -14,6 +14,7 @@ from starlette.routing import Route
 
 from aocrecs import resolvers, routes as aoc_routes
 from aocrecs.context import Context
+from aocrecs.cache import CacheWarmer
 
 
 config = Config('./.env') # pylint: disable=invalid-name
@@ -27,11 +28,13 @@ def new_app():
     """Create a new app instance."""
     coloredlogs.install(level='DEBUG' if DEBUG else 'INFO', fmt='%(asctime)s %(name)s %(levelname)s %(message)s')
     database = databases.Database(DATABASE_URL)
+    warmer = CacheWarmer(database, disable=DEBUG)
+
     routes = [
         Route('/api', GraphQL(
             resolvers.SCHEMA,
             debug=DEBUG,
-            context_value=lambda request: Context(request, database, resolvers.loaders),
+            context_value=lambda request: Context(request, database),
             extensions=[ApolloTracingExtension]
         ), name='api'),
         Route('/api/download/{file_id:int}', aoc_routes.download, name='download'),
@@ -47,8 +50,8 @@ def new_app():
         debug=DEBUG,
         routes=routes,
         middleware=middleware,
-        on_startup=[database.connect],
-        on_shutdown=[database.disconnect]
+        on_startup=[warmer.setup],
+        on_shutdown=[warmer.teardown]
     )
     app.state.database = database
     app.state.database_url = DATABASE_URL

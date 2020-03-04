@@ -55,7 +55,7 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing.unit,
+    padding: theme.spacing(1),
   },
   toolbar: theme.mixins.toolbar,
   logo: {
@@ -185,7 +185,7 @@ const Layout = () => {
           <Route path='/civilizations/:did?/:id?' component={Civilizations} />
           <Route path='/maps/:id?' component={Maps} />
           <Route path='/players/:id?' component={Players} />
-          <Route path='/match/:id?' component={Match} />
+          <Route path='/match/:id?/:section?/:subsection?' component={Match} />
           <Route path='/user/:pid?/:id?' component={User} />
           <Route path='/reports/:y?/:m?' component={Reports} />
           <Route path='/upload' component={Upload} />

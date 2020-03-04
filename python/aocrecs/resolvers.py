@@ -1,11 +1,10 @@
 """GraphQL resolvers."""
 from ariadne import QueryType, ObjectType, make_executable_schema, ScalarType, upload_scalar, MutationType
 
-from aocrecs.dataloaders import Loaders
 from aocrecs.logic import (
     search, metaladder, report, search_options, events,
     matches, stats as stat, maps, civilizations, users, odds,
-    playback
+    playback, market
 )
 from aocrecs.schema import TYPE_DEFS
 from aocrecs.upload import add_rec
@@ -14,7 +13,6 @@ from aocrecs.upload import add_rec
 # pylint: disable=unused-argument, missing-function-docstring, invalid-name, redefined-builtin
 
 
-loaders = Loaders()
 datetime_ = ScalarType('Datetime')
 dict_ = ScalarType('Dict')
 
@@ -50,6 +48,7 @@ report_ = ObjectType('Report')
 stat_user = ObjectType('StatUser')
 graph = ObjectType('Graph')
 person = ObjectType('Person')
+tribute = ObjectType('Tribute')
 
 
 @query.field('reports')
@@ -70,13 +69,13 @@ async def resolve_report_most_improvement(obj, info, platform_id, ladder_id, lim
 
 
 @query.field('report')
-async def resolve_report(obj, info, year, month, platform_id, limit): # pylint: disable=too-many-arguments
-    return await report.report(info.context.database, platform_id, year, month, limit)
+async def resolve_report(obj, info, year, month, limit):
+    return await report.report(info.context.database, year, month, limit)
 
 
 @report_.field('longest_matches')
 async def resolve_longest_matches(obj, info):
-    return await info.context.loaders.match.load_many(obj['longest_match_ids'])
+    return await info.context.load_many(matches.get_match, obj['longest_match_ids'])
 
 
 @query.field('search_options')
@@ -172,7 +171,7 @@ async def resolve_series_matches(obj, info, offset, limit):
 
 @series.field('sides')
 async def resolve_sides(obj, info):
-    return events.get_sides(await info.context.loaders.match.load_many(obj['match_ids']), obj['participants'])
+    return events.get_sides(await info.context.load_many(matches.get_match, obj['match_ids']), obj['participants'])
 
 
 @query.field('series')
@@ -222,24 +221,14 @@ async def resolve_preview_url(obj, info):
     return await maps.get_preview_url(info.context, obj['name'])
 
 
-@loaders.register('map_events')
-def load_map_events(keys, context):
-    return maps.get_map_events(keys, context)
-
-
 @match.field('map_events')
 async def resolve_match_map_events(obj, info):
-    return await info.context.loaders.map_events.load(obj['map_name'])
-
-
-@loaders.register('match')
-def load_match(keys, context):
-    return matches.get_match(keys, context)
+    return await info.context.load(maps.get_map_events, obj['map_name'])
 
 
 @query.field('match')
 async def resolve_match(obj, info, id):
-    return await info.context.loaders.match.load(id)
+    return await info.context.load(matches.get_match, id)
 
 
 @match.field('odds')
@@ -257,24 +246,79 @@ async def resolve_graph(obj, info):
     return await playback.get_graph(info.context.database, obj['id'])
 
 
-@loaders.register('units_trained')
-def load_units_trained(keys, context):
-    return playback.get_units_trained(keys, context.database)
+@match.field('market')
+async def resolve_market_prices(obj, info):
+    return await market.get_prices(info.context.database, obj['id'])
+
+
+@match.field('tribute')
+async def resolve_tribute(obj, info):
+    return await market.get_tribute(info.context.database, obj['id'])
+
+
+@tribute.field('from_player')
+async def resolve_tribute_from(obj, info):
+    return await info.context.load(matches.get_player, (obj['match_id'], obj['player_number']))
+
+
+@tribute.field('to_player')
+async def resolve_tribute_to(obj, info):
+    return await info.context.load(matches.get_player, (obj['match_id'], obj['target_player_number']))
+
+
+@player.field('timeseries')
+async def resolve_timeseries(obj, info):
+    return await info.context.load(playback.get_timeseries, (obj['match_id'], obj['number']))
 
 
 @player.field('units_trained')
 async def resolve_units_trained(obj, info):
-    return await info.context.loaders.units_trained.load((obj['match_id'], obj['number']))
-
-
-@loaders.register('research')
-def load_research(keys, context):
-    return matches.get_research_by_player(keys, context.database)
+    return await info.context.load(playback.get_units_trained, (obj['match_id'], obj['number']))
 
 
 @player.field('research')
 async def resolve_research(obj, info):
-    return await info.context.loaders.research.load((obj['match_id'], obj['number']))
+    return await info.context.load(matches.get_research_by_player, (obj['match_id'], obj['number']))
+
+
+@player.field('apm')
+async def resolve_apm(obj, info):
+    return await info.context.load(playback.get_apm, (obj['match_id'], obj['number']))
+
+
+@player.field('trade_carts')
+async def resolve_trade_carts(obj, info):
+    return await info.context.load(playback.get_trade_carts, (obj['match_id'], obj['number']))
+
+
+@player.field('villagers')
+async def resolve_villagers(obj, info):
+    return await info.context.load(playback.get_villagers, (obj['match_id'], obj['number']))
+
+
+@player.field('map_control')
+async def resolve_map_control(obj, info):
+    return await info.context.load(playback.get_map_control, (obj['match_id'], obj['number']))
+
+
+@player.field('flags')
+async def resolve_flags(obj, info):
+    return await info.context.load(playback.get_flags, (obj['match_id'], obj['number']))
+
+
+@player.field('metrics')
+async def resolve_metrics(obj, info):
+    return await info.context.load(playback.get_metrics, (obj['match_id'], obj['number']))
+
+
+@player.field('villager_allocation')
+async def resolve_villager_allocation(obj, info):
+    return await info.context.load(playback.get_villager_allocation, (obj['match_id'], obj['number']))
+
+
+@player.field('transactions')
+async def resolve_transactions(obj, info):
+    return await info.context.load(market.get_transactions, (obj['match_id'], obj['number']))
 
 
 @query.field('map')
@@ -358,5 +402,5 @@ SCHEMA = make_executable_schema(TYPE_DEFS, [
     query, map_, stats, datetime_, research, player, chat, match,
     team, file_, hits, side, series, civilization, event, meta_ladder,
     user, rank, search_options_, stat_user, report_, search_result,
-    graph, person, upload_scalar, mutation
+    graph, person, tribute, upload_scalar, mutation
 ])

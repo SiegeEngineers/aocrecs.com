@@ -12,7 +12,7 @@ async def get_chat(database, match_id):
         select name, player_number, message, origination, audience, timestamp, color_id
         from chat join players on chat.player_number=players.number and chat.match_id=players.match_id
         where chat.match_id=:match_id
-        order by timestamp
+        order by id
     """
     result = await database.fetch_all(query, values={'match_id': match_id})
     return [dict(c, player=dict(
@@ -24,16 +24,17 @@ async def get_chat(database, match_id):
 
 
 @dataloader_cached(ttl=None)
-async def get_research_by_player(keys, database):
+async def get_research_by_player(keys, context):
     """Get researches."""
     where, values = compound_where(keys, ('match_id', 'player_number'))
     query = """
-        select name, started, finished, player_number, match_id
+        select name, started::interval(0), finished::interval(0), player_number, match_id,
+        extract(epoch from started)::integer as started_secs, extract(epoch from finished)::integer as finished_secs
         from research join technologies on research.technology_id=technologies.id and research.dataset_id=technologies.dataset_id
         where {}
         order by started
     """.format(where)
-    results = await database.fetch_all(query, values=values)
+    results = await context.database.fetch_all(query, values=values)
     return by_key(results, ('match_id', 'player_number'))
 
 
@@ -83,6 +84,32 @@ def make_files(player_data, file_data, match_id, url_func):
 
 
 @dataloader_cached(ttl=None)
+async def get_player(keys, context):
+    """Get basic player data."""
+    where, values = compound_where(keys, ('match_id', 'number'))
+    query = """
+        select
+            players.match_id, players.number, players.name, players.winner,  players.color_id,
+            players.user_id, players.platform_id, players.user_name
+        from players
+        where {}
+    """.format(where)
+    results = await context.database.fetch_all(query, values=values)
+    return {(player['match_id'], player['number']): dict(
+        match_id=player['match_id'],
+        number=player['number'],
+        name=player['name'],
+        color_id=player['color_id'],
+        winner=player['winner'],
+        user=dict(
+            id=player['user_id'],
+            name=player['user_name'],
+            platform_id=player['platform_id']
+        )
+    ) for player in results}
+
+
+@dataloader_cached(ttl=None)
 async def get_match(keys, context):
     """Get a match."""
     player_query = """
@@ -93,7 +120,8 @@ async def get_match(keys, context):
             rate_snapshot, rate_before, rate_after, mvp, human, score, military_score,
             economy_score, technology_score, society_score, units_killed, buildings_razed,
             buildings_lost, units_converted, food_collected, wood_collected, stone_collected,
-            gold_collected, tribute_sent, tribute_received, trade_gold, relic_gold,
+            gold_collected, tribute_sent, tribute_received, trade_gold, relic_gold, units_lost,
+            feudal_time, castle_time, imperial_time,
             extract(epoch from feudal_time)::integer as feudal_time_secs, extract(epoch from castle_time)::integer as castle_time_secs,
             extract(epoch from imperial_time)::integer as imperial_time_secs, explored_percent, research_count,
             total_wonders, total_castles, total_relics, villager_high
@@ -126,8 +154,9 @@ async def get_match(keys, context):
             starting_resources.name as starting_resources,
             victory_conditions.name as victory_condition,
             played, rated, diplomacy_type, team_size, platform_match_id,
-            cheats, population_limit, lock_teams, mirror, dataset_version, postgame, has_playback,
-            versions.name as version, extract(epoch from duration)::integer as duration_secs, winning_team_id
+            cheats, population_limit, lock_teams, mirror, dataset_version, postgame, has_playback, duration::interval(0),
+            versions.name as version, extract(epoch from duration)::integer as duration_secs, winning_team_id,
+            rms_seed, rms_custom, direct_placement, fixed_positions, guard_state, effect_quantity
         from matches
         join versions on matches.version_id=versions.id
         join datasets on matches.dataset_id=datasets.id

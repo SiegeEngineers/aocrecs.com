@@ -21,25 +21,11 @@ import humanizeDuration from 'humanize-duration'
 
 import AppLink from './util/AppLink'
 import DataQuery from './util/DataQuery'
-import {getMatchTitle} from './util/Shared'
+import {getMatchTitle, ChangeIndicator} from './util/Shared'
 
 import GetReports from './graphql/Reports.js'
 import GetReport from './graphql/Report.js'
 
-const ChangeIndicator = ({change}) => {
-  let out = ''
-  let color = ''
-  if (change > 0) {
-    out = ' ' + String.fromCharCode(8593) + Math.abs(change)
-    color = '#00ee00'
-  } else if (change < 0) {
-    out = ' ' + String.fromCharCode(8595) + Math.abs(change)
-    color = '#f25f5f'
-  }
-  return (
-    <span style={{color: color}}>{out}</span>
-  )
-}
 
 const UserName = ({user}) => {
   return (

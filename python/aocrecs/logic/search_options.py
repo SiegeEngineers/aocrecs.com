@@ -17,25 +17,25 @@ def diplo_options():
         {'value': '1v1', 'label': '1v1'},
         {'value': 'TG', 'label': 'TG'},
         {'value': 'FFA', 'label': 'FFA'},
-        {'value': '1v1', 'label': 'Other'}
+        {'value': 'Other', 'label': 'Other'}
     ]
 
 
-@cached(ttl=None)
+@cached(warm=True, ttl=None)
 async def civilizations(database, dataset_id):
     """Get civilizations for a dataset."""
     query = "select id as value, name as label from civilizations where dataset_id=:dataset_id"
     return list(map(dict, await database.fetch_all(query, values={'dataset_id': dataset_id})))
 
 
-@cached(ttl=None)
+@cached(warm=True, ttl=None)
 async def ladders(database, platform_id):
     """Get ladders for a platform."""
     query = "select id as value, name as label from ladders where platform_id=:platform_id"
     return list(map(dict, await database.fetch_all(query, values={'platform_id': platform_id})))
 
 
-@cached(ttl=None)
+@cached(warm=True, ttl=None)
 async def general(database):
     """Get general search options."""
     colors, game_types, datasets, platforms, events, tournaments = await asyncio.gather(

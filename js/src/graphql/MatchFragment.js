@@ -3,6 +3,7 @@ import gql from 'graphql-tag';
 export default gql`
 fragment MatchFragment on Match {
   id
+  duration
   duration_secs
   played
   has_playback
@@ -11,6 +12,12 @@ fragment MatchFragment on Match {
   diplomacy_type
   team_size
   map_name
+  rms_seed
+  rms_custom
+  direct_placement
+  effect_quantity
+  guard_state
+  fixed_positions
   map_events {
     id
     name
@@ -20,6 +27,7 @@ fragment MatchFragment on Match {
   cheats
   map_size
   map_reveal_choice
+  minimap_link
   population_limit
   speed
   lock_teams
@@ -94,9 +102,9 @@ fragment MatchFragment on Match {
       tribute_received
       trade_gold
       relic_gold
-      feudal_time_secs
-      castle_time_secs
-      imperial_time_secs
+      feudal_time
+      castle_time
+      imperial_time
       explored_percent
       research_count
       total_wonders
@@ -107,6 +115,7 @@ fragment MatchFragment on Match {
   }
   files {
     id
+    download_link
     original_filename
     size
     owner {

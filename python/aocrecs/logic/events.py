@@ -23,7 +23,6 @@ def get_sides(matches, participants):
     ]
 
 
-@cached(ttl=None)
 async def get_series(database, series_id):
     """Get a series."""
     series_query = """
@@ -57,6 +56,7 @@ async def get_series(database, series_id):
     )
 
 
+@cached(ttl=86400)
 async def get_event(database, event_id):
     """Get an event."""
     events_query = 'select id, name, year from events where id=:event_id'
@@ -101,7 +101,7 @@ async def get_event(database, event_id):
     )
 
 
-@cached(ttl=None)
+@cached(warm=True, ttl=86400)
 async def get_events(database):
     """Get events."""
     events_query = 'select id, name, year from events order by year, name'

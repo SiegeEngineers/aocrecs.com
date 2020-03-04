@@ -6,6 +6,8 @@ import InputLabel from '@material-ui/core/InputLabel'
 import TextField from '@material-ui/core/TextField'
 import MenuItem from '@material-ui/core/MenuItem'
 import Select from '@material-ui/core/Select'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Checkbox from '@material-ui/core/Checkbox'
 
 import {DatePicker} from 'material-ui-pickers'
 import {useDebouncedCallback} from 'use-debounce'
@@ -146,5 +148,22 @@ export const DateInput = ({label, table, name}) => {
       onChange={setValue}
       format={DATE_FORMAT}
     />
+  )
+}
+
+export const BoolInput = ({label, table, name}) => {
+  const key = 'enabled'
+  const [current_value, params, setter] = searchState(table, name, key)
+  const setValue = (value) => {
+    setter(updateAll(params, table, name, value ? {[key]: value} : null))
+  }
+  return (
+    <FormControlLabel label={label} control={
+      <Checkbox
+        color='primary'
+        checked={current_value}
+        onChange={e => setValue(e.target.checked)}
+      />
+    }/>
   )
 }

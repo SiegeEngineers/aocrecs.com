@@ -5,7 +5,7 @@ from aocrecs.cache import cached
 from aocrecs.util import by_key
 
 
-@cached(ttl=1440)
+@cached(warm=True, ttl=3600)
 async def get_maps(database):
     """Get all maps."""
     query = """

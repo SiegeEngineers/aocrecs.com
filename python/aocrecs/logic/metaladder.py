@@ -4,7 +4,7 @@ from aocrecs.consts import COLLECTION_STARTED
 from aocrecs.cache import cached
 
 
-@cached(ttl=1440)
+@cached(warm=[[None, 'voobly', 131], [None, 'voobly', 132], [None, 'voobly', 163]], ttl=86400)
 async def compute_ranks(database, filters, platform_id, ladder_id):
     """Compute ranks of all ladder participants."""
     part_1 = """
@@ -57,7 +57,7 @@ async def get_meta_ranks(database, user_id, platform_id, ladder_ids):
     return ranks
 
 
-@cached(ttl=None)
+@cached(warm=True, ttl=None)
 async def get_ladders(database, platform_id, ladder_ids):
     """Get platform ladders."""
     query = 'select id, platform_id, name from ladders where platform_id=:platform_id and id = any(:ladder_ids)'
@@ -65,7 +65,7 @@ async def get_ladders(database, platform_id, ladder_ids):
     return list(map(dict, await database.fetch_all(query, values=values)))
 
 
-@cached(ttl=1440)
+@cached(ttl=86400)
 async def get_streak(database, user_id, platform_id, ladder_id):
     """Compute player's most recent win/loss streak."""
     query = """
@@ -87,7 +87,7 @@ async def get_streak(database, user_id, platform_id, ladder_id):
     return None
 
 
-@cached(ttl=1440)
+@cached(ttl=86400)
 async def get_rate_by_day(database, user_id, platform_id, ladder_id):
     """Compute max rate reached per day for a player."""
     query = """

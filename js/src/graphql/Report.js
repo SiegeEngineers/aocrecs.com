@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 export default gql`
 query Report($year: Int!, $month: Int!) {
-  report(platform_id: "voobly", year: $year, month: $month) {
+  report(year: $year, month: $month) {
     total_matches
     total_players
     most_matches {

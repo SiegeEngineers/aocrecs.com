@@ -8,6 +8,7 @@ query Graph($match_id: Int!) {
       nodes {
         id
         name
+        color_id
       }
       links {
         source

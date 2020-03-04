@@ -4,7 +4,7 @@ import {useTheme} from '@material-ui/styles'
 import {merge} from 'lodash'
 
 
-const Chart = ({id, type, timeseries, series, width, height, y_min}) => {
+const Chart = ({id, type, timeseries, series, width, height, y_min, custom}) => {
   const theme = useTheme()
   const options = {
     colors: [theme.palette.primary.main],
@@ -14,7 +14,7 @@ const Chart = ({id, type, timeseries, series, width, height, y_min}) => {
     xaxis: {
       labels: {
         style: {
-          fontSize: '14px'
+          fontSize: '13px'
         }
       }
     },
@@ -24,7 +24,7 @@ const Chart = ({id, type, timeseries, series, width, height, y_min}) => {
       forceNiceScale: true,
       labels: {
         style: {
-          fontSize: '14px'
+          fontSize: '13px'
         }
       }
     },
@@ -40,19 +40,22 @@ const Chart = ({id, type, timeseries, series, width, height, y_min}) => {
           zoomin: false,
           zoomout: false,
           pan: false,
-          reset: false
+          reset: true
         }
       },
       fontFamily: 'Roboto',
       animations: {
         enabled: false
-      },
+      }
     },
     tooltip: {
       theme: 'dark',
       enabled: false
     },
     legend: {
+      position: 'top',
+      horizontalAlign: 'right',
+      floating: true,
       show: true
     }
   }
@@ -103,6 +106,7 @@ const Chart = ({id, type, timeseries, series, width, height, y_min}) => {
       }
     })
   }
+  merge(options, custom)
   return <ApexChart type={type} width={width} height={height} series={series} options={options} />
 }
 

@@ -10,12 +10,14 @@ import {findKey} from 'lodash'
 
 import DataQuery from './util/DataQuery'
 import RelatedMatches from './util/RelatedMatches'
-import {OptionInput, DateInput, TextInput, NumberInput} from './util/Input'
+import {OptionInput, DateInput, TextInput, NumberInput, BoolInput} from './util/Input'
 
 import GetSearchOptions from './graphql/SearchOptions'
 import GetSearchOptionsDataset from './graphql/SearchOptionsDataset'
 import GetSearchOptionsPlatform from './graphql/SearchOptionsPlatform'
 import GetSearchResults from './graphql/SearchResults'
+
+import FormControl from '@material-ui/core/FormControl'
 
 const MAX_RATE = 3000
 const MIN_RATE = 0
@@ -47,7 +49,9 @@ const DatasetSection = ({data, values}) => {
     <Card>
       <CardContent>
         <Typography variant='h5'>Dataset</Typography>
-        <OptionInput label='Dataset' table='matches' name='dataset_id' data={data.search_options.general.datasets} />
+        <FormGroup>
+          <OptionInput label='Dataset' table='matches' name='dataset_id' data={data.search_options.general.datasets} />
+          </FormGroup>
         {findKey(values, 'dataset_id') &&
           <DataQuery
             query={GetSearchOptionsDataset}
@@ -91,7 +95,9 @@ const PlatformSection = ({data, values}) => {
     <Card>
       <CardContent>
         <Typography variant='h5'>Platform</Typography>
+        <FormGroup>
         <OptionInput label='Platform' table='matches' name='platform_id' data={data.search_options.general.platforms} />
+        </FormGroup>
         {findKey(values, 'platform_id') &&
           <DataQuery
             query={GetSearchOptionsPlatform}
@@ -109,6 +115,45 @@ const PlatformSection = ({data, values}) => {
   )
 }
 
+const PlaybackSection = ({data, values}) => {
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant='h5'>Events</Typography>
+        <Grid container>
+          <Grid xs={6}>
+        <FormControl component='fieldset'>
+          <BoolInput label='Feudal Archers' table='flags' name='archers' />
+          <BoolInput label='Feudal Trush' table='flags' name='trushes' />
+          <BoolInput label='Feudal Skirmishers' table='flags' name='skirmishers' />
+          <BoolInput label='Feudal Scouts' table='flags' name='scouts' />
+          <BoolInput label='Feudal Men-at-arms' table='flags' name='maa' />
+          <BoolInput label='Drush' table='flags' name='drush' />
+          <BoolInput label='Fast Castle' table='flags' name='fast_castle' />
+          <BoolInput label='Deer Push' table='flags' name='deer_pushes' />
+          <BoolInput label='Daut Castle' table='flags' name='daut_castles' />
+                  </FormControl>
+      </Grid>
+      <Grid xs={6}>
+        <FormControl component='fieldset'>
+<BoolInput label='Castle Drop' table='flags' name='castle_drops' />
+          <BoolInput label='Boar Steal' table='flags' name='boar_steals' />
+          <BoolInput label='Sheep Steal' table='flags' name='sheep_steals' />
+          <BoolInput label='Boar Kills Villager' table='flags' name='lost_to_boar' />
+          <BoolInput label='Wolf Kills Villager' table='flags' name='lost_to_predator' />
+          <BoolInput label='Castle Race' table='flags' name='castle_race' />
+          <BoolInput label='Splash Damage Kills' table='flags' name='badaboom' />
+          <BoolInput label='Lost Research' table='flags' name='lost_research' />
+
+</FormControl>
+      </Grid>
+    </Grid>
+
+      </CardContent>
+    </Card>
+  )
+}
+
 const Form = () => {
   const [values,] = useGlobal('search')
   return (
@@ -119,12 +164,13 @@ const Form = () => {
             <GeneralSection data={data} />
           </Grid>
           <Grid item xs={3}>
+            <PlaybackSection data={data} />
+          </Grid>
+          <Grid item xs={3}>
             <PlayerSection data={data} />
           </Grid>
           <Grid item xs={3}>
             <DatasetSection data={data} values={values} />
-          </Grid>
-          <Grid item xs={3}>
             <PlatformSection data={data} values={values} />
           </Grid>
         </Grid>

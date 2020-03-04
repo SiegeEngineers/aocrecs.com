@@ -3,7 +3,7 @@ import asyncio
 from aocrecs.cache import cached
 
 
-@cached(ttl=1440)
+@cached(ttl=None)
 async def get_civilization(database, civilization_id, dataset_id):
     """Get a civilization."""
     query = """
@@ -24,7 +24,7 @@ async def get_civilization(database, civilization_id, dataset_id):
     return dict(result, bonuses=list(map(dict, bonuses)))
 
 
-@cached(ttl=1440)
+@cached(warm=[[0], [1], [100]], ttl=3600)
 async def get_all_civilizations(database, dataset_id):
     """Get all civilizations."""
     query = """

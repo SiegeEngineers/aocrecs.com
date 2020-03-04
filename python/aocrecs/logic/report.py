@@ -7,6 +7,9 @@ from aocrecs.logic.metaladder import compute_ranks
 from aocrecs.cache import cached
 
 
+LAST_MONTH = datetime.datetime.today() - relativedelta(months=+1)
+
+
 def compute_map_data(result):
     """Compute rank and percent from map counts."""
     total = sum([r['count'] for r in result])
@@ -69,7 +72,10 @@ async def rankings(database, platform_id, ladder_id, year, month, limit): # pyli
     ]
 
 
-@cached(ttl=None)
+@cached(warm=[
+    ['voobly', 131, LAST_MONTH.year, LAST_MONTH.month, 25],
+    ['voobly', 132, LAST_MONTH.year, LAST_MONTH.month, 25]
+], ttl=None)
 async def most_improvement(database, platform_id, ladder_id, year, month, limit): # pylint: disable=too-many-arguments
     """Get most improvement for report interval."""
     query = """
@@ -98,8 +104,8 @@ async def most_improvement(database, platform_id, ladder_id, year, month, limit)
     ]
 
 
-@cached(ttl=None)
-async def report(database, platform_id, year, month, limit):
+@cached(warm=[[LAST_MONTH.year, LAST_MONTH.month, 25]], ttl=None)
+async def report(database, year, month, limit):
     """Get a report."""
     matches_query = """
         select count(*) as count

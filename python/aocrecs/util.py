@@ -2,11 +2,14 @@
 from collections import defaultdict
 
 
-def by_key(results, keys):
+def by_key(results, keys, defaults=None):
     """Group rows by specified key."""
     if not isinstance(keys, tuple):
         keys = (keys,)
     output = defaultdict(list)
+    if defaults:
+        for key in defaults:
+            output[key] = []
     for row in results:
         key = list(row[k] for k in keys)
         if len(key) == 1:

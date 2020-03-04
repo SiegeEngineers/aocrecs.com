@@ -14,8 +14,15 @@ const theme = createMuiTheme({
   },
   typography: {
     useNextVariants: true,
+    fontSize: 13
   },
   overrides: {
+    MuiListItem: {
+      root: {
+        paddingTop: '2px',
+        paddingBottom: '2px'
+      }
+    },
     MuiTableCell: {
       root: {
         padding: '1px',

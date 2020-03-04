@@ -1,6 +1,8 @@
 """Build search query."""
 import asyncio
 from aocrecs.cache import cached
+from aocrecs.logic import matches
+from aocrecs.logic.playback import FLAGS
 
 
 @cached()
@@ -11,7 +13,7 @@ async def get_hits(context, params, offset, limit):
         context.database.fetch_one(count_query, values=values),
         context.database.fetch_all(result_query, values=values)
     )
-    return dict(count=count['count'], hits=await context.loaders.match.load_many(map(lambda m: m['id'], result)))
+    return dict(count=count['count'], hits=await context.load_many(matches.get_match, map(lambda m: m['id'], result)))
 
 
 def add_filter(field, bind, criteria):
@@ -43,9 +45,34 @@ def build_query(params, offset, limit):
             where.append(where_clause)
             args[bind_name] = bind_value
 
-    query = 'from matches {} {}'.format('join' if join else '', ' join '.join(join))
+    query = 'from matches {} {}'.format('join' if join else '', ' join '.join(join)) + ' {playback}'
     if where:
         query += ' where {}'.format(' and '.join(where))
 
+    query = append_flags(query, params, args)
+
     query_template = "select distinct matches.id {} order by matches.id desc limit {} offset {}"
     return query_template.format(query, limit, offset), 'select count(distinct matches.id) {}'.format(query), args
+
+
+def append_flags(query, params, args):
+    """Append flag logic."""
+    joins = []
+    for alias, _, _, (subquery, values) in FLAGS:
+        if alias not in params.get('flags', {}).keys():
+            continue
+
+        if '{sq}' in subquery:
+            subquery = subquery.format(sq='select distinct matches.id {}'.format(query.format(playback='')))
+
+        new_args = {}
+        for key, value in values.items():
+            subquery = subquery.replace(':{}'.format(key), ':{}_{}'.format(alias, key))
+            new_args['{}_{}'.format(alias, key)] = value
+
+        args.update(new_args)
+        joins.append('({subquery}) as {alias} on {alias}.match_id = matches.id'.format(subquery=subquery, alias=alias))
+
+    if joins:
+        return query.format(playback='join ' + ' join '.join(joins))
+    return query.format(playback='')

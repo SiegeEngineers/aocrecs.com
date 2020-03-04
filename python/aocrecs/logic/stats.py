@@ -1,11 +1,12 @@
 """Global statistics."""
 import asyncio
+import datetime
 
 from aocrecs.consts import COLLECTION_STARTED
 from aocrecs.cache import cached
 
 
-@cached()
+@cached(warm=True, ttl=3600)
 async def summary(database):
     """Get summary statistics."""
     match_count, series_count, player_count = await asyncio.gather(
@@ -20,7 +21,7 @@ async def summary(database):
     }
 
 
-@cached(ttl=1440)
+@cached(warm=True, ttl=3600)
 async def map_count(database):
     """Get map count."""
     query = "select count(*) as count from (select map_name from matches group by map_name) as x"
@@ -28,7 +29,7 @@ async def map_count(database):
     return result['count']
 
 
-@cached()
+@cached(warm=[['game_types', 'type_id'], ['datasets', 'dataset_id'], ['platforms', 'platform_id']], ttl=86400)
 async def rel_agg_query(database, table, foreign_key):
     """Aggregate across related table."""
     query = """
@@ -40,7 +41,7 @@ async def rel_agg_query(database, table, foreign_key):
     return [dict(r) for r in await database.fetch_all(query)]
 
 
-@cached()
+@cached(warm=[['files', 'language'], ['matches', 'diplomacy_type']], ttl=86400)
 async def agg_query(database, table, field):
     """Aggregate on table."""
     query = """
@@ -49,14 +50,17 @@ async def agg_query(database, table, field):
     return [dict(r) for r in await database.fetch_all(query)]
 
 
-@cached(ttl=1440)
+@cached(warm=True, ttl=86400)
 async def by_day(database):
     """Get daily match counts."""
     query = """
         select played::date as date, count(*) as count
         from matches
-        where played > :start and played < now()::date
+        where played > :start and played < :end
         group by played::date
         order by played::date
     """
-    return [dict(r) for r in await database.fetch_all(query, values={'start': COLLECTION_STARTED})]
+    return [dict(r) for r in await database.fetch_all(query, values={
+        'start': COLLECTION_STARTED,
+        'end': datetime.datetime.now().date()
+    })]

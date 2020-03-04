@@ -4,7 +4,7 @@ import asyncio
 from aocrecs.cache import cached
 
 
-@cached(ttl=1440)
+@cached(warm=True, ttl=86400)
 async def get_people(database):
     """Get all people."""
     query = """
@@ -21,7 +21,7 @@ async def get_people(database):
     return list(map(dict, await database.fetch_all(query)))
 
 
-@cached(ttl=1440)
+@cached(ttl=86400)
 async def get_person(database, person_id):
     """Get a person."""
     person_query = """
@@ -77,7 +77,7 @@ async def get_person(database, person_id):
     )
 
 
-@cached(ttl=1440)
+@cached(ttl=86400)
 async def get_user(database, user_id, platform_id):
     """Get user."""
     query = """
@@ -106,7 +106,7 @@ async def get_user(database, user_id, platform_id):
     )
 
 
-@cached(ttl=1440)
+@cached(ttl=86400)
 async def get_top_map(database, user_id, platform_id):
     """Get top map for user."""
     query = """
@@ -122,7 +122,7 @@ async def get_top_map(database, user_id, platform_id):
     return None
 
 
-@cached(ttl=1440)
+@cached(ttl=86400)
 async def get_top_civilization(database, user_id, platform_id):
     """Get top civilizations for user."""
     query = """
@@ -138,7 +138,7 @@ async def get_top_civilization(database, user_id, platform_id):
     return None
 
 
-@cached(ttl=1440)
+@cached(ttl=86400)
 async def get_top_dataset(database, user_id, platform_id):
     """Get top dataset for user."""
     query = """
