@@ -34,7 +34,7 @@ const GeneralSection = ({data}) => {
           <OptionInput label='Mirror' table='matches' name='mirror' data={data.search_options.general.mirror} />
           <OptionInput label='Rated' table='matches' name='rated' data={data.search_options.general.rated} />
           <OptionInput label='ZR' table='matches' name='rms_zr' data={data.search_options.general.rms_zr} />
-          <OptionInput label='Playback' table='matches' name='has_playback' data={data.search_options.general.playback} />
+          <OptionInput label='Extended Stats' table='matches' name='has_playback' data={data.search_options.general.playback} />
           <OptionInput label='Event' table='matches' name='event_id' data={data.search_options.general.events} />
           <OptionInput label='Tournament' table='matches' name='tournament_id' data={data.search_options.general.tournaments} />
           <DateInput label='Played' table='matches' name='played' />

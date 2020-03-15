@@ -34,7 +34,7 @@ const Main = () => {
             <Grid item><Stat title='Maps' stat={data.stats.map_count.toLocaleString()} /></Grid>
           </Grid>
           <Grid container>
-            <Grid item xs={12}>
+            <Grid item xs={4}>
               <Card>
                 <CardContent>
                   <Typography variant='h5'>Match Additions</Typography>

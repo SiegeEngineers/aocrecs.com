@@ -17,7 +17,6 @@ import Typography from '@material-ui/core/Typography'
 
 import ReactCountryFlag from 'react-country-flag'
 import {format, subMonths} from 'date-fns'
-import humanizeDuration from 'humanize-duration'
 
 import AppLink from './util/AppLink'
 import DataQuery from './util/DataQuery'
@@ -72,7 +71,7 @@ const LongestMatchesSection = ({data}) => {
                 <TableCell>{index + 1}</TableCell>
                 <TableCell><AppLink path={['match', match.id]} text={getMatchTitle(match, false)} /></TableCell>
                 <TableCell> <AppLink path={['maps', match.map_name]} text={match.map_name} /></TableCell>
-                <TableCell>{humanizeDuration(match.duration_secs * 1000)}</TableCell>
+                <TableCell>{match.duration}</TableCell>
               </TableRow>
             )}
           </TableBody>

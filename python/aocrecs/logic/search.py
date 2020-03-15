@@ -51,7 +51,7 @@ def build_query(params, offset, limit):
 
     query = append_flags(query, params, args)
 
-    query_template = "select distinct matches.id {} order by matches.id desc limit {} offset {}"
+    query_template = "select distinct matches.id, matches.played {} order by matches.played desc nulls last limit {} offset {}"
     return query_template.format(query, limit, offset), 'select count(distinct matches.id) {}'.format(query), args
 
 

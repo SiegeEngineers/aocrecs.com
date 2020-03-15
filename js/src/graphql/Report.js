@@ -94,7 +94,7 @@ query Report($year: Int!, $month: Int!) {
       diplomacy_type
       team_size
       map_name
-      duration_secs
+      duration
     }
   }
 }

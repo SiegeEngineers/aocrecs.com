@@ -25,7 +25,7 @@ const Map = ({match}) => {
           <TableRow>
             <TableCell>Size</TableCell>
             {match.map_events && <TableCell>Events</TableCell>}
-            <TableCell>Seed</TableCell>
+            {match.rms_seed && <TableCell>Seed</TableCell>}
             <TableCell align='center'>Custom</TableCell>
             <TableCell align='center'>Fixed Positions</TableCell>
             <TableCell align='center'>Tech Effects</TableCell>
@@ -39,7 +39,7 @@ const Map = ({match}) => {
             <AppLink key={event.id} path={['events', event.id]} text={event.name} />
           ])}
             </TableCell>}
-            <TableCell><code>{match.rms_seed}</code></TableCell>
+            {match.rms_seed && <TableCell><code>{match.rms_seed}</code></TableCell>}
             <TableCell align='center'><BoolIcon value={match.rms_custom} /></TableCell>
             <TableCell align='center'><BoolIcon value={match.direct_placement} /></TableCell>
             <TableCell align='center'><BoolIcon value={match.effect_quantity} /></TableCell>
