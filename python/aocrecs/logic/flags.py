@@ -1,5 +1,5 @@
 """Compute flagged events."""
-from aocrecs.consts import VILLAGER_IDS, BOAR_IDS, HUNT_IDS, SCOUT_IDS, SPLASH_DAMAGE_IDS
+from aocrecs.consts import VILLAGER_IDS, BOAR_IDS, HUNT_IDS, SCOUT_IDS, SPLASH_DAMAGE_IDS, TC_IDS
 
 
 def lost_to_gaia(gaia_ids):
@@ -55,11 +55,11 @@ def daut_castle():
     """Find castles deleted after more than 10% built."""
     query = """
         select
-            players.match_id, players.number, destroyed_building_percent as deleted_at_percent, destroyed::interval(0) as timestamp
+            players.match_id, players.number, destroyed_building_percent as destroyed_at_percent, oi.deleted, destroyed::interval(0) as timestamp
         from object_instances as oi join players on oi.match_id=players.match_id and oi.initial_player_number=players.number
         where
             oi.initial_object_id=82 and
-            oi.deleted is true and oi.destroyed_building_percent > 0.1
+            oi.destroyed_building_percent > 0.1 and oi.destroyed_building_percent < 1.0 and oi.building_completed is null
     """
     return query, dict()
 
@@ -139,24 +139,26 @@ def fast_castle():
     return query, dict()
 
 
-def research_order(technology_id, after_technology_id):
+def research_order(technology_id, after_technology_id, civ_ids):
     """Report research that began after a specified research finished."""
     query = """
-        select x.match_id, x.player_number as number, started::interval(0) as timestamp, imp.finished as imp_time
-        from research as x
-        join (
-            select match_id, player_number, finished from research
-            where technology_id=:after_technology_id
-        ) as imp on imp.match_id=x.match_id and imp.player_number=x.player_number
-        where technology_id=:technology_id and started > imp.finished
+        select
+            imp.match_id, imp.player_number as number, imp.finished as imp_time, late.started::interval(0) as timestamp
+        from research as imp
+        join players on imp.match_id=players.match_id and imp.player_number=players.number
+        left join (
+            select match_id, player_number, started, finished from research
+            where technology_id=:technology_id
+        ) as late on late.match_id=imp.match_id and imp.player_number=late.player_number
+        where imp.technology_id=:after_technology_id and imp.finished is not null and late.finished is null and not (players.civilization_id = any(:civ_ids))
     """
-    return query, dict(technology_id=technology_id, after_technology_id=after_technology_id)
+    return query, dict(technology_id=technology_id, after_technology_id=after_technology_id, civ_ids=civ_ids)
 
 
 def trained_unit(object_ids, before_tech):
     """Returns matches where only *1* of the object ids is played prior to before_tech."""
     query = """
-        select oi.match_id, oi.initial_player_number as number, (case when count(distinct initial_object_id) = 1 then true else false end) as val
+        select oi.match_id, oi.initial_player_number as number, (case when count(distinct initial_object_id) = 1 then true else false end) as value
         from object_instances as oi join ({sq}) as sq on oi.match_id=sq.id
         where initial_class_id=70 and initial_object_id=any(:object_ids) and created > '00:01:00'
         and created < (select finished from research where match_id=oi.match_id and player_number=oi.initial_player_number and technology_id=:before_tech)
@@ -167,6 +169,39 @@ def trained_unit(object_ids, before_tech):
         query,
         dict(object_ids=object_ids, before_tech=before_tech)
     )
+
+
+def formation_uses(formation_id):
+    query = """
+        select players.match_id, players.number, count(formations.formation_id) as value
+        from players left join formations on players.match_id=formations.match_id and players.number=formations.player_number and formations.formation_id=:formation_id
+        group by players.match_id, players.number
+    """
+    return query, dict(formation_id=formation_id)
+
+
+def maa():
+    query = """
+        select oi.match_id, oi.initial_player_number as number, case when count(*) > 0 then true else false end as value
+        from object_instances as oi join ({sq}) as sq on oi.match_id=sq.id
+        join research as maa on oi.match_id=maa.match_id and oi.initial_player_number=maa.player_number and maa.technology_id=222
+        left join research as castle on oi.match_id=castle.match_id and oi.initial_player_number=castle.player_number and castle.technology_id=102
+        where initial_class_id=70 and initial_object_id in(74, 75) and created > '00:01:00' and maa.started < castle.started and created < castle.started
+group by oi.match_id, oi.initial_player_number
+    """
+    return query, dict()
+
+
+def drush():
+    query = """
+        select oi.match_id, oi.initial_player_number as number, case when count(*) > 0 then true else false end as value
+        from object_instances as oi join ({sq}) as sq on oi.match_id=sq.id
+        left join research as maa on oi.match_id=maa.match_id and oi.initial_player_number=maa.player_number and maa.technology_id=222
+        left join research as castle on oi.match_id=castle.match_id and oi.initial_player_number=castle.player_number and castle.technology_id=102
+        where initial_class_id=70 and initial_object_id in(74) and created > '00:01:00' and (maa.started is null or maa.started > castle.started) and created < castle.started
+group by oi.match_id, oi.initial_player_number
+    """
+    return query, dict()
 
 
 def badaboom():
@@ -209,7 +244,38 @@ def castle_race():
 def market_usage():
     """Buying and selling resources at the market."""
     query = """
-        select match_id, player_number as number, timestamp::interval(0), actions.name as value
-        from ({sq}) as m join transactions on m.id=transactions.match_id join actions on transactions.action_id=actions.id
+        select
+            players.match_id, timestamp::interval(0),
+            player_number as number,
+            case when action_id=123 then 'Gold' else resources.name end as sold_resource,
+            (amount * 100) as sold_amount,
+            case when action_id=123 then resources.name else 'Gold' end as bought_resource
+        from players left join transactions on transactions.match_id=players.match_id and transactions.player_number = players.number
+        join resources on transactions.resource_id=resources.id
     """
     return query, dict()
+
+
+def scout_lost_to_tc(before_age):
+    """Scout lost to opponent's TC."""
+    query = """
+        select scout.match_id, scout.initial_player_number as number, scout.destroyed::interval(0) as timestamp, research.finished as reached_castle
+        from object_instances as scout
+        join object_instances as tc on scout.destroyed_by_instance_id=tc.instance_id and scout.match_id=tc.match_id and scout.initial_player_number <> tc.initial_player_number
+        left join research on research.match_id=scout.match_id and research.player_number=scout.initial_player_number
+        where scout.initial_object_id = any(:scout_ids) and scout.created < '00:00:10' and tc.initial_object_id = any(:tc_ids) and tc.created < '00:00:10'
+        and research.technology_id = :before_age
+        and scout.destroyed < research.finished
+    """
+    return query, dict(scout_ids=SCOUT_IDS, tc_ids=TC_IDS, before_age=before_age)
+
+
+def gaia_killed_by_tc(gaia_ids):
+    """Gaia killed by TC."""
+    query = """
+        select tc.match_id, tc.initial_player_number as number, boar.destroyed::interval(0) as timestamp
+        from object_instances as boar
+        join object_instances as tc on boar.destroyed_by_instance_id=tc.instance_id and boar.match_id=tc.match_id
+        where boar.initial_object_id = any(:gaia_ids) and tc.initial_object_id = any(:tc_ids) and tc.created < '00:00:10'
+    """
+    return query, dict(gaia_ids=gaia_ids, tc_ids=TC_IDS)

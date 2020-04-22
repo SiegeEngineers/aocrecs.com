@@ -143,7 +143,7 @@ type StatItem {
 
 type StatDate {
     date: Datetime
-    count: Int!
+    count: Int
 }
 
 type Map {
@@ -206,6 +206,9 @@ type Match {
     mirror: Boolean
     dataset_version: String
     version: String
+    game_version: String
+    save_version: String
+    build: String
     postgame: Boolean
     platform_match_id: String
     winning_team_id: Int

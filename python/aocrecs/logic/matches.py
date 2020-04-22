@@ -46,7 +46,12 @@ def make_players(player_data, match_id):
             user=dict(
                 id=player['user_id'],
                 name=player['name'],
-                platform_id=player['platform_id']
+                platform_id=player['platform_id'],
+                person=dict(
+                    id=player['person_id'],
+                    country=player['country'],
+                    name=player['person_name']
+                ) if player['person_id'] else None,
             ) if player['user_id'] else None,
             civilization=dict(
                 id=player['civilization_id'],
@@ -124,12 +129,15 @@ async def get_match(keys, context):
             feudal_time, castle_time, imperial_time,
             extract(epoch from feudal_time)::integer as feudal_time_secs, extract(epoch from castle_time)::integer as castle_time_secs,
             extract(epoch from imperial_time)::integer as imperial_time_secs, explored_percent, research_count,
-            total_wonders, total_castles, total_relics, villager_high
+            total_wonders, total_castles, total_relics, villager_high,
+            people.id as person_id, people.country, people.name as person_name
         from players join teams on players.team_id=teams.team_id and players.match_id=teams.match_id
         join player_colors on players.color_id=player_colors.id
         join civilizations on players.dataset_id=civilizations.dataset_id and players.civilization_id=civilizations.id
         join datasets on players.dataset_id=datasets.id
         left join platforms on players.platform_id=platforms.id
+        left join users on players.platform_id=users.platform_id and players.user_id=users.id
+        left join people on users.person_id=people.id
         where players.match_id=any(:match_id)
     """
     file_query = """
@@ -156,6 +164,7 @@ async def get_match(keys, context):
             played, rated, diplomacy_type, team_size, platform_match_id,
             cheats, population_limit, lock_teams, mirror, dataset_version, postgame, has_playback, duration::interval(0),
             versions.name as version, extract(epoch from duration)::integer as duration_secs, winning_team_id,
+            game_version, save_version, build,
             rms_seed, rms_custom, direct_placement, fixed_positions, guard_state, effect_quantity
         from matches
         join versions on matches.version_id=versions.id

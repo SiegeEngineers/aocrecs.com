@@ -9,7 +9,7 @@ from mgzdb import platforms
 from mgzdb.api import API
 from mgzdb.util import path_components
 
-from aocrecs.consts import S3_BUCKET
+from aocrecs.consts import S3_BUCKET, S3_BUCKET_ERRORS
 
 
 def add_rec(filename, contents, database_url, voobly_username, voobly_password):
@@ -23,6 +23,8 @@ def add_rec(filename, contents, database_url, voobly_username, voobly_password):
         with tempfile.TemporaryDirectory() as store_path:
             file_hash, payload = API(database_url, store_path, sessions).add_file(path, 'upload')
             if file_hash is False:
+                with open(path, 'rb') as rec:
+                    s3_client.upload_fileobj(rec, S3_BUCKET_ERRORS, filename)
                 return dict(success=False, message=payload)
             if file_hash is not None:
                 object_path = os.path.join(*path_components(file_hash) + [file_hash + '.mgc'])

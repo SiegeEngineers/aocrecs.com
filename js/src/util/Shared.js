@@ -38,7 +38,7 @@ export const ChangeIndicator = ({change}) => {
 }
 
 export const getHasTeams = (size) => {
-  return size !== '1v1'
+  return size !== '1v1' && size !== 'FFA'
 }
 
 export const getIsNomad = (map_name) => {

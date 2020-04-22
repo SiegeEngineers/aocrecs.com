@@ -132,19 +132,21 @@ const PlaybackSection = ({data, values}) => {
           <BoolInput label='Fast Castle' table='flags' name='fast_castle' />
           <BoolInput label='Deer Push' table='flags' name='deer_pushes' />
           <BoolInput label='Daut Castle' table='flags' name='daut_castles' />
-                  </FormControl>
+          <BoolInput label='Scout Lost to TC' table='flags' name='scout_lost_to_tc' />
+        </FormControl>
       </Grid>
       <Grid xs={6}>
         <FormControl component='fieldset'>
-<BoolInput label='Castle Drop' table='flags' name='castle_drops' />
+        <BoolInput label='Castle Drop' table='flags' name='castle_drops' />
           <BoolInput label='Boar Steal' table='flags' name='boar_steals' />
           <BoolInput label='Sheep Steal' table='flags' name='sheep_steals' />
           <BoolInput label='Boar Kills Villager' table='flags' name='lost_to_boar' />
           <BoolInput label='Wolf Kills Villager' table='flags' name='lost_to_predator' />
+          <BoolInput label='TC Kills Boar' table='flags' name='tc_killed_boar' />
+          <BoolInput label='TC Kills Sheep' table='flags' name='tc_killed_sheep' />
           <BoolInput label='Castle Race' table='flags' name='castle_race' />
           <BoolInput label='Splash Damage Kills' table='flags' name='badaboom' />
           <BoolInput label='Lost Research' table='flags' name='lost_research' />
-
 </FormControl>
       </Grid>
     </Grid>

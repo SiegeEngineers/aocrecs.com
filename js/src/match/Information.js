@@ -78,11 +78,11 @@ const Information = ({match}) => {
       <TableRow>
         <TableCell>Difficulty</TableCell><TableCell>{match.difficulty}</TableCell>
       </TableRow>
-      {match.dataset && <TableRow>
+      {match.dataset && match.dataset.name !== match.version &&<TableRow>
         <TableCell>Dataset</TableCell><TableCell>{match.dataset.name} {match.dataset_version}</TableCell>
       </TableRow>}
       <TableRow>
-        <TableCell>Version</TableCell><TableCell>{upperFirst(match.version)}</TableCell>
+        <TableCell>Version</TableCell><TableCell>{match.version} {match.version === 'Definitive Edition' && <>{match.save_version} {match.build}</>}</TableCell>
       </TableRow>
       {match.platform && match.platform.url === '' && <TableRow>
         <TableCell>Platform</TableCell>

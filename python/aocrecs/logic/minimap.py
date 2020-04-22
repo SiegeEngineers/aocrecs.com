@@ -1,10 +1,26 @@
 """Generate SVG minimap."""
-
 from subprocess import Popen, PIPE
 import math
 import xml.etree.ElementTree as ET
 
+from aocrecs.consts import PREDATOR_IDS, HERDABLE_IDS, HUNT_IDS, BOAR_IDS, FISH_IDS, FORAGE_ID, TC_IDS
 
+
+GOLD_COLOR = '#FFC700'
+STONE_COLOR = '#919191'
+FOOD_COLOR = '#A5C46C'
+RELIC_COLOR = '#FFFFFF'
+CONSTANT_COLORS = [GOLD_COLOR, STONE_COLOR, FOOD_COLOR, RELIC_COLOR]
+FOOD_IDS = PREDATOR_IDS + HERDABLE_IDS + HUNT_IDS + BOAR_IDS + FISH_IDS + [FORAGE_ID]
+GOLD_ID = 66
+STONE_ID = 102
+RELIC_ID = 285
+OBJECT_MAPPING = [
+    ([GOLD_ID], GOLD_COLOR),
+    ([STONE_ID], STONE_COLOR),
+    (FOOD_IDS, FOOD_COLOR),
+    ([RELIC_ID], RELIC_COLOR)
+]
 NAMESPACE = 'http://www.w3.org/2000/svg'
 
 
@@ -56,7 +72,7 @@ def trace(layers, dimension, corners, squareness, scale):
         'viewBox': '0 0 {} {}'.format(translate * 2, translate),
     })
     transform = ET.SubElement(svg, 'g', attrib={
-        'transform': 'translate({}) scale({}, {}) rotate(45)'.format(translate, scale, scale/2)
+        'transform': 'translate({}, {}) scale({}, {}) rotate(-45)'.format(0, translate/2, scale, scale/2)
     })
 
     for color, canvas in layers.items():
@@ -74,7 +90,7 @@ def trace(layers, dimension, corners, squareness, scale):
     return ET.tostring(svg, encoding='unicode')
 
 
-def generate_svg(tiles, dimension, terrain, corners=0, squareness=3, scale=1000): # pylint: disable=too-many-arguments
+def generate_svg(tiles, dimension, terrain, objects, player_colors, corners=0, squareness=3, scale=1000): # pylint: disable=too-many-arguments
     """Generate map SVG."""
     layers = {}
     for i, tile in enumerate(tiles):
@@ -82,4 +98,26 @@ def generate_svg(tiles, dimension, terrain, corners=0, squareness=3, scale=1000)
         if color not in layers:
             layers[color] = new_canvas(dimension)
         layers[color][tile['y']][tile['x']] = '1'
+    for color in list(player_colors.values()) + CONSTANT_COLORS:
+        layers[color] = new_canvas(dimension)
+    for obj in objects:
+        if obj['initial_player_number'] is not None and obj['initial_class_id'] in [70, 80]:
+            color = player_colors[obj['initial_player_number']]
+            layers[color][int(obj['created_y'])][int(obj['created_x'])] = '1'
+            if obj['initial_object_id'] in TC_IDS:
+                for i in range(-1, 2):
+                    for j in range(-1, 2):
+                        layers[color][int(obj['created_y']) + i][int(obj['created_x']) + j] = '1'
+            elif obj['initial_object_id'] in [88, 793]:
+                for i in range(-1, 2):
+                    layers[color][int(obj['created_y']) + i][int(obj['created_x'])] = '1'
+            elif obj['initial_object_id'] in [64, 789]:
+                for i in range(-1, 2):
+                    layers[color][int(obj['created_y'])][int(obj['created_x']) + i] = '1'
+        else:
+            for object_ids, color in OBJECT_MAPPING:
+                if obj['initial_object_id'] in object_ids:
+                    layers[color][int(obj['created_y'])][int(obj['created_x'])] = '1'
+                    break
+
     return trace(layers, dimension, corners, squareness, scale)

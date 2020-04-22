@@ -69,6 +69,7 @@ async def get_event(database, event_id):
             join tournaments on rounds.tournament_id=tournaments.id
             join series_metadata on series.id=series_metadata.series_id
         where tournaments.event_id=:event_id
+        order by series.id
     """
     participants_query = """
         select series_id, participants.name, score, winner
@@ -148,6 +149,10 @@ def compute_participants(matches, challonge_data):
         for player in match['players']:
             name_to_user[player['name']] = player['user_id']
             graph.add_node(player['name'], type='player')
+
+        # Can happen for incomplete matches
+        if match['winning_team'] is None:
+            continue
 
         # Connect winning players to recorded win
         for player in match['winning_team']['players']:

@@ -34,14 +34,17 @@ FLAGS = [
     ('scout_war', 'Won Scout War', True, flags.scout_war()),
     ('trushes', 'Trush Towers', True, flags.near_buildings([79, 566])),
     ('fast_castle', 'Fast Castle', True, flags.fast_castle()),
-    ('imperial horse collar', 'Imperial Horse Collar', True, flags.research_order(14, 203)),
+    #('imperial horse collar', 'Imperial Horse Collar', True, flags.research_order(14, 203, [2])),
     ('badaboom', 'Splash Damage Kills', True, flags.badaboom()),
     ('castle_race', 'Won Castle Race', True, flags.castle_race()),
     ('archers', 'Trained Archers in Feudal', False, flags.trained_unit([4], 102)),
     ('skirms', 'Trained Skirmishers in Feudal', False, flags.trained_unit([7], 102)),
     ('scouts', 'Trained Scouts in Feudal', False, flags.trained_unit([448], 102)),
-    ('drush', 'Drushed', False, flags.trained_unit([74, 75], 102)),
-    ('maa', 'Trained Men-at-arms in Feudal', False, flags.trained_unit([75], 102)),
+    ('drush', 'Drushed', False, flags.drush()),
+    ('maa', 'Trained Men-at-arms in Feudal', False, flags.maa()),
+    ('tc_killed_boar', 'Town Center killed Boar', True, flags.gaia_killed_by_tc(BOAR_IDS)),
+    ('tc_killed_sheep', 'Town Center killed Sheep', True, flags.gaia_killed_by_tc(HERDABLE_IDS)),
+    ('scout_lost_to_tc', 'Scout Lost to Town Center', True, flags.scout_lost_to_tc(102)),
 ]
 METRICS = [
     ('dark_age_tc_idle', metrics.tc_idle()),
@@ -223,7 +226,6 @@ async def get_flags(keys, context): # pylint: disable=too-many-locals
     results = {}
     for k in keys:
         results[k] = []
-    #results = defaultdict(list)
     for type_, name, use_evidence, (query, i_values) in FLAGS:
         if not use_evidence:
             continue

@@ -13,6 +13,7 @@ import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
+import Box from '@material-ui/core/Box'
 
 import UploadIcon from 'mdi-react/FileUploadIcon'
 
@@ -66,14 +67,27 @@ const Upload = ({history}) => {
       <CardIconHeader icon={<UploadIcon />} title='Upload' />
       <CardContent>
         <Typography>
-          Select a file to upload. Supported types:
-          <ul>
-            <li>Userpatch 1.4 and up (<code>.mgz</code>)</li>
-            <li>Definitive Edition (<code>.aoe2record</code>)</li>
-            <li>The Conquerors (<code>.mgx</code>)</li>
-            <li>Age of Kings (<code>.mgl</code>)</li>
-          </ul>
-          If your file is part of an event, please don't use this form. Instead, contact <code>happyleaves#4133</code> on <Link target="_blank" href="https://discordapp.com/invite/njAsNuD">Discord</Link> to have it appropriately catalogued.
+          <Box display='flex'>
+            <Box>
+              Supported types:
+              <ul>
+                <li>Userpatch 1.4 and up (<code>.mgz</code>)</li>
+                <li>Definitive Edition (<code>.aoe2record</code>)</li>
+                <li>The Conquerors (<code>.mgx</code>)</li>
+                <li>Age of Kings (<code>.mgl</code>)</li>
+              </ul>
+            </Box>
+            <Box>
+              Unsupported types:
+              <ul>
+                <li>Incomplete or Restored</li>
+                <li>Custom Scenarios</li>
+                <li>Single Player</li>
+                <li>Multiplayer with AIs</li>
+              </ul>
+            </Box>
+          </Box>
+          Select a file to upload. If your file is part of an event, please don't use this form. Instead, contact <code>happyleaves#4133</code> on <Link target="_blank" href="https://discordapp.com/invite/njAsNuD">Discord</Link> to have it appropriately catalogued.
         </Typography>
         <input className={classes.input} id='rec_file' type='file' onChange={onChange} />
         {loading

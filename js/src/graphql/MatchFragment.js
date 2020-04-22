@@ -61,6 +61,9 @@ fragment MatchFragment on Match {
     name
   }
   version
+  game_version
+  save_version
+  build
   winning_team_id
   teams {
     winner
@@ -72,6 +75,11 @@ fragment MatchFragment on Match {
         id
         name
         platform_id
+        person {
+          id
+          country
+          name
+        }
       }
       civilization {
         id

@@ -82,7 +82,7 @@ const Match = ({match, selected, subselected}) => {
             <MatchLink id={match.id} selected={selected} route='players' label='Players' icon={<PlayersIcon />} />
             <MatchLink id={match.id} selected={selected} route='information' label='Information' icon={<InformationIcon />} />
             <MatchLink id={match.id} selected={selected} route='map' label='Map' icon={<MapIcon />} />
-            <MatchLink id={match.id} selected={selected} route='achievements' label='Achievements' icon={<AchievementsIcon />} />
+            {match.postgame && <MatchLink id={match.id} selected={selected} route='achievements' label='Achievements' icon={<AchievementsIcon />} />}
             <MatchLink id={match.id} selected={selected} route='chat' label='Chat' icon={<ChatIcon />} />
             <MatchLink id={match.id} selected={selected} route='files' label='Files' icon={<FilesIcon />} />
             <MatchLink id={match.id} selected={selected} route='odds' label='Odds' icon={<OddsIcon />} />

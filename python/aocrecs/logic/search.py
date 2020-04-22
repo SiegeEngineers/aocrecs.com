@@ -1,13 +1,19 @@
 """Build search query."""
 import asyncio
+from datetime import datetime
 from aocrecs.cache import cached
 from aocrecs.logic import matches
 from aocrecs.logic.playback import FLAGS
 
 
+SEARCH_LIMIT = 10
+
+
 @cached()
 async def get_hits(context, params, offset, limit):
     """Return hits: count and paginated matches."""
+    if limit > SEARCH_LIMIT:
+        limit = SEARCH_LIMIT
     result_query, count_query, values = build_query(params, offset, limit)
     count, result = await asyncio.gather(
         context.database.fetch_one(count_query, values=values),
@@ -21,7 +27,7 @@ def add_filter(field, bind, criteria):
     if 'values' in criteria:
         return '{0}=any(:{1})'.format(field, bind), criteria['values']
     if 'date' in criteria:
-        return '{0}::date=:{1}'.format(field, bind), criteria['date']
+        return '{0}::date=:{1}'.format(field, bind), datetime.strptime(criteria['date'], '%Y-%m-%d').date()
     if 'gte' in criteria:
         return '{0}>=:{1}'.format(field, bind), criteria['gte']
     if 'lte' in criteria:
