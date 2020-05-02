@@ -79,19 +79,91 @@ async def get_event(database, event_id):
             join tournaments on rounds.tournament_id=tournaments.id
         where tournaments.event_id=:event_id
     """
-    maps_query = 'select id, event_id, name from event_maps where event_id=:event_id'
-    event, tournaments, series, maps, participants = await asyncio.gather(
+    maps_query = """
+        select
+            map_name, avg(matches.duration)::interval(0) as avg_duration, count(distinct match_id) as matches, max(players.dataset_id) as dataset_id,
+            round(count(distinct match_id)/(select count(*) from matches where event_id=:event_id)::numeric, 2) as played_percent,
+            mode() within group (order by civilizations.id) as most_played_civ_id,
+            mode() within group (order by civilizations.name) as most_played_civ_name
+        from players
+        join civilizations on civilizations.dataset_id=players.dataset_id and civilizations.id = players.civilization_id
+        join matches on players.match_id=matches.id
+        where event_id=:event_id
+        group by map_name
+        order by count(*) desc
+    """
+    players_query = """
+        select
+            max(players.name) as name, max(players.platform_id) as platform_id, max(user_id) as user_id,
+            max(people.id) as person_id, max(people.name) as person_name, max(people.country) as country,
+            count(*) as matches, round(sum(players.winner::int)/count(*)::numeric, 2) as win_percent,
+            max(matches.dataset_id) as dataset_id,
+            avg(matches.duration)::interval(0) as avg_duration,
+            mode() within group (order by civilizations.id) as most_played_civ_id,
+            mode() within group (order by civilizations.name) as most_played_civ_name,
+            mode() within group (order by matches.map_name) as most_played_map
+        from players
+        join civilizations on civilizations.dataset_id=players.dataset_id and civilizations.id = players.civilization_id
+        join matches on players.match_id=matches.id
+        left join users on players.platform_id=users.platform_id and players.user_id=users.id
+        left join people on users.person_id=people.id
+        where event_id=:event_id
+        group by case when people.id is not null then people.id::varchar else players.name end
+        order by count(*) desc, sum(players.winner::int)/count(*)::numeric desc
+    """
+    event, tournaments, series, maps, players, participants = await asyncio.gather(
         database.fetch_one(events_query, values={'event_id': event_id}),
         database.fetch_all(tournaments_query, values={'event_id': event_id}),
         database.fetch_all(series_query, values={'event_id': event_id}),
         database.fetch_all(maps_query, values={'event_id': event_id}),
+        database.fetch_all(players_query, values={'event_id': event_id}),
         database.fetch_all(participants_query, values={'event_id': event_id})
     )
     series_data = by_key(series, 'tournament_id')
     participant_data = by_key(participants, 'series_id')
     return dict(
         event,
-        maps=[dict(m) for m in maps],
+        maps=[
+            dict(
+                map=dict(
+                    name=m['map_name']
+                ),
+                average_duration=m['avg_duration'],
+                match_count=m['matches'],
+                played_percent=m['played_percent'],
+                most_played_civilization=dict(
+                    id=m['most_played_civ_id'],
+                    name=m['most_played_civ_name'],
+                    dataset_id=m['dataset_id']
+                )
+            ) for m in maps
+        ],
+        players=[
+            dict(
+                player=dict(
+                    name=player['name'],
+                    user=dict(
+                        id=player['user_id'],
+                        name=player['name'],
+                        platform_id=player['platform_id'],
+                        person=dict(
+                            id=player['person_id'],
+                            country=player['country'],
+                            name=player['person_name']
+                        ) if player['person_id'] else None
+                    ) if player['user_id'] else None
+                ),
+                match_count=player['matches'],
+                win_percent=player['win_percent'],
+                average_duration=player['avg_duration'],
+                most_played_map=player['most_played_map'],
+                most_played_civilization=dict(
+                    id=player['most_played_civ_id'],
+                    name=player['most_played_civ_name'],
+                    dataset_id=player['dataset_id']
+                )
+            ) for player in players
+        ],
         tournaments=[dict(
             tournament,
             series=[dict(

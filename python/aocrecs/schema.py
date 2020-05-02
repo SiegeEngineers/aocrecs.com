@@ -484,7 +484,25 @@ type Event {
     year: Int!
     name: String!
     tournaments: [Tournament]
-    maps: [Map]
+    maps: [EventMap]
+    players: [EventPlayer]
+}
+
+type EventPlayer {
+    player: Player!
+    match_count: Int!
+    win_percent: Float!
+    average_duration: Datetime!
+    most_played_civilization: Civilization!
+    most_played_map: String!
+}
+
+type EventMap {
+    map: Map!
+    match_count: Int!
+    played_percent: Float!
+    average_duration: Datetime!
+    most_played_civilization: Civilization!
 }
 
 type Tournament {

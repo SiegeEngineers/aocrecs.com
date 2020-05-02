@@ -8,7 +8,7 @@ import {PLAYER_COLORS} from '../util/Shared'
 const PlayerName = ({player}) => {
   return (
     <span>
-      <div style={{
+      {player.color_id >= 0 && <div style={{
         backgroundColor: PLAYER_COLORS[player.color_id + 1],
         borderRadius: '4px',
         borderWidth: '1px',
@@ -19,7 +19,7 @@ const PlayerName = ({player}) => {
         borderStyle: 'solid',
         marginRight: '4px'
       }}
-      />
+      />}
       {player.user
           ? (player.user.person
             ? <span>{player.user.person.country && <ReactCountryFlag countryCode={player.user.person.country} title={player.user.person.country.toUpperCase()} svg />} <AppLink path={['players', player.user.person.id]} text={player.user.person.name} /> ({player.name})</span>

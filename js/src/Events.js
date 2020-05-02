@@ -24,11 +24,13 @@ import {map, join, sortBy, reverse, groupBy} from 'lodash'
 
 import EventIcon from 'mdi-react/CalendarRangeIcon'
 
+import PaginatedTable from './util/PaginatedTable'
 import AppLink from './util/AppLink'
 import CardIconHeader from './util/CardIconHeader'
 import DataQuery from './util/DataQuery'
 import RelatedMatches from './util/RelatedMatches'
 import WinnerMark from './util/WinnerMark'
+import PlayerName from './match/PlayerName'
 
 import GetEvents from './graphql/Events'
 import GetEvent from './graphql/Event'
@@ -124,6 +126,9 @@ const Series = ({id}) => {
 
 const Tournament = ({tournament}) => {
   return (
+    <div style={{width: '100%'}}>
+    <PaginatedTable limit={25} rows={tournament.series}>
+    {(rows) => (
     <Table>
       <TableHead>
         <TableRow>
@@ -134,7 +139,7 @@ const Tournament = ({tournament}) => {
         </TableRow>
       </TableHead>
        <TableBody>
-       {tournament.series.map(series => (
+       {rows.map(series => (
          <TableRow key={series.id}>
             <TableCell>
               <AppLink path={['events', tournament.event_id, tournament.id, series.id]} text={series.name} />
@@ -147,6 +152,9 @@ const Tournament = ({tournament}) => {
         ))}
       </TableBody>
     </Table>
+    )}
+  </PaginatedTable>
+    </div>
   )
 }
 
@@ -180,14 +188,23 @@ const MapTable = ({rows}) => {
       <TableHead>
         <TableRow>
           <TableCell>Map</TableCell>
+          <TableCell>Most Played Civilization</TableCell>
+          <TableCell align='right'># Matches</TableCell><TableCell align='right'>Percent</TableCell>
+          <TableCell align='right'>Avg Duration</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {rows.map((row, index) =>
           <TableRow key={index}>
             <TableCell>
-              <AppLink path={['maps', row.name]} text={row.name} />
+              <AppLink path={['maps', row.map.name]} text={row.map.name} />
             </TableCell>
+              <TableCell>
+                <AppLink path={['civilizations', row.most_played_civilization.dataset_id, row.most_played_civilization.id]} text={row.most_played_civilization.name} />
+              </TableCell>
+              <TableCell align='right'>{row.match_count}</TableCell>
+                <TableCell align='right'>{Math.round(row.played_percent * 100)}%</TableCell>
+              <TableCell align='right'>{row.average_duration}</TableCell>
           </TableRow>
         )}
       </TableBody>
@@ -195,6 +212,43 @@ const MapTable = ({rows}) => {
     : <p>No custom maps for this event</p>
   )
 }
+
+
+const PlayerTable = ({players}) => {
+  return (
+    <PaginatedTable limit={25} rows={players}>
+    {(rows) => (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableCell>Player</TableCell>
+          <TableCell>Most Played Map</TableCell><TableCell>Most Played Civilization</TableCell>
+          <TableCell align='right'># Matches</TableCell><TableCell align='right'>Win Percent</TableCell>
+          <TableCell align='right'>Avg Duration</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {rows.map((row, index) =>
+          <TableRow key={index}>
+            <TableCell><PlayerName player={row.player} /></TableCell>
+            <TableCell>
+              <AppLink path={['maps', row.most_played_map]} text={row.most_played_map} />
+            </TableCell>
+            <TableCell>
+              <AppLink path={['civilizations', row.most_played_civilization.dataset_id, row.most_played_civilization.id]} text={row.most_played_civilization.name} />
+            </TableCell>
+            <TableCell align='right'>{row.match_count}</TableCell>
+            <TableCell align='right'>{Math.round(row.win_percent * 100)}%</TableCell>
+            <TableCell align='right'>{row.average_duration}</TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+    )}
+  </PaginatedTable>
+  )
+}
+
 
 
 const Event = ({id}) => {
@@ -209,11 +263,13 @@ const Event = ({id}) => {
           <Tabs value={tab} onChange={(e, value) => setTab(value)}>
             <Tab label='Tournaments' />
             <Tab label='Maps' />
+            <Tab label='Players' />
           </Tabs>
         </AppBar>
         <Typography component='div' className={classes.tabContent}>
           {tab === 0 && <Tournaments tournaments={data.event.tournaments} />}
           {tab === 1 && <MapTable rows={data.event.maps} />}
+          {tab === 2 && <PlayerTable players={data.event.players} />}
         </Typography>
       </>
     )}

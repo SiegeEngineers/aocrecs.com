@@ -79,7 +79,7 @@ const PlayerSection = ({data}) => {
       <CardContent>
         <Typography variant='h5'>Player</Typography>
         <FormGroup>
-          <TextInput label='Name' table='players' name='user_name' />
+          <TextInput label='Name' table='players' name='name' />
           <OptionInput label='Winner' table='players' name='winner' data={data.search_options.general.winner} />
           <OptionInput label='MVP' table='players' name='mvp' data={data.search_options.general.mvp} />
           <OptionInput label='Color' table='players' name='color_id' data={data.search_options.general.colors} />

@@ -93,11 +93,18 @@ def trace(layers, dimension, corners, squareness, scale):
 def generate_svg(tiles, dimension, terrain, objects, player_colors, corners=0, squareness=3, scale=1000): # pylint: disable=too-many-arguments
     """Generate map SVG."""
     layers = {}
+    from collections import defaultdict
+    x = defaultdict(int)
+    y = {}
     for i, tile in enumerate(tiles):
         color = terrain[tile['terrain_id']][get_slope(tiles, dimension, i)]
+        x[tile['terrain_id']] += 1
+        y[tile['terrain_id']] = color
         if color not in layers:
             layers[color] = new_canvas(dimension)
         layers[color][tile['y']][tile['x']] = '1'
+    #for t, c in x.items():
+    #    print(t, c, y[t])
     for color in list(player_colors.values()) + CONSTANT_COLORS:
         layers[color] = new_canvas(dimension)
     for obj in objects:

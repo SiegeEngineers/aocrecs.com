@@ -7,7 +7,6 @@ import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 
 import Timestamp from 'react-timestamp'
-import {upperFirst} from 'lodash'
 
 import AppLink from '../util/AppLink'
 import {getHasTeams} from '../util/Shared'
