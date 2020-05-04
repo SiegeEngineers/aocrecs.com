@@ -87,6 +87,15 @@ const formatter = new Intl.NumberFormat(undefined, {
   currency: 'USD',
 })
 
+const PersonRow = ({title, children}) => {
+  return (
+    <TableRow>
+      <TableCell><Box fontWeight="fontWeightMedium">{title}</Box></TableCell>
+      <TableCell align="right">{children}</TableCell>
+    </TableRow>
+  )
+}
+
 const Person = ({id}) => {
   const classes = useStyles()
   return (
@@ -114,6 +123,10 @@ const Person = ({id}) => {
                   <TableCell><Box fontWeight="fontWeightMedium">Tournament Elo</Box></TableCell>
                   <TableCell align="right"><Link target="_blank" href={"https://aoe-elo.com/player/" + data.aoeelo_id + "/"}>{data.aoeelo_rate} (#{data.aoeelo_rank})</Link></TableCell>
                 </TableRow>}
+                {data.twitch && <PersonRow title='Twitch'><Link target="_blank" href={data.twitch}>{data.twitch}</Link></PersonRow>}
+                {data.mixer && <PersonRow title='Mixer'><Link target="_blank" href={data.mixer}>{data.mixer}</Link></PersonRow>}
+                {data.youtube && <PersonRow title='Youtube'><Link target="_blank" href={data.youtube}>{data.youtube}</Link></PersonRow>}
+                {data.discord && <PersonRow title='Discord'><Link target="_blank" href={data.discord}>{data.discord}</Link></PersonRow>}
               </TableBody>
             </Table>
           </Box>

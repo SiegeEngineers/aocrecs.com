@@ -2,9 +2,7 @@ import React from 'react'
 
 import Typography from '@material-ui/core/Typography'
 
-import DataQuery from './util/DataQuery'
 import RelatedMatches from './util/RelatedMatches'
-
 import GetLatest from './graphql/Latest'
 
 

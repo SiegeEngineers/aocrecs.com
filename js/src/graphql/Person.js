@@ -16,6 +16,10 @@ query Person($id: Int!, $offset: Int!, $limit: Int!) {
     esportsearnings_id
     earnings
     portrait_link
+    twitch
+    mixer
+    youtube
+    discord
     accounts {
       id
       name

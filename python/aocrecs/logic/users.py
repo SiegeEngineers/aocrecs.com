@@ -26,7 +26,8 @@ async def get_person(context, person_id):
     """Get a person."""
     person_query = """
         select id, name, country, aoeelo_rank, aoeelo_rate, earnings, first_name, last_name,
-        aoeelo_id, esportsearnings_id, case when portrait is not null then true else false end as has_portrait
+        aoeelo_id, esportsearnings_id, case when portrait is not null then true else false end as has_portrait,
+        twitch, mixer, youtube, discord
         from people
         where id=:person_id
     """

@@ -578,6 +578,10 @@ type Person {
     aoeelo_rank: Int
     aoeelo_rate: Int
     portrait_link: String
+    twitch: String
+    mixer: String
+    youtube: String
+    discord: String
     match_count: Int!
     first_year: Int!
     last_year: Int!
