@@ -22,10 +22,12 @@ async def get_people(database):
 
 
 @cached(ttl=86400)
-async def get_person(database, person_id):
+async def get_person(context, person_id):
     """Get a person."""
     person_query = """
-        select id, name, country from people
+        select id, name, country, aoeelo_rank, aoeelo_rate, earnings, first_name, last_name,
+        aoeelo_id, esportsearnings_id, case when portrait is not null then true else false end as has_portrait
+        from people
         where id=:person_id
     """
     account_query = """
@@ -51,10 +53,10 @@ async def get_person(database, person_id):
         where person_id=:person_id and players.human=true
     """
     person, accounts, aliases, events = await asyncio.gather(
-        database.fetch_one(person_query, values=dict(person_id=person_id)),
-        database.fetch_all(account_query, values=dict(person_id=person_id)),
-        database.fetch_all(alias_query, values=dict(person_id=person_id)),
-        database.fetch_all(event_query, values=dict(person_id=person_id))
+        context.database.fetch_one(person_query, values=dict(person_id=person_id)),
+        context.database.fetch_all(account_query, values=dict(person_id=person_id)),
+        context.database.fetch_all(alias_query, values=dict(person_id=person_id)),
+        context.database.fetch_all(event_query, values=dict(person_id=person_id))
     )
     aliases_set = set()
     for row in aliases:
@@ -64,6 +66,7 @@ async def get_person(database, person_id):
             aliases_set.add(row['user_name'])
     return dict(
         person,
+        portrait_link=context.request.url_for('portrait', person_id=person['id']) if person['has_portrait'] else None,
         accounts=[
             dict(
                 id=a['id'],

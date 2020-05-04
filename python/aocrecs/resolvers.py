@@ -49,6 +49,22 @@ stat_user = ObjectType('StatUser')
 graph = ObjectType('Graph')
 person = ObjectType('Person')
 tribute = ObjectType('Tribute')
+latest = ObjectType('Latest')
+
+
+@query.field('latest_summary')
+async def resolve_latest_summary(obj, info):
+    return await search.latest_summary(info.context.database)
+
+
+@query.field('latest')
+async def resolve_latest(obj, info):
+    return {}
+
+
+@latest.field('matches')
+async def resolve_latest_matches(obj, info, dataset_id, offset, limit):
+    return await search.latest(info.context, dataset_id, offset, limit)
 
 
 @query.field('reports')
@@ -86,6 +102,11 @@ async def resolve_search_options(obj, info):
 @search_options_.field('civilizations')
 async def resolve_search_options_civilizations(obj, info, dataset_id):
     return await search_options.civilizations(info.context.database, dataset_id)
+
+
+@search_options_.field('versions')
+async def resolve_search_options_versions(obj, info, dataset_id):
+    return await search_options.versions(info.context.database, dataset_id)
 
 
 @search_options_.field('ladders')
@@ -136,7 +157,7 @@ async def resolve_people(obj, info):
 
 @query.field('person')
 async def resolve_person(obj, info, id):
-    return await users.get_person(info.context.database, id)
+    return await users.get_person(info.context, id)
 
 
 @query.field('meta_ladders')
@@ -402,5 +423,5 @@ SCHEMA = make_executable_schema(TYPE_DEFS, [
     query, map_, stats, datetime_, research, player, chat, match,
     team, file_, hits, side, series, civilization, event, meta_ladder,
     user, rank, search_options_, stat_user, report_, search_result,
-    graph, person, tribute, upload_scalar, mutation
+    graph, person, tribute, upload_scalar, mutation, latest
 ])

@@ -38,7 +38,8 @@ def new_app():
             extensions=[ApolloTracingExtension]
         ), name='api'),
         Route('/api/download/{file_id:int}', aoc_routes.download, name='download'),
-        Route('/api/map/{match_id:int}', aoc_routes.svg_map, name='minimap')
+        Route('/api/map/{match_id:int}', aoc_routes.svg_map, name='minimap'),
+        Route('/api/portrait/{person_id:int}', aoc_routes.portrait, name='portrait')
     ]
 
     middleware = [

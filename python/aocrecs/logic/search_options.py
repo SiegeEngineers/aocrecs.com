@@ -28,6 +28,17 @@ async def civilizations(database, dataset_id):
     return list(map(dict, await database.fetch_all(query, values={'dataset_id': dataset_id})))
 
 
+@cached(warm=[0, 1, 7, 100, 200], ttl=None)
+async def versions(database, dataset_id):
+    """Get versions of a dataset."""
+    query = """
+        select distinct dataset_version as value, dataset_version as label
+        from matches
+        where dataset_id=:dataset_id and dataset_version is not null order by dataset_version
+    """
+    return list(map(dict, await database.fetch_all(query, values={'dataset_id': dataset_id})))
+
+
 @cached(warm=True, ttl=None)
 async def ladders(database, platform_id):
     """Get ladders for a platform."""

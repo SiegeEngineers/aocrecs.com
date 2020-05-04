@@ -47,7 +47,7 @@ export const OptionInput = ({label, table, name, data}) => {
       val = true
     } else if (val === 'false') {
       val = false
-    } else if (!isNaN(val)) {
+    } else if (!isNaN(val) && name !== 'dataset_version') {
       val = parseInt(val)
     }
     setter(updateAll(params, table, name, value !== '' ? {[key]: [val]} : null))

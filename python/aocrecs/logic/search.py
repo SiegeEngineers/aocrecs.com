@@ -7,19 +7,69 @@ from aocrecs.logic.playback import FLAGS
 
 
 SEARCH_LIMIT = 10
+LATEST_DATASETS = [0, 1, 100]
+
+
+@cached(warm=True, ttl=3600)
+async def latest_summary(database):
+    latest = []
+    query = """
+        select dataset_id, datasets.name, datasets.short, max(dataset_version) as version
+        from matches join datasets on datasets.id=dataset_id
+        where dataset_id = any(:dataset_ids)
+        group by dataset_id, datasets.name, datasets.short
+    """
+    datasets = await database.fetch_all(query, values=dict(dataset_ids=LATEST_DATASETS))
+    for dataset in datasets:
+        params = {'matches': {
+            'dataset_id': {'values': [dataset['dataset_id']]},
+            'dataset_version': {'values': [dataset['version']]}
+        }}
+        _, count_query, values = build_query(params, 0, 0)
+        latest.append(database.fetch_one(count_query, values=values))
+    output = []
+    for dataset, hits in zip(datasets, await asyncio.gather(*latest)):
+        version = dataset['version']
+        if dataset['short'] == 'de':
+            version = version.split('.')[2]
+        output.append(dict(
+            dataset=dict(
+                name=dataset['name'],
+                id=dataset['dataset_id']
+            ),
+            count=hits['count'],
+            version=version
+        ))
+    return output
+
+
+#@cached(warm=[[0, 0, 8], [1, 0, 8], [100, 0, 8]], ttl=3600)
+async def latest(context, dataset_id, offset, limit):
+    query = "select max(dataset_version) as version from matches where dataset_id=:dataset_id"
+    result = await context.database.fetch_one(query, values=dict(dataset_id=dataset_id))
+    params = {'matches': {
+        'dataset_id': {'values': [dataset_id]},
+        'dataset_version': {'values': [result['version']]}
+    }}
+    return await get_hits(context, params, offset, limit)
+
+
+async def get_hits(context, params, offset, limit):
+    """Return hits: count and paginated matches."""
+    count, result = await _cached_get_hits(context.database, params, offset, limit)
+    return dict(count=count['count'], hits=await context.load_many(matches.get_match, map(lambda m: m['id'], result)))
 
 
 @cached()
-async def get_hits(context, params, offset, limit):
-    """Return hits: count and paginated matches."""
+async def _cached_get_hits(database, params, offset, limit):
+    """Cacheable hits."""
     if limit > SEARCH_LIMIT:
         limit = SEARCH_LIMIT
     result_query, count_query, values = build_query(params, offset, limit)
-    count, result = await asyncio.gather(
-        context.database.fetch_one(count_query, values=values),
-        context.database.fetch_all(result_query, values=values)
+    return await asyncio.gather(
+        database.fetch_one(count_query, values=values),
+        database.fetch_all(result_query, values=values)
     )
-    return dict(count=count['count'], hits=await context.load_many(matches.get_match, map(lambda m: m['id'], result)))
 
 
 def add_filter(field, bind, criteria):

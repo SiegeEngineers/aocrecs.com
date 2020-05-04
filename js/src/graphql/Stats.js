@@ -17,5 +17,13 @@ export default gql`
       diplomacy { name count }
       types { name count }
     }
+    latest_summary {
+      dataset {
+        id
+        name
+      }
+      version
+      count
+    }
   }
 `;

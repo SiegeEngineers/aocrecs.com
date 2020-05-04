@@ -19,6 +19,16 @@ async def download(request):
     return Response(get_zip(result['hash'], result['original_filename'], Version(result['version_id'])), media_type='application/zip')
 
 
+async def portrait(request):
+    """Return player portrait."""
+    person_id = request.path_params['person_id']
+    query = """
+        select portrait from people where id=:id
+    """
+    result = await request.app.state.database.fetch_one(query, values={'id': person_id})
+    return Response(result['portrait'], media_type='image/jpeg')
+
+
 async def svg_map(request):
     """Get map tile SVGs."""
     match_id = request.path_params['match_id']

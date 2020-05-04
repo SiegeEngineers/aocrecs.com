@@ -87,7 +87,7 @@ const Series = ({id}) => {
               <table>
                 <tbody>
                 <tr>
-                  {data.sides.map((side, index) =>
+                  {data.sides.filter(side => side.score !== null).map((side, index) =>
                     <td key={index} valign='top'>
                       {side.users.length > 1 && <div>
                         <WinnerMark winner={side.winner} className={classes.sideWinner} /> {side.name} ({side.score})

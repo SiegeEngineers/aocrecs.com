@@ -8,6 +8,14 @@ query Person($id: Int!, $offset: Int!, $limit: Int!) {
     id
     name
     country
+    first_name
+    last_name
+    aoeelo_rank
+    aoeelo_rate
+    aoeelo_id
+    esportsearnings_id
+    earnings
+    portrait_link
     accounts {
       id
       name

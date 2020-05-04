@@ -60,6 +60,7 @@ const DatasetSection = ({data, values}) => {
           {(data) => (
             <FormGroup>
               <OptionInput label='Civilization' table='players' name='civilization_id' data={data.search_options.civilizations} />
+              <OptionInput label='Version' table='matches' name='dataset_version' data={data.search_options.versions} />
             </FormGroup>
           )}
           </DataQuery>

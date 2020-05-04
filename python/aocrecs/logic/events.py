@@ -249,5 +249,5 @@ def compute_participants(matches, challonge_data):
         'platform_id': platform_ids[0]
     } for mgz, challonge in zip(
         sorted(mgz_data, key=lambda k: -1 * k['wins']),
-        sorted(challonge_data, key=lambda k: -1 * k['score'])
+        sorted(challonge_data, key=lambda k: -1 * k['score'] if k['score'] else 0)
     )]

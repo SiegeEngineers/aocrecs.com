@@ -91,6 +91,7 @@ class Warmer:
             for arg in data['args']:
                 LOGGER.info("warming cache for %s", key_builder(func, *arg))
                 await func(self._database, *arg)
+                LOGGER.info("... done warming cache for %s", key_builder(func, *arg))
             if data['interval']:
                 await asyncio.sleep(data['interval'])
             else:

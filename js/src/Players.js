@@ -14,8 +14,12 @@ import FormControl from '@material-ui/core/FormControl'
 import InputLabel from '@material-ui/core/InputLabel'
 import MenuItem from '@material-ui/core/MenuItem'
 import Select from '@material-ui/core/Select'
+import Box from '@material-ui/core/Box'
+import Link from '@material-ui/core/Link'
+import Avatar from '@material-ui/core/Avatar'
 
 import {sortBy, uniqBy} from 'lodash'
+import {getName} from 'country-list'
 
 import ReactCountryFlag from 'react-country-flag'
 
@@ -31,8 +35,13 @@ import GetPeople from './graphql/People'
 
 const useStyles = makeStyles({
   narrowTable: {
-    width: 'unset'
-  }
+    width: 'unset',
+    margin: '5px'
+  },
+  portrait: {
+    width: '150px',
+    height: '150px'
+  },
 })
 
 
@@ -56,7 +65,6 @@ const PeopleTable = ({rows, selected}) => {
               <TableCell><AppLink path={['players', row.id]} text={row.name} /></TableCell>
               <TableCell>{row.first_year} - {row.last_year}</TableCell>
               <TableCell align='right'>{row.match_count.toLocaleString()}</TableCell>
-
             </TableRow>
           )}
         </TableBody>
@@ -67,17 +75,55 @@ const PeopleTable = ({rows, selected}) => {
 }
 
 
+const format_name = (data) => {
+  if(data.first_name !== null && data.last_name !== null) {
+    return data.name + ' (' + data.first_name + ' ' + data.last_name + ')'
+  }
+  return data.name
+}
+
+const formatter = new Intl.NumberFormat(undefined, {
+  style: 'currency',
+  currency: 'USD',
+})
+
 const Person = ({id}) => {
   const classes = useStyles()
   return (
     <RelatedMatches query={GetPerson} variables={{id}} field='person'>
       {(data) => (
         <Card>
-          <CardIconHeader icon={data.country && <ReactCountryFlag countryCode={data.country} title={data.country.toUpperCase()} svg />} title={data.name} />
+          <CardIconHeader icon={data.country && <ReactCountryFlag countryCode={data.country} title={data.country.toUpperCase()} svg />} title={format_name(data)} />
           <CardContent>
+            <Box display='flex'>
+              <Box>
+                {data.portrait_link && <Avatar alt={data.name} src={data.portrait_link} className={classes.portrait} />}
+              </Box>
+              <Box>
+            <Table className={classes.narrowTable}>
+              <TableBody>
+                {data.country && <TableRow>
+                  <TableCell><Box fontWeight="fontWeightMedium">Country</Box></TableCell>
+                  <TableCell align="right">{getName(data.country)}</TableCell>
+                </TableRow>}
+                {data.earnings && <TableRow>
+                  <TableCell><Box fontWeight="fontWeightMedium">Pro Earnings</Box></TableCell>
+                  <TableCell align="right"><Link target="_blank" href={"https://www.esportsearnings.com/players/" + data.esportsearnings_id}>{formatter.format(data.earnings)}</Link></TableCell>
+                </TableRow>}
+                {data.aoeelo_rank && <TableRow>
+                  <TableCell><Box fontWeight="fontWeightMedium">Tournament Elo</Box></TableCell>
+                  <TableCell align="right"><Link target="_blank" href={"https://aoe-elo.com/player/" + data.aoeelo_id + "/"}>{data.aoeelo_rate} (#{data.aoeelo_rank})</Link></TableCell>
+                </TableRow>}
+              </TableBody>
+            </Table>
+          </Box>
+        </Box>
+            <br />
             <Typography variant='h6'>Aliases</Typography>
             <Typography>{data.aliases.join(', ')}</Typography>
             <br />
+            <Box display='flex'>
+              <Box>
             <Typography variant='h6'>Accounts</Typography>
             <Table className={classes.narrowTable}>
               <TableHead>
@@ -95,7 +141,8 @@ const Person = ({id}) => {
                 )}
               </TableBody>
             </Table>
-            <br />
+          </Box>
+          <Box>
             <Typography variant='h6'>Event Participation</Typography>
             <Table className={classes.narrowTable}>
               <TableHead>
@@ -113,6 +160,8 @@ const Person = ({id}) => {
                 )}
               </TableBody>
             </Table>
+          </Box>
+        </Box>
 
           </CardContent>
         </Card>

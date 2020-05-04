@@ -5,6 +5,9 @@ import CardContent from '@material-ui/core/CardContent'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 
+import {reverse} from 'lodash'
+
+import AppLink from './util/AppLink'
 import Chart from './util/Chart'
 import DataQuery from './util/DataQuery'
 
@@ -22,6 +25,20 @@ const Stat = ({title, stat}) => {
   )
 }
 
+
+const Cell = ({children}) => {
+  return (
+    <Grid item>
+    <Card>
+      <CardContent>
+        <Typography component='p'>{children}</Typography>
+      </CardContent>
+    </Card>
+  </Grid>
+  )
+}
+
+
 const Main = () => {
   return (
     <DataQuery query={GetStats}>
@@ -32,6 +49,14 @@ const Main = () => {
             <Grid item><Stat title='Series' stat={data.stats.series_count.toLocaleString()} /></Grid>
             <Grid item><Stat title='Players' stat={data.stats.player_count.toLocaleString()} /></Grid>
             <Grid item><Stat title='Maps' stat={data.stats.map_count.toLocaleString()} /></Grid>
+          </Grid>
+          <Grid container spacing={24}>
+            <Cell>
+              Recorded Games for Latest Versions:
+            </Cell>
+            {reverse(data.latest_summary.map(latest => (
+              <Cell><AppLink path={['latest', latest.dataset.id]} text={latest.dataset.name + ' ' + latest.version}/> ({latest.count.toLocaleString()})</Cell>
+            )))}
           </Grid>
           <Grid container>
             <Grid item xs={4}>

@@ -23,6 +23,18 @@ type Query {
     reports: [ReportOption]
     person(id: Int!): Person
     people: [Person]
+    latest: Latest
+    latest_summary: [LatestSummary]
+}
+
+type Latest {
+    matches(dataset_id: Int!, offset: Int = 0, limit: Int = 10): Hits
+}
+
+type LatestSummary {
+    dataset: Dataset
+    version: String!
+    count: Int!
 }
 
 type SearchResult {
@@ -109,6 +121,7 @@ type Stats {
 type SearchOptions {
     general: SearchOptionsGeneral
     civilizations(dataset_id: Int!): [KeyValue]
+    versions(dataset_id: Int!): [KeyValue]
     ladders(platform_id: String!): [KeyValue]
 }
 
@@ -528,7 +541,7 @@ type Series {
 type Side {
     series_id: Int!
     name: String!
-    score: Int!
+    score: Int
     winner: Boolean
     users: [User]
 }
@@ -557,6 +570,14 @@ type Person {
     id: Int!
     country: String
     name: String!
+    first_name: String
+    last_name: String
+    earnings: Float
+    esportsearnings_id: Int
+    aoeelo_id: Int
+    aoeelo_rank: Int
+    aoeelo_rate: Int
+    portrait_link: String
     match_count: Int!
     first_year: Int!
     last_year: Int!

@@ -35,6 +35,7 @@ import User from './UserView'
 import Players from './Players'
 import Reports from './Reports'
 import Upload from './Upload'
+import Latest from './Latest'
 import About from './About'
 
 const drawerWidth = 180
@@ -189,6 +190,7 @@ const Layout = () => {
           <Route path='/user/:pid?/:id?' component={User} />
           <Route path='/reports/:y?/:m?' component={Reports} />
           <Route path='/upload' component={Upload} />
+          <Route path='/latest/:id' component={Latest} />
           <Route path='/about' component={About} />
           <Redirect to='/' />
         </Switch>
