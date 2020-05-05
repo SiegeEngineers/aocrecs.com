@@ -1,9 +1,12 @@
 import React from 'react'
-//import ApolloClient from 'apollo-boost'
+import { split } from 'apollo-link'
 import { ApolloClient } from 'apollo-client';
 import Analytics from 'react-router-ga'
 import DateFnsUtils from '@date-io/date-fns'
 import {InMemoryCache, defaultDataIdFromObject} from 'apollo-cache-inmemory'
+import { WebSocketLink } from 'apollo-link-ws'
+import { getMainDefinition } from 'apollo-utilities'
+
 import {ThemeProvider} from '@material-ui/styles'
 import {ApolloProvider} from 'react-apollo'
 import {BrowserRouter} from 'react-router-dom'
@@ -22,10 +25,26 @@ const cache = new InMemoryCache({
   }
 })
 
-const client = new ApolloClient({
-  cache: cache,
-  link: createUploadLink({uri: process.env.REACT_APP_API})
+const wsLink = new WebSocketLink({
+  uri: process.env.REACT_APP_API.replace('http', 'ws'),
+  options: {
+    reconnect: true
+  }
 })
+
+const link = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    );
+  },
+  wsLink,
+  createUploadLink({uri: process.env.REACT_APP_API})
+)
+
+const client = new ApolloClient({cache, link})
 
 const App = () => {
   return (

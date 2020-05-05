@@ -10,7 +10,7 @@ from starlette.datastructures import Secret, URL
 from starlette.middleware import Middleware
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.middleware.cors import CORSMiddleware
-from starlette.routing import Route
+from starlette.routing import Route, WebSocketRoute
 
 from aocrecs import resolvers, routes as aoc_routes
 from aocrecs.context import Context
@@ -29,14 +29,15 @@ def new_app():
     coloredlogs.install(level='DEBUG' if DEBUG else 'INFO', fmt='%(asctime)s %(name)s %(levelname)s %(message)s')
     database = databases.Database(DATABASE_URL)
     warmer = CacheWarmer(database, disable=DEBUG)
-
+    graphql = GraphQL(
+        resolvers.SCHEMA,
+        debug=DEBUG,
+        context_value=lambda request: Context(request, database),
+        extensions=[ApolloTracingExtension]
+    )
     routes = [
-        Route('/api', GraphQL(
-            resolvers.SCHEMA,
-            debug=DEBUG,
-            context_value=lambda request: Context(request, database),
-            extensions=[ApolloTracingExtension]
-        ), name='api'),
+        Route('/api', graphql, name='api', methods=['GET', 'POST']),
+        WebSocketRoute('/api', graphql, name='ws'),
         Route('/api/download/{file_id:int}', aoc_routes.download, name='download'),
         Route('/api/map/{match_id:int}', aoc_routes.svg_map, name='minimap'),
         Route('/api/portrait/{person_id:int}', aoc_routes.portrait, name='portrait')

@@ -27,6 +27,15 @@ type Query {
     latest_summary: [LatestSummary]
 }
 
+type Subscription {
+    stats: LiveStats
+}
+
+type LiveStats {
+    match_count: Int!
+    latest_summary: [LatestSummary]
+}
+
 type Latest {
     matches(dataset_id: Int!, offset: Int = 0, limit: Int = 10): Hits
 }
@@ -580,6 +589,7 @@ type Person {
     portrait_link: String
     twitch: String
     mixer: String
+    douyu: String
     youtube: String
     discord: String
     match_count: Int!

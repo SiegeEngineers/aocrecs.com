@@ -18,6 +18,7 @@ query Person($id: Int!, $offset: Int!, $limit: Int!) {
     portrait_link
     twitch
     mixer
+    douyu
     youtube
     discord
     accounts {

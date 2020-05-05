@@ -125,6 +125,7 @@ const Person = ({id}) => {
                 </TableRow>}
                 {data.twitch && <PersonRow title='Twitch'><Link target="_blank" href={data.twitch}>{data.twitch}</Link></PersonRow>}
                 {data.mixer && <PersonRow title='Mixer'><Link target="_blank" href={data.mixer}>{data.mixer}</Link></PersonRow>}
+                {data.douyu && <PersonRow title='Douyu'><Link target="_blank" href={data.douyu}>{data.douyu}</Link></PersonRow>}
                 {data.youtube && <PersonRow title='Youtube'><Link target="_blank" href={data.youtube}>{data.youtube}</Link></PersonRow>}
                 {data.discord && <PersonRow title='Discord'><Link target="_blank" href={data.discord}>{data.discord}</Link></PersonRow>}
               </TableBody>

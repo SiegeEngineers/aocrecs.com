@@ -12,18 +12,18 @@ setup(
     packages=find_packages(),
     install_requires=[
         'aiocache==0.11.1',
-        'aiodataloader==0.1.2',
-        'ariadne==0.8.0',
-        'asyncpg==0.20.0',
+        'aiodataloader==0.2.0',
+        'ariadne==0.11.0',
+        'asyncpg==0.20.1',
         'boto3==1.10.46',
         'coloredlogs==10.0',
-        'databases==0.2.6',
+        'databases==0.3.2',
         'mgzdb>=1.3.8',
         'networkx==2.4',
         'python-dateutil==2.8.1',
         'python-multipart==0.0.5',
-        'starlette==0.13.0',
-        'uvicorn==0.10.8'
+        'starlette==0.13.4',
+        'uvicorn==0.11.5'
     ],
     classifiers=[
         'License :: OSI Approved :: MIT License',

@@ -10,8 +10,8 @@ SEARCH_LIMIT = 10
 LATEST_DATASETS = [0, 1, 100]
 
 
-@cached(warm=True, ttl=3600)
-async def latest_summary(database):
+@cached(warm=True, ttl=86400)
+async def _latest_versions(database):
     latest = []
     query = """
         select dataset_id, datasets.name, datasets.short, max(dataset_version) as version
@@ -19,7 +19,13 @@ async def latest_summary(database):
         where dataset_id = any(:dataset_ids)
         group by dataset_id, datasets.name, datasets.short
     """
-    datasets = await database.fetch_all(query, values=dict(dataset_ids=LATEST_DATASETS))
+    return await database.fetch_all(query, values=dict(dataset_ids=LATEST_DATASETS))
+
+
+@cached(warm=True, ttl=2)
+async def latest_summary(database):
+    latest = []
+    datasets = await _latest_versions(database)
     for dataset in datasets:
         params = {'matches': {
             'dataset_id': {'values': [dataset['dataset_id']]},

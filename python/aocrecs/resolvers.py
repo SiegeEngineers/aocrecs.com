@@ -1,5 +1,6 @@
 """GraphQL resolvers."""
-from ariadne import QueryType, ObjectType, make_executable_schema, ScalarType, upload_scalar, MutationType
+import asyncio
+from ariadne import QueryType, ObjectType, make_executable_schema, ScalarType, upload_scalar, MutationType, SubscriptionType
 
 from aocrecs.logic import (
     search, metaladder, report, search_options, events,
@@ -50,6 +51,22 @@ graph = ObjectType('Graph')
 person = ObjectType('Person')
 tribute = ObjectType('Tribute')
 latest = ObjectType('Latest')
+subscription = SubscriptionType()
+
+
+@subscription.source('stats')
+async def counter_generator(obj, info):
+    while True:
+        await asyncio.sleep(2)
+        yield dict(
+            match_count=(await stat.live_match_count(info.context.database))['count'],
+            latest_summary=search.latest_summary(info.context.database)
+        )
+
+
+@subscription.field('stats')
+def counter_resolver(stats, info):
+    return stats
 
 
 @query.field('latest_summary')
@@ -423,5 +440,5 @@ SCHEMA = make_executable_schema(TYPE_DEFS, [
     query, map_, stats, datetime_, research, player, chat, match,
     team, file_, hits, side, series, civilization, event, meta_ladder,
     user, rank, search_options_, stat_user, report_, search_result,
-    graph, person, tribute, upload_scalar, mutation, latest
+    graph, person, tribute, upload_scalar, mutation, latest, subscription
 ])

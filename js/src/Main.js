@@ -5,21 +5,25 @@ import CardContent from '@material-ui/core/CardContent'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 
+import Odometer from 'react-odometerjs'
 import {reverse} from 'lodash'
+import {useSubscription} from '@apollo/react-hooks'
 
 import AppLink from './util/AppLink'
 import Chart from './util/Chart'
 import DataQuery from './util/DataQuery'
 
 import GetStats from './graphql/Stats'
+import GetSubscription from './graphql/Subscriptions'
 
+import 'odometer/themes/odometer-theme-default.css'
 
 const Stat = ({title, stat}) => {
   return (
     <Card>
       <CardContent>
         <Typography component='p'>{title}</Typography>
-        <Typography variant='h3'>{stat}</Typography>
+        <Typography variant='h3'><Odometer value={stat} format="(,ddd)" /></Typography>
       </CardContent>
     </Card>
   )
@@ -40,22 +44,26 @@ const Cell = ({children}) => {
 
 
 const Main = () => {
+  const sub = useSubscription(GetSubscription)
   return (
     <DataQuery query={GetStats}>
       {(data) => (
         <div>
           <Grid container spacing={24}>
-            <Grid item><Stat title='Matches' stat={data.stats.match_count.toLocaleString()} /></Grid>
-            <Grid item><Stat title='Series' stat={data.stats.series_count.toLocaleString()} /></Grid>
-            <Grid item><Stat title='Players' stat={data.stats.player_count.toLocaleString()} /></Grid>
-            <Grid item><Stat title='Maps' stat={data.stats.map_count.toLocaleString()} /></Grid>
+            <Grid item><Stat title='Matches' stat={sub.data ? sub.data.stats.match_count : data.stats.match_count } /></Grid>
+            <Grid item><Stat title='Series' stat={data.stats.series_count} /></Grid>
+            <Grid item><Stat title='Players' stat={data.stats.player_count} /></Grid>
+            <Grid item><Stat title='Maps' stat={data.stats.map_count} /></Grid>
           </Grid>
           <Grid container spacing={24}>
             <Cell>
               Recorded Games for Latest Versions:
             </Cell>
-            {reverse(data.latest_summary.map(latest => (
-              <Cell><AppLink path={['latest', latest.dataset.id]} text={latest.dataset.name + ' ' + latest.version}/> ({latest.count.toLocaleString()})</Cell>
+            {reverse(data.latest_summary.map((latest, i) => (
+              <Cell>
+                <AppLink path={['latest', latest.dataset.id]} text={latest.dataset.name + ' ' + latest.version}/>&nbsp;
+                (<Odometer value={sub.data ? sub.data.stats.latest_summary[i].count : latest.count} format="(,ddd)" />)
+              </Cell>
             )))}
           </Grid>
           <Grid container>

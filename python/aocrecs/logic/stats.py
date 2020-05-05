@@ -6,11 +6,16 @@ from aocrecs.consts import COLLECTION_STARTED
 from aocrecs.cache import cached
 
 
+@cached(warm=True, ttl=2)
+async def live_match_count(database):
+    return await database.fetch_one('select count(*) as count from matches')
+
+
 @cached(warm=True, ttl=3600)
 async def summary(database):
     """Get summary statistics."""
     match_count, series_count, player_count = await asyncio.gather(
-        database.fetch_one('select count(*) as count from matches'),
+        live_match_count(database),
         database.fetch_one('select count(*) as count from series'),
         database.fetch_one('select count(*) as count from users'),
     )
