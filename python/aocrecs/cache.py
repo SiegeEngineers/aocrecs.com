@@ -89,9 +89,11 @@ class Warmer:
             if not isinstance(data['args'], list):
                 data['args'] = [[]]
             for arg in data['args']:
-                LOGGER.info("warming cache for %s", key_builder(func, *arg))
+                if data['interval'] and data['interval'] > 60:
+                    LOGGER.info("warming cache for %s", key_builder(func, *arg))
                 await func(self._database, *arg)
-                LOGGER.info("... done warming cache for %s", key_builder(func, *arg))
+                if data['interval'] and data['interval'] > 60:
+                    LOGGER.info("... done warming cache for %s", key_builder(func, *arg))
             if data['interval']:
                 await asyncio.sleep(data['interval'])
             else:

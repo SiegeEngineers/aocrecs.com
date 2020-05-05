@@ -5,7 +5,7 @@ RUN yarn
 COPY public ./public
 COPY src ./src
 ARG GTM
-RUN REACT_APP_API="/api" REACT_APP_GTM=${GTM} yarn build
+RUN REACT_APP_API="https://aocrecs.com/api" REACT_APP_GTM=${GTM} yarn build
 
 FROM nginx
 COPY aocrecs.conf /etc/nginx/conf.d/default.conf

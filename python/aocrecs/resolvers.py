@@ -56,12 +56,17 @@ subscription = SubscriptionType()
 
 @subscription.source('stats')
 async def counter_generator(obj, info):
+    last = None
     while True:
         await asyncio.sleep(2)
-        yield dict(
+        result = dict(
             match_count=(await stat.live_match_count(info.context.database))['count'],
-            latest_summary=search.latest_summary(info.context.database)
+            latest_summary=await search.latest_summary(info.context.database)
         )
+        if result['match_count'] == last:
+            continue
+        last = result['match_count']
+        yield result
 
 
 @subscription.field('stats')
