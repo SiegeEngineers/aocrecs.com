@@ -22,6 +22,7 @@ import LadderIcon from 'mdi-react/FormatListNumberedIcon'
 import ReportIcon from 'mdi-react/TableIcon'
 import AboutIcon from 'mdi-react/InformationIcon'
 import UploadIcon from 'mdi-react/FileUploadIcon'
+import WatchingIcon from 'mdi-react/EyeOutlineIcon'
 import ApiIcon from 'mdi-react/JsonIcon'
 
 import Main from './Main'
@@ -36,6 +37,7 @@ import Players from './Players'
 import Reports from './Reports'
 import Upload from './Upload'
 import Latest from './Latest'
+import Watching from './Watching'
 import About from './About'
 
 const drawerWidth = 180
@@ -122,6 +124,11 @@ const MENU = [
     icon: UploadIcon
   },
   {
+    link: '/watching',
+    title: 'Watching',
+    icon: WatchingIcon
+  },
+  {
     link: '/api',
     title: 'API',
     icon: ApiIcon
@@ -191,9 +198,11 @@ const Layout = () => {
           <Route path='/reports/:y?/:m?' component={Reports} />
           <Route path='/upload' component={Upload} />
           <Route path='/latest/:id' component={Latest} />
+          <Route path='/watching' component={Watching} />
           <Route path='/about' component={About} />
           <Redirect to='/' />
         </Switch>
+        <Typography style={{fontSize: 13}}>aocrecs.com isn't endorsed by Microsoft Corporation and doesn't reflect the views or opinions of Microsoft Corporation or anyone officially involved in producing or managing Age of Empires II. Age of Empires II is a trademark or registered trademark of Microsoft Corporation in the U.S. and other countries.</Typography>
       </main>
     </div>
   )

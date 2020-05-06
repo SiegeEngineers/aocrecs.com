@@ -1,10 +1,32 @@
 """Routes."""
 import asyncio
-from starlette.responses import Response
+import requests
+from starlette.responses import Response, PlainTextResponse
 from mgz.util import Version
 from mgzdb.compress import decompress_tiles
 from aocrecs.download import get_zip
 from aocrecs.logic.minimap import generate_svg
+
+async def nightbot(request):
+    """Nightbot match prototype."""
+    steam_id = request.path_params['steam_id']
+    data = requests.get('https://aoe2.net/api/player/lastmatch?game=aoe2de&steam_id={}'.format(steam_id)).json()
+    profile_ids = [str(player['profile_id']) for player in data['last_match']['players']]
+    civ_ids = [player['civ'] for player in data['last_match']['players']]
+    person_query = "select name, users.id from people join users on people.id=users.person_id where users.platform_id='de' and users.id=any(:profile_ids)"
+    map_query = "select name from maps where dataset_id=100 and id=:map_id"
+    civ_query = "select name, id from civilizations where dataset_id=100 and id=any(:civ_ids)"
+    players, map_, civs = await asyncio.gather(
+        request.app.state.database.fetch_all(person_query, values=dict(profile_ids=profile_ids)),
+        request.app.state.database.fetch_one(map_query, values=dict(map_id=data['last_match']['map_type'])),
+        request.app.state.database.fetch_all(civ_query, values=dict(civ_ids=civ_ids))
+    )
+    def player_string(player, names, civs):
+        return '{} ({}) as {}'.format(names.get(player['profile_id'], player['name']), player['rating'], civs.get(player['civ']))
+    names = {int(player['id']): player['name'] for player in players}
+    civs = {civ['id']: civ['name'] for civ in civs}
+    vs = ' -VS- '.join([player_string(player, names, civs) for player in data['last_match']['players']])
+    return PlainTextResponse('{} on {}'.format(vs, map_['name']))
 
 
 async def download(request):

@@ -40,7 +40,8 @@ def new_app():
         WebSocketRoute('/api', graphql, name='ws'),
         Route('/api/download/{file_id:int}', aoc_routes.download, name='download'),
         Route('/api/map/{match_id:int}', aoc_routes.svg_map, name='minimap'),
-        Route('/api/portrait/{person_id:int}', aoc_routes.portrait, name='portrait')
+        Route('/api/portrait/{person_id:int}', aoc_routes.portrait, name='portrait'),
+        Route('/nightbot/match/{steam_id:int}', aoc_routes.nightbot, name='nightbot')
     ]
 
     middleware = [
