@@ -115,6 +115,10 @@ const Person = ({id}) => {
                   <TableCell><Box fontWeight="fontWeightMedium">Country</Box></TableCell>
                   <TableCell align="right">{getName(data.country)}</TableCell>
                 </TableRow>}
+                {data.age && <TableRow>
+                  <TableCell><Box fontWeight="fontWeightMedium">Age</Box></TableCell>
+                  <TableCell align="right">{data.age}</TableCell>
+                </TableRow>}
                 {data.earnings && <TableRow>
                   <TableCell><Box fontWeight="fontWeightMedium">Pro Earnings</Box></TableCell>
                   <TableCell align="right"><Link target="_blank" href={"https://www.esportsearnings.com/players/" + data.esportsearnings_id}>{formatter.format(data.earnings)}</Link></TableCell>

@@ -4,7 +4,7 @@ import requests
 from starlette.responses import Response, PlainTextResponse
 from mgz.util import Version
 from mgzdb.compress import decompress_tiles
-from aocrecs.download import get_zip
+from aocrecs.download import get_rec
 from aocrecs.logic.minimap import generate_svg
 
 async def nightbot(request):
@@ -38,7 +38,9 @@ async def download(request):
         where files.id=:id
     """
     result = await request.app.state.database.fetch_one(query, values={'id': file_id})
-    return Response(get_zip(result['hash'], result['original_filename'], Version(result['version_id'])), media_type='application/zip')
+    return Response(get_rec(result['hash'], result['original_filename'], Version(result['version_id'])), media_type='application/binary', headers={
+        'Content-Disposition': 'attachment; filename="{}"'.format(result['original_filename'])
+    })
 
 
 async def portrait(request):

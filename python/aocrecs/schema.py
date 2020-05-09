@@ -581,6 +581,8 @@ type Person {
     name: String!
     first_name: String
     last_name: String
+    birthday: Datetime
+    age: Int
     earnings: Float
     esportsearnings_id: Int
     aoeelo_id: Int

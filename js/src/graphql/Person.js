@@ -10,6 +10,7 @@ query Person($id: Int!, $offset: Int!, $limit: Int!) {
     country
     first_name
     last_name
+    age
     aoeelo_rank
     aoeelo_rate
     aoeelo_id

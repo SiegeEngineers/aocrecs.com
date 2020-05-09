@@ -202,6 +202,7 @@ const Layout = () => {
           <Route path='/about' component={About} />
           <Redirect to='/' />
         </Switch>
+        <br />
         <Typography style={{fontSize: 13}}>aocrecs.com isn't endorsed by Microsoft Corporation and doesn't reflect the views or opinions of Microsoft Corporation or anyone officially involved in producing or managing Age of Empires II. Age of Empires II is a trademark or registered trademark of Microsoft Corporation in the U.S. and other countries.</Typography>
       </main>
     </div>
