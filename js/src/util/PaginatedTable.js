@@ -4,7 +4,7 @@ import Pagination from 'material-ui-flat-pagination'
 const PaginatedTable = ({rows, children, limit}) => {
   const [offset, setOffset] = useState(0)
   const total = rows.length
-  if(offset >= total) {
+  if(offset >= total && total > 0) {
     setOffset(0)
   }
   return (
