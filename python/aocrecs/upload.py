@@ -4,6 +4,7 @@ import os
 import tempfile
 
 import boto3
+from aioify import wrap as aiowrap
 
 from mgzdb import platforms
 from mgzdb.api import API
@@ -12,6 +13,7 @@ from mgzdb.util import path_components
 from aocrecs.consts import S3_BUCKET, S3_BUCKET_ERRORS
 
 
+@aiowrap
 def add_rec(filename, contents, database_url, voobly_username, voobly_password):
     """Upload recorded game files."""
     s3_client = boto3.client('s3')

@@ -13,6 +13,7 @@ setup(
     install_requires=[
         'aiocache==0.11.1',
         'aiodataloader==0.2.0',
+        'aioify==0.3.2',
         'ariadne==0.11.0',
         'asyncpg==0.20.1',
         'boto3==1.10.46',

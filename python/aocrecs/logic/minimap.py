@@ -1,4 +1,5 @@
 """Generate SVG minimap."""
+from aioify import wrap as aiowrap
 from subprocess import Popen, PIPE
 import math
 import xml.etree.ElementTree as ET
@@ -90,6 +91,7 @@ def trace(layers, dimension, corners, squareness, scale):
     return ET.tostring(svg, encoding='unicode')
 
 
+@aiowrap
 def generate_svg(tiles, dimension, terrain, objects, player_colors, corners=0, squareness=3, scale=1000): # pylint: disable=too-many-arguments
     """Generate map SVG."""
     layers = {}

@@ -432,9 +432,10 @@ async def resolve_person_matches(obj, info, offset, limit):
 
 @mutation.field('upload')
 async def resolve_upload(obj, info, rec_file):
-    return add_rec(
+    data = await rec_file.read()
+    return await add_rec(
         rec_file.filename,
-        await rec_file.read(),
+        data,
         str(info.context.request.app.state.database_url),
         info.context.request.app.state.voobly_username,
         str(info.context.request.app.state.voobly_password)

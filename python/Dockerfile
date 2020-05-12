@@ -1,4 +1,4 @@
-FROM python:3.8.1
+FROM python:3.8.2
 EXPOSE 8000
 WORKDIR /opt/app
 COPY . .

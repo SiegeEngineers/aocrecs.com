@@ -90,7 +90,7 @@ async def svg_map(request):
             'match_id': match_id
         })
     )
-    svg = generate_svg(
+    svg = await generate_svg(
         tiles,
         match['map_size_id'],
         {t['id']: {'level': t['color_level'], 'up': t['color_up'], 'down': t['color_down']} for t in terrain},
