@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import MatchFragment from '../graphql/MatchFragment.js';
 
 export default gql`
-query Series($id: String!, $offset: Int!, $limit: Int!) {
+query Series($id: String!, $order: [String], $offset: Int!, $limit: Int!) {
   series(id: $id) {
     name
     played
@@ -25,7 +25,7 @@ query Series($id: String!, $offset: Int!, $limit: Int!) {
         name
       }
     }
-    matches(offset: $offset, limit: $limit) {
+    matches(order: $order, offset: $offset, limit: $limit) {
       count
       hits {
         ...MatchFragment

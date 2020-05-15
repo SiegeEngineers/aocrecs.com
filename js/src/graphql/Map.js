@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import MatchFragment from '../graphql/MatchFragment.js'
 
 export default gql`
-query Map($name: String!, $offset: Int!, $limit: Int!) {
+query Map($name: String!, $order: [String], $offset: Int!, $limit: Int!) {
   map(name: $name) {
     name
     top_civilizations {
@@ -12,7 +12,7 @@ query Map($name: String!, $offset: Int!, $limit: Int!) {
       name
     }
     preview_url
-    matches(offset: $offset, limit: $limit) {
+    matches(order: $order, offset: $offset, limit: $limit) {
       count
       hits {
         ...MatchFragment

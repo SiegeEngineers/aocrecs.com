@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 import MatchFragment from '../graphql/MatchFragment.js'
 
 export default gql`
-query Person($id: Int!, $offset: Int!, $limit: Int!) {
+query Person($id: Int!, $order: [String], $offset: Int!, $limit: Int!) {
   person(id: $id) {
     id
     name
@@ -37,7 +37,7 @@ query Person($id: Int!, $offset: Int!, $limit: Int!) {
       year
     }
     aliases
-    matches(offset: $offset, limit: $limit) {
+    matches(order: $order, offset: $offset, limit: $limit) {
       count
       hits {
         ...MatchFragment

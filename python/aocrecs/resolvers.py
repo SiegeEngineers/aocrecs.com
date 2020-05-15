@@ -162,9 +162,9 @@ async def resolve_top_dataset(obj, info):
 
 
 @user.field('matches')
-async def resolve_user_matches(obj, info, offset, limit):
+async def resolve_user_matches(obj, info, order, offset, limit):
     params = {'players': {'user_id': {'values': [obj['id']]}}}
-    return await search.get_hits(info.context, params, offset, limit)
+    return await search.get_hits(info.context, params, order, offset, limit)
 
 
 @user.field('meta_ranks')
@@ -207,9 +207,9 @@ async def resolve_ranks(obj, info, limit):
 
 
 @series.field('matches')
-async def resolve_series_matches(obj, info, offset, limit):
+async def resolve_series_matches(obj, info, order, offset, limit):
     params = {'matches': {'id': {'values': obj['match_ids']}}}
-    return await search.get_hits(info.context, params, offset, limit)
+    return await search.get_hits(info.context, params, order, offset, limit)
 
 
 @series.field('sides')
@@ -238,20 +238,20 @@ async def resolve_search(obj, info):
 
 
 @search_result.field('matches')
-async def resolve_search_matches(obj, info, params, offset, limit):
-    return await search.get_hits(info.context, params, offset, limit)
+async def resolve_search_matches(obj, info, params, order, offset, limit):
+    return await search.get_hits(info.context, params, order, offset, limit)
 
 
 @civilization.field('matches')
-async def resolve_civilization_matches(obj, info, offset, limit):
+async def resolve_civilization_matches(obj, info, order, offset, limit):
     params = {'players': {'civilization_id': {'values': [obj['id']]}, 'dataset_id': {'values': [obj['dataset_id']]}}}
-    return await search.get_hits(info.context, params, offset, limit)
+    return await search.get_hits(info.context, params, order, offset, limit)
 
 
 @map_.field('matches')
-async def resolve_map_matches(obj, info, offset, limit):
+async def resolve_map_matches(obj, info, offset, order, limit):
     params = {'matches': {'map_name': {'values': [obj['name']]}}}
-    return await search.get_hits(info.context, params, offset, limit)
+    return await search.get_hits(info.context, params, order, offset, limit)
 
 
 @map_.field('top_civilizations')
@@ -425,9 +425,9 @@ async def resolve_by_day(obj, info):
 
 
 @person.field('matches')
-async def resolve_person_matches(obj, info, offset, limit):
+async def resolve_person_matches(obj, info, order, offset, limit):
     params = {'players': {'user_id': {'values': [a['id'] for a in obj['accounts']]}}}
-    return await search.get_hits(info.context, params, offset, limit)
+    return await search.get_hits(info.context, params, order, offset, limit)
 
 
 @mutation.field('upload')

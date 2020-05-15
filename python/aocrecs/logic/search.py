@@ -31,7 +31,7 @@ async def latest_summary(database):
             'dataset_id': {'values': [dataset['dataset_id']]},
             'dataset_version': {'values': [dataset['version']]}
         }}
-        _, count_query, values = build_query(params, 0, 0)
+        _, count_query, values = build_query(params, None, 0, 0)
         latest.append(database.fetch_one(count_query, values=values))
     output = []
     for dataset, hits in zip(datasets, await asyncio.gather(*latest)):
@@ -50,28 +50,28 @@ async def latest_summary(database):
 
 
 #@cached(warm=[[0, 0, 8], [1, 0, 8], [100, 0, 8]], ttl=3600)
-async def latest(context, dataset_id, offset, limit):
+async def latest(context, dataset_id, order, offset, limit):
     query = "select max(dataset_version) as version from matches where dataset_id=:dataset_id"
     result = await context.database.fetch_one(query, values=dict(dataset_id=dataset_id))
     params = {'matches': {
         'dataset_id': {'values': [dataset_id]},
         'dataset_version': {'values': [result['version']]}
     }}
-    return await get_hits(context, params, offset, limit)
+    return await get_hits(context, params, order, offset, limit)
 
 
-async def get_hits(context, params, offset, limit):
+async def get_hits(context, params, order, offset, limit):
     """Return hits: count and paginated matches."""
-    count, result = await _cached_get_hits(context.database, params, offset, limit)
+    count, result = await _cached_get_hits(context.database, params, order, offset, limit)
     return dict(count=count['count'], hits=await context.load_many(matches.get_match, map(lambda m: m['id'], result)))
 
 
 @cached()
-async def _cached_get_hits(database, params, offset, limit):
+async def _cached_get_hits(database, params, order, offset, limit):
     """Cacheable hits."""
     if limit > SEARCH_LIMIT:
         limit = SEARCH_LIMIT
-    result_query, count_query, values = build_query(params, offset, limit)
+    result_query, count_query, values = build_query(params, order, offset, limit)
     return await asyncio.gather(
         database.fetch_one(count_query, values=values),
         database.fetch_all(result_query, values=values)
@@ -91,7 +91,7 @@ def add_filter(field, bind, criteria):
     raise ValueError('criteria not supported')
 
 
-def build_query(params, offset, limit):
+def build_query(params, order, offset, limit):
     """Build search query."""
     join = []
     where = []
@@ -113,8 +113,16 @@ def build_query(params, offset, limit):
 
     query = append_flags(query, params, args)
 
-    query_template = "select distinct matches.id, matches.played {} order by matches.played desc nulls last limit {} offset {}"
-    return query_template.format(query, limit, offset), 'select count(distinct matches.id) {}'.format(query), args
+    order_by = []
+    selected = ['matches.id']
+    for field in order:
+        order_by.append('{} desc'.format(field))
+        selected.append(field)
+    if not order:
+        order_by.append('matches.played desc')
+        selected.append('matches.played')
+    query_template = "select distinct {} {} order by {} nulls last limit {} offset {}"
+    return query_template.format(', '.join(selected), query, ', '.join(order_by), limit, offset), 'select count(distinct matches.id) {}'.format(query), args
 
 
 def append_flags(query, params, args):

@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import MatchFragment from '../graphql/MatchFragment.js';
 
 export default gql`
-query User($user_id: String!, $platform_id: String!, $offset: Int!, $limit: Int!) {
+query User($user_id: String!, $platform_id: String!, $order: [String], $offset: Int!, $limit: Int!) {
   user(id: $user_id, platform_id: $platform_id) {
     id
     name
@@ -37,7 +37,7 @@ query User($user_id: String!, $platform_id: String!, $offset: Int!, $limit: Int!
     top_dataset {
       name
     }
-    matches(offset: $offset, limit: $limit) {
+    matches(order: $order, offset: $offset, limit: $limit) {
       count
       hits {
         ...MatchFragment

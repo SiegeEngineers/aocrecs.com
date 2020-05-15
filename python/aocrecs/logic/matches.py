@@ -165,7 +165,8 @@ async def get_match(keys, context):
             cheats, population_limit, lock_teams, mirror, dataset_version, postgame, has_playback, duration::interval(0),
             versions.name as version, extract(epoch from duration)::integer as duration_secs, winning_team_id,
             game_version, save_version, build,
-            rms_seed, rms_custom, direct_placement, fixed_positions, guard_state, effect_quantity
+            rms_seed, rms_custom, direct_placement, fixed_positions, guard_state, effect_quantity,
+            added
         from matches
         join versions on matches.version_id=versions.id
         join datasets on matches.dataset_id=datasets.id

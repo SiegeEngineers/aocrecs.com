@@ -37,7 +37,7 @@ type LiveStats {
 }
 
 type Latest {
-    matches(dataset_id: Int!, offset: Int = 0, limit: Int = 10): Hits
+    matches(dataset_id: Int!, order: [String], offset: Int = 0, limit: Int = 10): Hits
 }
 
 type LatestSummary {
@@ -47,7 +47,7 @@ type LatestSummary {
 }
 
 type SearchResult {
-    matches(params: Dict!, offset: Int = 0, limit: Int = 10): Hits
+    matches(params: Dict!, order: [String], offset: Int = 0, limit: Int = 10): Hits
 }
 
 type StatImprovement {
@@ -175,7 +175,7 @@ type Map {
     percent: Float!
     events: [Event]
     preview_url: String
-    matches(offset: Int = 0, limit: Int = 10): Hits
+    matches(order: [String], offset: Int = 0, limit: Int = 10): Hits
     top_civilizations(limit: Int = 3): [Civilization]
 }
 
@@ -186,7 +186,7 @@ type Civilization {
     count: Int!
     percent: Float!
     bonuses: [CivilizationBonus]
-    matches(offset: Int = 0, limit: Int = 10): Hits
+    matches(order: [String], offset: Int = 0, limit: Int = 10): Hits
 }
 
 type CivilizationBonus {
@@ -218,6 +218,7 @@ type Match {
     duration: Datetime
     duration_secs: Int
     played: Datetime
+    added: Datetime
     has_playback: Boolean
     rated: Boolean
     diplomacy_type: String
@@ -544,7 +545,7 @@ type Series {
     tournament: Tournament
     participants: [Participant]
     match_ids: [Int!]
-    matches(offset: Int = 0, limit: Int = 10): Hits
+    matches(order: [String], offset: Int = 0, limit: Int = 10): Hits
 }
 
 type Side {
@@ -569,7 +570,7 @@ type User {
     name: String!
     person: Person
     meta_ranks(ladder_ids: [Int]): [Rank]
-    matches(offset: Int = 0, limit: Int = 10): Hits
+    matches(order: [String], offset: Int = 0, limit: Int = 10): Hits
     top_map: Map
     top_civilization: Civilization
     top_dataset: Dataset
@@ -600,7 +601,7 @@ type Person {
     aliases: [String]
     accounts: [User]
     events: [Event]
-    matches(offset: Int = 0, limit: Int = 10): Hits
+    matches(order: [String], offset: Int = 0, limit: Int = 10): Hits
 }
 
 type Mutation {
