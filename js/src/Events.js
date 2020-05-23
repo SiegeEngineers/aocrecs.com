@@ -184,7 +184,9 @@ const Tournaments = ({tournaments}) => {
 
 const MapTable = ({rows}) => {
   return (
-    rows.length > 0 ? <Table>
+       <Card style={{margin: '0px'}}>
+      <CardContent>
+        {rows.length > 0 ? <Table>
       <TableHead>
         <TableRow>
           <TableCell>Map</TableCell>
@@ -209,13 +211,18 @@ const MapTable = ({rows}) => {
         )}
       </TableBody>
     </Table>
-    : <p>No custom maps for this event</p>
+            : <p>No custom maps for this event</p>}
+          </CardContent>
+        </Card>
   )
 }
 
 
 const PlayerTable = ({players}) => {
   return (
+    <Card style={{margin: '0px'}}>
+      <CardContent>
+
     <PaginatedTable limit={25} rows={players}>
     {(rows) => (
     <Table>
@@ -246,6 +253,48 @@ const PlayerTable = ({players}) => {
     </Table>
     )}
   </PaginatedTable>
+</CardContent>
+    </Card>
+  )
+}
+
+const CivilizationTable = ({civilizations}) => {
+  return (
+    <Card style={{margin: '0px'}}>
+      <CardContent>
+
+    <PaginatedTable limit={25} rows={civilizations}>
+    {(rows) => (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableCell>Civilization</TableCell>
+          <TableCell>Most Played Map</TableCell>
+          <TableCell align='right'># Matches</TableCell>
+          <TableCell align='right'>Win Percent</TableCell>
+          <TableCell align='right'>Avg Duration</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {rows.map((row, index) =>
+          <TableRow key={index}>
+            <TableCell>
+              <AppLink path={['civilizations', row.civilization.dataset_id, row.civilization.id]} text={row.civilization.name} />
+            </TableCell>
+            <TableCell>
+              <AppLink path={['maps', row.most_played_map]} text={row.most_played_map} />
+            </TableCell>
+            <TableCell align='right'>{row.match_count}</TableCell>
+            <TableCell align='right'>{Math.round(row.win_percent * 100)}%</TableCell>
+            <TableCell align='right'>{row.average_duration}</TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+    )}
+  </PaginatedTable>
+</CardContent>
+    </Card>
   )
 }
 
@@ -264,12 +313,14 @@ const Event = ({id}) => {
             <Tab label='Tournaments' />
             <Tab label='Maps' />
             <Tab label='Players' />
+            <Tab label='Civilizations' />
           </Tabs>
         </AppBar>
         <Typography component='div' className={classes.tabContent}>
           {tab === 0 && <Tournaments tournaments={data.event.tournaments} />}
           {tab === 1 && <MapTable rows={data.event.maps} />}
           {tab === 2 && <PlayerTable players={data.event.players} />}
+          {tab === 3 && <CivilizationTable civilizations={data.event.civilizations} />}
         </Typography>
       </>
     )}

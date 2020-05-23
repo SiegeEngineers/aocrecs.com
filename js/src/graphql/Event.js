@@ -26,10 +26,23 @@ query Event($id: String!) {
       }
       match_count
       most_played_civilization {
+        id
+        dataset_id
         name
       }
       played_percent
       average_duration
+    }
+    civilizations {
+      match_count
+      average_duration
+      win_percent
+      most_played_map
+      civilization {
+        id
+        dataset_id
+        name
+      }
     }
     players {
       match_count

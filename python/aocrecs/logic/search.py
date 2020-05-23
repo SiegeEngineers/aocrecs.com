@@ -115,12 +115,13 @@ def build_query(params, order, offset, limit):
 
     order_by = []
     selected = ['matches.id']
-    for field in order:
-        order_by.append('{} desc'.format(field))
-        selected.append(field)
     if not order:
         order_by.append('matches.played desc')
         selected.append('matches.played')
+    else:
+        for field in order:
+            order_by.append('{} desc'.format(field))
+            selected.append(field)
     query_template = "select distinct {} {} order by {} nulls last limit {} offset {}"
     return query_template.format(', '.join(selected), query, ', '.join(order_by), limit, offset), 'select count(distinct matches.id) {}'.format(query), args
 

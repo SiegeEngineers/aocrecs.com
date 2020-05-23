@@ -85,8 +85,8 @@ async def resolve_latest(obj, info):
 
 
 @latest.field('matches')
-async def resolve_latest_matches(obj, info, dataset_id, offset, limit):
-    return await search.latest(info.context, dataset_id, offset, limit)
+async def resolve_latest_matches(obj, info, dataset_id, order, offset, limit):
+    return await search.latest(info.context, dataset_id, order, offset, limit)
 
 
 @query.field('reports')

@@ -90,7 +90,7 @@ async def get_event(database, event_id):
         join matches on players.match_id=matches.id
         where event_id=:event_id
         group by map_name
-        order by count(*) desc
+        order by count(distinct match_id) desc
     """
     players_query = """
         select
@@ -111,11 +111,26 @@ async def get_event(database, event_id):
         group by case when people.id is not null then people.id::varchar else players.name end
         order by count(*) desc, sum(players.winner::int)/count(*)::numeric desc
     """
-    event, tournaments, series, maps, players, participants = await asyncio.gather(
+    civilizations_query = """
+        select
+            civilizations.id, civilizations.name, avg(matches.duration)::interval(0) as avg_duration,
+            count(distinct match_id) as matches, max(players.dataset_id) as dataset_id,
+            count(*) as matches, round(sum(players.winner::int)/count(*)::numeric, 2) as win_percent,
+            mode() within group (order by matches.map_name) as most_played_map
+        from players
+        join civilizations on civilizations.dataset_id=players.dataset_id and civilizations.id = players.civilization_id
+        join matches on players.match_id=matches.id
+        where event_id=:event_id
+        group by civilizations.id, civilizations.name
+        order by count(distinct match_id) desc
+;
+    """
+    event, tournaments, series, maps, civilizations, players, participants = await asyncio.gather(
         database.fetch_one(events_query, values={'event_id': event_id}),
         database.fetch_all(tournaments_query, values={'event_id': event_id}),
         database.fetch_all(series_query, values={'event_id': event_id}),
         database.fetch_all(maps_query, values={'event_id': event_id}),
+        database.fetch_all(civilizations_query, values={'event_id': event_id}),
         database.fetch_all(players_query, values={'event_id': event_id}),
         database.fetch_all(participants_query, values={'event_id': event_id})
     )
@@ -137,6 +152,19 @@ async def get_event(database, event_id):
                     dataset_id=m['dataset_id']
                 )
             ) for m in maps
+        ],
+        civilizations=[
+            dict(
+                civilization=dict(
+                    id=c['id'],
+                    name=c['name'],
+                    dataset_id=c['dataset_id']
+                ),
+                average_duration=c['avg_duration'],
+                match_count=c['matches'],
+                win_percent=c['win_percent'],
+                most_played_map=c['most_played_map']
+            ) for c in civilizations
         ],
         players=[
             dict(
