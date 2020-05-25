@@ -76,13 +76,13 @@ def make_teams(player_data, match_id):
     return team_data, winning_team
 
 
-def make_files(player_data, file_data, match_id, url_func):
+def make_files(player_data, file_data, match_id):
     """Make files structures."""
     by_number = by_key(player_data, 'number')
     return [
         dict(
             file_,
-            download_link=url_func('download', file_id=file_['id']),
+            download_link='/api/download/{}'.format(file_['id']),
             owner=by_number[file_['owner_number']][0]
         ) for file_ in file_data[match_id]
     ]
@@ -200,7 +200,7 @@ async def get_match(keys, context):
             players=player_data,
             teams=team_data,
             winning_team=winning_team,
-            minimap_link=context.request.url_for('minimap', match_id=match_id),
+            minimap_link='/api/map/{}'.format(match_id),
             event=dict(
                 id=match['event_id'],
                 name=match['event_name']
@@ -213,7 +213,7 @@ async def get_match(keys, context):
                 id=match['series_id'],
                 name=match['series_name']
             ) if match['series_id'] else None,
-            files=make_files(player_data, by_key(files, 'match_id'), match_id, context.request.url_for),
+            files=make_files(player_data, by_key(files, 'match_id'), match_id),
             dataset=dict(
                 id=match['dataset_id'],
                 name=match['dataset_name']

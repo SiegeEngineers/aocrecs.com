@@ -40,7 +40,7 @@ async def get_preview_url(context, map_name):
     """
     preview = await context.database.fetch_one(preview_query, values={'name': map_name})
     if preview:
-        return context.request.url_for('minimap', match_id=preview['id'])
+        return '/api/map/{}'.format(preview['id'])
     return None
 
 

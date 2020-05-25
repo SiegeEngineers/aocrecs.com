@@ -67,7 +67,7 @@ async def get_person(context, person_id):
             aliases_set.add(row['user_name'])
     return dict(
         person,
-        portrait_link=context.request.url_for('portrait', person_id=person['id']) if person['has_portrait'] else None,
+        portrait_link='/api/portrait/{}'.format(person['id']) if person['has_portrait'] else None,
         accounts=[
             dict(
                 id=a['id'],
