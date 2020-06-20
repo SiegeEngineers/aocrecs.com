@@ -33,6 +33,8 @@ import GetPerson from './graphql/Person'
 import GetPeople from './graphql/People'
 
 
+const liquipediaUrl = 'https://liquipedia.net/ageofempires/'
+
 const useStyles = makeStyles({
   narrowTable: {
     width: 'unset',
@@ -127,6 +129,7 @@ const Person = ({id}) => {
                   <TableCell><Box fontWeight="fontWeightMedium">Tournament Elo</Box></TableCell>
                   <TableCell align="right"><Link target="_blank" href={"https://aoe-elo.com/player/" + data.aoeelo_id + "/"}>{data.aoeelo_rate} (#{data.aoeelo_rank})</Link></TableCell>
                 </TableRow>}
+                {data.liquipedia && <PersonRow title='Liquipedia'><Link target="_blank" href={liquipediaUrl + data.liquipedia}>{liquipediaUrl + data.liquipedia}</Link></PersonRow>}
                 {data.twitch && <PersonRow title='Twitch'><Link target="_blank" href={data.twitch}>{data.twitch}</Link></PersonRow>}
                 {data.mixer && <PersonRow title='Mixer'><Link target="_blank" href={data.mixer}>{data.mixer}</Link></PersonRow>}
                 {data.douyu && <PersonRow title='Douyu'><Link target="_blank" href={data.douyu}>{data.douyu}</Link></PersonRow>}

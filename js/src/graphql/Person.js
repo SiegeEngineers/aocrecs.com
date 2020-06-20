@@ -16,6 +16,7 @@ query Person($id: Int!, $order: [String], $offset: Int!, $limit: Int!) {
     aoeelo_id
     esportsearnings_id
     earnings
+    liquipedia
     portrait_link
     twitch
     mixer

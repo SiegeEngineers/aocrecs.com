@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='aocrecs',
-    version='4.0.3',
+    version='4.0.4',
     description='aocrecs.com API.',
     url='https://github.com/siegeengineers/aocrecs.com/',
     license='MIT',
@@ -19,7 +19,7 @@ setup(
         'boto3==1.10.46',
         'coloredlogs==10.0',
         'databases==0.3.2',
-        'mgzdb>=1.3.9',
+        'mgzdb>=1.3.10',
         'networkx==2.4',
         'python-dateutil==2.8.1',
         'python-multipart==0.0.5',

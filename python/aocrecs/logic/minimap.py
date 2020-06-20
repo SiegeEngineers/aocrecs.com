@@ -110,23 +110,23 @@ def generate_svg(tiles, dimension, terrain, objects, player_colors, corners=0, s
     for color in list(player_colors.values()) + CONSTANT_COLORS:
         layers[color] = new_canvas(dimension)
     for obj in objects:
-        if obj['initial_player_number'] is not None and obj['initial_class_id'] in [70, 80]:
-            color = player_colors[obj['initial_player_number']]
-            layers[color][int(obj['created_y'])][int(obj['created_x'])] = '1'
-            if obj['initial_object_id'] in TC_IDS:
+        if obj['player_number'] is not None and obj['class_id'] in [70, 80]:
+            color = player_colors[obj['player_number']]
+            layers[color][int(obj['y'])][int(obj['x'])] = '1'
+            if obj['object_id'] in TC_IDS:
                 for i in range(-1, 2):
                     for j in range(-1, 2):
-                        layers[color][int(obj['created_y']) + i][int(obj['created_x']) + j] = '1'
-            elif obj['initial_object_id'] in [88, 793]:
+                        layers[color][int(obj['y']) + i][int(obj['x']) + j] = '1'
+            elif obj['object_id'] in [88, 793]:
                 for i in range(-1, 2):
-                    layers[color][int(obj['created_y']) + i][int(obj['created_x'])] = '1'
-            elif obj['initial_object_id'] in [64, 789]:
+                    layers[color][int(obj['y']) + i][int(obj['x'])] = '1'
+            elif obj['object_id'] in [64, 789]:
                 for i in range(-1, 2):
-                    layers[color][int(obj['created_y'])][int(obj['created_x']) + i] = '1'
+                    layers[color][int(obj['y'])][int(obj['x']) + i] = '1'
         else:
             for object_ids, color in OBJECT_MAPPING:
-                if obj['initial_object_id'] in object_ids:
-                    layers[color][int(obj['created_y'])][int(obj['created_x'])] = '1'
+                if obj['object_id'] in object_ids:
+                    layers[color][int(obj['y'])][int(obj['x'])] = '1'
                     break
 
     return trace(layers, dimension, corners, squareness, scale)

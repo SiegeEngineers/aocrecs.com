@@ -334,7 +334,7 @@ const EventsView = ({match, history}) => {
     <DataQuery query={GetEvents}>
       {(data) => (
         <Grid container spacing={24}>
-          <Grid item xs={6}>
+          {match.url.startsWith('/events') && <Grid item xs={6}>
             {match.params.eid ?
               <>
                 <Typography><AppLink path={['events']} text="< Back to Events" /></Typography>
@@ -353,7 +353,7 @@ const EventsView = ({match, history}) => {
               </div>
             ))}
             </>}
-          </Grid>
+          </Grid>}
           {match.params.sid && <Grid item xs={6}>
             <Series id={match.params.sid} />
           </Grid>}

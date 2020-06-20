@@ -27,7 +27,7 @@ async def get_person(context, person_id):
     person_query = """
         select id, name, country, aoeelo_rank, aoeelo_rate, earnings, first_name, last_name,
         aoeelo_id, esportsearnings_id, case when portrait is not null then true else false end as has_portrait,
-        twitch, mixer, douyu, youtube, discord, birthday, date_part('year', age(birthday)) as age
+        twitch, mixer, douyu, youtube, discord, birthday, date_part('year', age(birthday)) as age, liquipedia
         from people
         where id=:person_id
     """

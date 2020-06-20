@@ -598,6 +598,7 @@ type Person {
     aoeelo_id: Int
     aoeelo_rank: Int
     aoeelo_rate: Int
+    liquipedia: String
     portrait_link: String
     twitch: String
     mixer: String

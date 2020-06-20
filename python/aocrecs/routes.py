@@ -3,7 +3,7 @@ import asyncio
 import requests
 from starlette.responses import Response, PlainTextResponse
 from mgz.util import Version
-from mgzdb.compress import decompress_tiles
+from mgzdb.compress import decompress_tiles, decompress_objects
 from aocrecs.download import get_rec
 from aocrecs.logic.minimap import generate_svg
 
@@ -57,17 +57,12 @@ async def svg_map(request):
     """Get map tile SVGs."""
     match_id = request.path_params['match_id']
     match_query = """
-        select dataset_id, map_size_id, map_tiles from matches where id=:match_id
+        select dataset_id, map_size_id, map_tiles, objects from matches where id=:match_id
     """
     tile_query = """
         select id, color_level, color_up, color_down
         from terrain
         where dataset_id=:dataset_id and id = any(:terrain_ids)
-    """
-    object_query = """
-        select initial_object_id, initial_player_number, initial_class_id, created_x, created_y
-        from object_instances
-        where match_id=:match_id and created = '00:00:00'
     """
     player_color_query = """
         select number, hex
@@ -78,13 +73,11 @@ async def svg_map(request):
     if not match['map_tiles']:
         return Response()
     tiles = decompress_tiles(match['map_tiles'], match['map_size_id'])
-    terrain, objects, player_colors = await asyncio.gather(
+    objects = decompress_objects(match['objects']) if match['objects'] else []
+    terrain, player_colors = await asyncio.gather(
         request.app.state.database.fetch_all(tile_query, values={
             'dataset_id': match['dataset_id'],
             'terrain_ids': {t['terrain_id'] for t in tiles}
-        }),
-        request.app.state.database.fetch_all(object_query, values={
-            'match_id': match_id
         }),
         request.app.state.database.fetch_all(player_color_query, values={
             'match_id': match_id
