@@ -24,7 +24,7 @@ setup(
         'python-dateutil==2.8.1',
         'python-multipart==0.0.5',
         'starlette==0.13.4',
-        'uvicorn==0.11.5'
+        'uvicorn==0.11.7'
     ],
     classifiers=[
         'License :: OSI Approved :: MIT License',
