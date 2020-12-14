@@ -71,13 +71,13 @@ async def odds_query(database, teams, type_id, match_filters=None, civ_filter=Fa
 
         elif civ_filter:
             key = 'civilization_id'
-            player_filters = " players.civilization_id=any(:civilization_ids_{})".format(i)
-            values.update({'civilization_ids_{}'.format(i): [p['civilization_id'] for p in team]})
+            player_filters = f" players.civilization_id=any(:civilization_ids_{i})"
+            values.update({f'civilization_ids_{i}': [p['civilization_id'] for p in team]})
 
         elif user_filter:
             key = 'user_id'
-            player_filters = " players.user_id=any(:user_ids_{})".format(i)
-            values.update({'user_ids_{}'.format(i): [p['user_id'] for p in team]})
+            player_filters = f" players.user_id=any(:user_ids_{i})"
+            values.update({f'user_ids_{i}': [p['user_id'] for p in team]})
 
         team_query = """
             select match_id from players
@@ -91,7 +91,7 @@ async def odds_query(database, teams, type_id, match_filters=None, civ_filter=Fa
     match_query = match_query.format(key)
 
     if match_filters is not None:
-        match_query += ' and ' + match_filters[0]
+        match_query += f" and {match_filters[0]}"
         values.update(match_filters[1])
 
     result = await database.fetch_all(match_query, values=values)

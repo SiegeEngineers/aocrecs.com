@@ -10,7 +10,7 @@ from aocrecs.logic.minimap import generate_svg
 async def nightbot(request):
     """Nightbot match prototype."""
     steam_id = request.path_params['steam_id']
-    data = requests.get('https://aoe2.net/api/player/lastmatch?game=aoe2de&steam_id={}'.format(steam_id)).json()
+    data = requests.get(f'https://aoe2.net/api/player/lastmatch?game=aoe2de&steam_id={steam_id}').json()
     profile_ids = [str(player['profile_id']) for player in data['last_match']['players']]
     civ_ids = [player['civ'] for player in data['last_match']['players']]
     person_query = "select name, users.id from people join users on people.id=users.person_id where users.platform_id='de' and users.id=any(:profile_ids)"
@@ -22,11 +22,11 @@ async def nightbot(request):
         request.app.state.database.fetch_all(civ_query, values=dict(civ_ids=civ_ids))
     )
     def player_string(player, names, civs):
-        return '{} ({}) as {}'.format(names.get(player['profile_id'], player['name']), player['rating'], civs.get(player['civ']))
+        return f"{names.get(player['profile_id'], player['name'])} ({player['rating']}) as {civs.get(player['civ'])}"
     names = {int(player['id']): player['name'] for player in players}
     civs = {civ['id']: civ['name'] for civ in civs}
     vs = ' -VS- '.join([player_string(player, names, civs) for player in data['last_match']['players']])
-    return PlainTextResponse('{} on {}'.format(vs, map_['name']))
+    return PlainTextResponse(f"{vs} on {map_['name']}")
 
 
 async def download(request):
@@ -39,7 +39,7 @@ async def download(request):
     """
     result = await request.app.state.database.fetch_one(query, values={'id': file_id})
     return Response(get_rec(result['hash'], result['original_filename'], Version(result['version_id'])), media_type='application/binary', headers={
-        'Content-Disposition': 'attachment; filename="{}"'.format(result['original_filename'])
+        'Content-Disposition': f"attachment; filename=\"{result['original_filename']}\""
     })
 
 

@@ -231,17 +231,17 @@ async def get_flags(keys, context): # pylint: disable=too-many-locals
             continue
         if '{sq}' in query:
             query = query.format(sq='select id from matches where id = any(:match_ids)')
-        query = """
+        query = f"""
             select inside.*
-            from ({inside}) as inside
-            where {where}
-        """.format(inside=query, where='match_id = any(:match_ids)')
-        evidence_query = '{query} order by timestamp'.format(query=query)
-        agg_query = """
+            from ({query}) as inside
+            where match_id = any(:match_ids)
+        """
+        evidence_query = f'{query} order by timestamp'
+        agg_query = f"""
             select inside.match_id, inside.number, count(*) as count
             from ({query}) as inside
             group by inside.match_id, inside.number
-        """.format(query=query)
+        """
 
         values = dict(i_values, match_ids=[k[0] for k in keys])
         evidence, flag_result = await asyncio.gather(
@@ -276,11 +276,11 @@ async def get_metrics(keys, context):
         if '{sq}' in query:
             query = query.format(sq='select id from matches where id = any(:match_ids)')
         queries.append(context.database.fetch_all(
-            """
+            f"""
                 select inside.*
-                from ({inside}) as inside
-                where {where}
-            """.format(inside=query, where='match_id = any(:match_ids)'),
+                from ({query}) as inside
+                where match_id = any(:match_ids)
+            """,
             values=dict(values, match_ids=[k[0] for k in keys])
         ))
 

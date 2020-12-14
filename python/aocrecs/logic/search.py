@@ -81,13 +81,13 @@ async def _cached_get_hits(database, params, order, offset, limit):
 def add_filter(field, bind, criteria):
     """Generate a filter."""
     if 'values' in criteria:
-        return '{0}=any(:{1})'.format(field, bind), criteria['values']
+        return f'{field}=any(:{bind})', criteria['values']
     if 'date' in criteria:
-        return '{0}::date=:{1}'.format(field, bind), datetime.strptime(criteria['date'], '%Y-%m-%d').date()
+        return f'{field}::date=:{bind}', datetime.strptime(criteria['date'], '%Y-%m-%d').date()
     if 'gte' in criteria:
-        return '{0}>=:{1}'.format(field, bind), criteria['gte']
+        return f'{field}>=:{bind}', criteria['gte']
     if 'lte' in criteria:
-        return '{0}<=:{1}'.format(field, bind), criteria['lte']
+        return f'{field}<=:{bind}', criteria['lte']
     raise ValueError('criteria not supported')
 
 
@@ -101,15 +101,15 @@ def build_query(params, order, offset, limit):
             join.append('{0} on {0}.match_id=matches.id'.format(table))
 
         for field, criteria in params.get(table, {}).items():
-            path = '{}.{}'.format(table, field)
+            path = f'{table}.{field}'
             bind_name = path.replace('.', '_')
             where_clause, bind_value = add_filter(path, bind_name, criteria)
             where.append(where_clause)
             args[bind_name] = bind_value
 
-    query = 'from matches {} {}'.format('join' if join else '', ' join '.join(join)) + ' {playback}'
+    query = f"from matches {'join' if join else ''} {' join '.join(join)} {{playback}}"
     if where:
-        query += ' where {}'.format(' and '.join(where))
+        query += f" where {' and '.join(where)}"
 
     query = append_flags(query, params, args)
 
@@ -120,10 +120,10 @@ def build_query(params, order, offset, limit):
         selected.append('matches.played')
     else:
         for field in order:
-            order_by.append('{} desc'.format(field))
+            order_by.append(f'{field} desc')
             selected.append(field)
     query_template = "select distinct {} {} order by {} nulls last limit {} offset {}"
-    return query_template.format(', '.join(selected), query, ', '.join(order_by), limit, offset), 'select count(distinct matches.id) {}'.format(query), args
+    return query_template.format(', '.join(selected), query, ', '.join(order_by), limit, offset), f'select count(distinct matches.id) {query}', args
 
 
 def append_flags(query, params, args):
@@ -134,16 +134,16 @@ def append_flags(query, params, args):
             continue
 
         if '{sq}' in subquery:
-            subquery = subquery.format(sq='select distinct matches.id {}'.format(query.format(playback='')))
+            subquery = subquery.format(sq=f"select distinct matches.id {query.format(playback='')}")
 
         new_args = {}
         for key, value in values.items():
-            subquery = subquery.replace(':{}'.format(key), ':{}_{}'.format(alias, key))
-            new_args['{}_{}'.format(alias, key)] = value
+            subquery = subquery.replace(f':{key}', f':{alias}_{key}')
+            new_args[f'{alias}_{key}'] = value
 
         args.update(new_args)
         joins.append('({subquery}) as {alias} on {alias}.match_id = matches.id'.format(subquery=subquery, alias=alias))
 
     if joins:
-        return query.format(playback='join ' + ' join '.join(joins))
+        return query.format(playback=f"join {' join '.join(joins)}")
     return query.format(playback='')

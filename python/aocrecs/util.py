@@ -27,8 +27,8 @@ def compound_where(keys, fields):
     for i, key in enumerate(keys):
         ands = []
         for field, value in zip(fields, key):
-            bind_name = '{}_{}'.format(field.replace('.', '_'), i)
-            ands.append('{} = :{}'.format(field, bind_name))
+            bind_name = f"{field.replace('.', '_')}_{i}"
+            ands.append(f'{field} = :{bind_name}')
             args[bind_name] = value
         ors.append(ands)
     return ' or '.join([' and '.join(a) for a in ors]), args

@@ -15,7 +15,7 @@ def get_rec(file_hash, file_name, version):
     """Download route."""
     s3_client = boto3.client('s3')
     input_file = io.BytesIO()
-    parts = path_components(file_hash) + [file_hash + '.mgc']
+    parts = path_components(file_hash) + [f"{file_hash}.mgc"]
     s3_client.download_fileobj(S3_BUCKET, os.path.join(*parts), input_file)
     input_file.seek(0)
     mgz_bytes = decompress(input_file, version=version)

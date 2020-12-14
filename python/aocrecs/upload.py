@@ -29,7 +29,7 @@ def add_rec(filename, contents, database_url, voobly_username, voobly_password):
                     s3_client.upload_fileobj(rec, S3_BUCKET_ERRORS, filename)
                 return dict(success=False, message=payload)
             if file_hash is not None:
-                object_path = os.path.join(*path_components(file_hash) + [file_hash + '.mgc'])
+                object_path = os.path.join(*path_components(file_hash) + [f"{file_hash}.mgc"])
                 with open(os.path.join(store_path, object_path), 'rb') as data:
                     s3_client.upload_fileobj(data, S3_BUCKET, object_path)
             return dict(success=True, match_id=payload)

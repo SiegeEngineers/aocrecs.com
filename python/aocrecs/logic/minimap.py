@@ -27,7 +27,7 @@ NAMESPACE = 'http://www.w3.org/2000/svg'
 
 def make_pbm(data, dimension, multiplier):
     """Produce PBM file contents."""
-    pbm = 'P1\n{} {}\n'.format(dimension * multiplier, dimension * multiplier)
+    pbm = f'P1\n{dimension * multiplier} {dimension * multiplier}\n'
     for row in data:
         for _ in range(0, multiplier):
             for col in row:
@@ -70,10 +70,10 @@ def trace(layers, dimension, corners, squareness, scale):
     translate = math.sqrt(((dimension * squareness * scale)**2) * 2)/2.0
     ET.register_namespace('', NAMESPACE)
     svg = ET.Element('svg', attrib={
-        'viewBox': '0 0 {} {}'.format(translate * 2, translate),
+        'viewBox': f'0 0 {translate * 2} {translate}',
     })
     transform = ET.SubElement(svg, 'g', attrib={
-        'transform': 'translate({}, {}) scale({}, {}) rotate(-45)'.format(0, translate/2, scale, scale/2)
+        'transform': f'translate({0}, {translate / 2}) scale({scale}, {scale / 2}) rotate(-45)'
     })
 
     for color, canvas in layers.items():
@@ -82,9 +82,9 @@ def trace(layers, dimension, corners, squareness, scale):
         xml = ET.fromstring(Popen(
             args, stdout=PIPE, stdin=PIPE, stderr=PIPE
         ).communicate(input=make_pbm(canvas, dimension, squareness))[0].decode('ascii'))
-        layer = xml.find('{' + NAMESPACE + '}g')
+        layer = xml.find(f"{{{NAMESPACE}}}g")
         layer.set('fill', color)
-        for path in layer.findall('{' + NAMESPACE + '}path'):
+        for path in layer.findall(f"{{{NAMESPACE}}}path"):
             path.set('stroke', color)
             path.set('stroke-width', str(10))
         transform.append(layer)

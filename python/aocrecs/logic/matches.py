@@ -82,7 +82,7 @@ def make_files(player_data, file_data, match_id):
     return [
         dict(
             file_,
-            download_link='/api/download/{}'.format(file_['id']),
+            download_link=f"/api/download/{file_['id']}",
             owner=by_number[file_['owner_number']][0]
         ) for file_ in file_data[match_id]
     ]
@@ -200,7 +200,7 @@ async def get_match(keys, context):
             players=player_data,
             teams=team_data,
             winning_team=winning_team,
-            minimap_link='/api/map/{}'.format(match_id),
+            minimap_link=f'/api/map/{match_id}',
             event=dict(
                 id=match['event_id'],
                 name=match['event_name']
