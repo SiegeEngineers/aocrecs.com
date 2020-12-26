@@ -73,7 +73,7 @@ const RankTable = ({platform_id, ladder_id, ranks, selected}) => {
 
 const LaddersView = ({match, history}) => {
   const ladder_id = parseInt(match.params.id)
-  const [platform_id, setPlatform] = useState(match.params.pid ? match.params.pid : 'voobly')
+  const [platform_id, setPlatform] = useState(match.params.pid ? match.params.pid : 'de')
   return (
     <div>
         <FormControl>
@@ -81,7 +81,7 @@ const LaddersView = ({match, history}) => {
           <DataQuery query={GetPlatforms}>
             {(data) => (
               <Select value={platform_id} onChange={(e, v) => setPlatform(e.target.value)}>
-                {data.search_options.general.platforms.map((platform) =>
+                {data.search_options.general.platforms.filter((platform) => platform.value === 'de').map((platform) =>
                   <MenuItem key={platform.value} value={platform.value}>{platform.label}</MenuItem>
                 )}
               </Select>
@@ -91,7 +91,7 @@ const LaddersView = ({match, history}) => {
         <br />
         <br />
 
-    <DataQuery query={GetLadders} variables={{platform_id}}>
+    <DataQuery query={GetLadders} variables={{platform_id, ladder_ids: [3, 4]}}>
       {(data) => (
           <Grid container spacing={24}>
             <Grid item xs={6}>

@@ -4,25 +4,25 @@ from aocrecs.consts import COLLECTION_STARTED
 from aocrecs.cache import cached
 
 
-@cached(warm=[[None, 'voobly', 131], [None, 'voobly', 132], [None, 'voobly', 163]], ttl=86400)
+@cached(warm=[[None, 'voobly', 131], [None, 'voobly', 132], [None, 'voobly', 163], [None, 'de', 3], [None, 'de', 4]], ttl=86400)
 async def compute_ranks(database, filters, platform_id, ladder_id):
     """Compute ranks of all ladder participants."""
     part_1 = """
-        select players.user_id, players.name, players.user_name, players.rate_after as rating,
+        select players.user_id, players.name, players.user_name, players.rate_snapshot as rating,
         people.name as person_name, people.country, people.id as person_id
         from players join matches on players.match_id=matches.id
             join (
                 select user_id, max(played) as maxdate
                 from players join matches on players.match_id=matches.id
-                where players.platform_id=:platform_id and players.rate_after > 0 and matches.ladder_id=:ladder_id
+                where players.platform_id=:platform_id and players.rate_snapshot > 0 and matches.ladder_id=:ladder_id
     """
     part_2 = """
                 group by user_id
             ) as s on players.user_id=s.user_id and matches.played=s.maxdate
         join users on s.user_id=users.id and users.platform_id=:platform_id
         left join people on users.person_id=people.id
-        where matches.platform_id=:platform_id and matches.ladder_id=:ladder_id and players.rate_after > 0
-        order by players.rate_after desc
+        where matches.platform_id=:platform_id and matches.ladder_id=:ladder_id and players.rate_snapshot > 0
+        order by players.rate_snapshot desc
     """
     values = {'platform_id': platform_id, 'ladder_id': ladder_id}
     if filters:
@@ -91,7 +91,7 @@ async def get_streak(database, user_id, platform_id, ladder_id):
 async def get_rate_by_day(database, user_id, platform_id, ladder_id):
     """Compute max rate reached per day for a player."""
     query = """
-        select matches.played::date as date, max(players.rate_after) as count
+        select matches.played::date as date, max(players.rate_snapshot) as count
         from matches join players on matches.id=players.match_id
         where players.user_id=:id and matches.platform_id=:platform_id and matches.ladder_id=:ladder_id
             and matches.played is not null and matches.played > :after and matches.played < :before

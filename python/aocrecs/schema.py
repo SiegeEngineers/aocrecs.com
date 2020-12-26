@@ -333,6 +333,7 @@ type Platform {
     name: String!
     url: String
     match_url: String
+    ladders: [Ladder]
 }
 
 type Player {

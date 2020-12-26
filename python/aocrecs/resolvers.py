@@ -51,6 +51,7 @@ graph = ObjectType('Graph')
 person = ObjectType('Person')
 tribute = ObjectType('Tribute')
 latest = ObjectType('Latest')
+platform = ObjectType('Platform')
 subscription = SubscriptionType()
 
 
@@ -139,6 +140,15 @@ async def resolve_search_options_ladders(obj, info, platform_id):
 @search_options_.field('general')
 async def resolve_search_options_general(obj, info):
     return await search_options.general(info.context.database)
+
+
+@platform.field('ladders')
+async def resolve_ladders(obj, info):
+    data = await search_options.ladders(info.context.database, obj['id'])
+    return dict(
+        id=data['value'],
+        name=data['label']
+    )
 
 
 @query.field('user')
@@ -446,5 +456,6 @@ SCHEMA = make_executable_schema(TYPE_DEFS, [
     query, map_, stats, datetime_, research, player, chat, match,
     team, file_, hits, side, series, civilization, event, meta_ladder,
     user, rank, search_options_, stat_user, report_, search_result,
-    graph, person, tribute, upload_scalar, mutation, latest, subscription
+    graph, person, tribute, upload_scalar, mutation, latest, subscription,
+    platform
 ])

@@ -26,7 +26,7 @@ query Report($year: Int!, $month: Int!) {
       count
       percent
     }
-    rankings_1v1: rankings(platform_id: "voobly", ladder_id: 131) {
+    rankings_1v1: rankings(platform_id: "de", ladder_id: 3) {
       rank
       user {
         id
@@ -41,7 +41,7 @@ query Report($year: Int!, $month: Int!) {
       rating
       change
     }
-    rankings_tg: rankings(platform_id: "voobly", ladder_id: 132) {
+    rankings_tg: rankings(platform_id: "de", ladder_id: 4) {
       rank
       user {
         id

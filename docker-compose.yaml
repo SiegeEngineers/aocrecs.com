@@ -29,5 +29,5 @@ services:
       args:
         GTM: ${MGZ_GTM}
     ports:
-      - 80:80
-      - 443:443
+      - 1180:80
+      - 11443:443

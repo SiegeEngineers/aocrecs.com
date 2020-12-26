@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 export default gql`
-query Ladders($platform_id: String!) {
-  meta_ladders(platform_id: $platform_id, ladder_ids: [131, 132]) {
+query Ladders($platform_id: String!, $ladder_ids: [Int]) {
+  meta_ladders(platform_id: $platform_id, ladder_ids: $ladder_ids) {
     id
     platform_id
     name
