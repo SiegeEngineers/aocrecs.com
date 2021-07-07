@@ -247,7 +247,7 @@ def market_usage():
         select
             players.match_id, timestamp::interval(0),
             player_number as number,
-            case when action_id=123 then 'Gold' else resources.name end as sold_resource,
+            case when action_id=122 then 'Gold' else resources.name end as sold_resource,
             (amount * 100) as sold_amount,
             case when action_id=123 then resources.name else 'Gold' end as bought_resource
         from players left join transactions on transactions.match_id=players.match_id and transactions.player_number = players.number

@@ -19,7 +19,7 @@ setup(
         'boto3==1.10.46',
         'coloredlogs==10.0',
         'databases==0.3.2',
-        'mgzdb>=1.4.0',
+        'mgzdb>=1.4.2',
         'networkx==2.4',
         'python-dateutil==2.8.1',
         'python-multipart==0.0.5',
