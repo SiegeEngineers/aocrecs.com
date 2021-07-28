@@ -66,6 +66,6 @@ async def by_day(database):
         order by played::date
     """
     return [dict(r) for r in await database.fetch_all(query, values={
-        'start': COLLECTION_STARTED,
+        'start': datetime.date(2021, 5, 1),
         'end': datetime.datetime.now().date()
     })]
