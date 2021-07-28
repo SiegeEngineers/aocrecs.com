@@ -40,6 +40,8 @@ import Latest from './Latest'
 import Watching from './Watching'
 import About from './About'
 
+import logo from './assets/logo/SiegeEngineers_40x40.png';
+
 const drawerWidth = 180
 
 const useStyles = makeStyles(theme => ({
@@ -75,7 +77,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const TITLE = 'Siege Engineers Recorded Game Database'
-const LOGO = 'https://github.com/SiegeEngineers/SiegeEngineers-CD/raw/master/SiegeEngineers.png'
+const LOGO = logo
 const LOGO_ALT = 'SE'
 const MENU = [
   {
